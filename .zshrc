@@ -370,7 +370,7 @@ function .dotsync() {
         return 0
     fi
     yadm add -u
-    yadm commit -m "Update dotfiles"
+    yadm commit
     yadm push
 }
 
@@ -383,7 +383,7 @@ function .dotsync-sys() {
         return 0
     fi
     sysyadm add -u
-    sysyadm commit -m "Update dotfiles (sys)"
+    sysyadm commit
     sysyadm push
 }
 

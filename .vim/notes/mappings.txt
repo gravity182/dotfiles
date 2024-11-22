@@ -1,0 +1,1341 @@
+/* disable linebreak */
+/* vim: set formatoptions-=tc: */
+
+======================================
+Notes on the VIM workflow and mappings
+======================================
+
+Introduction
+============
+
+This document aims to provide an overview of how VIM works and help to memorize its mappings.
+
+Vim is powerful, no doubt, but maybe a bit too powerful? I strongly believe you don't need all of its features and mappings for casual configs editing and writing. Therefore, this document only concentrates on the essentials.
+Note that this document also contains my custom mappings, and some of them may replace standard ones. However, I created these mappings with VIM's ideology in mind so they should feel natural and complementary.
+
+This document uses VIM's very own help notation (see _:h notation_) so that everything's written here should be easy to understand.
+This document is written in the _junegunn/vim-journal_ format.
+
+
+******************************************************************************
+
+Modes
+  *:h vim-modes*
+  *:h mode-switching*
+=====================
+
+Vim has seven BASIC modes:
+- `Normal mode`                                     ==>  in Normal mode you can enter all the normal editor commands. If you start the editor you are in this mode (unless you have set the 'insertmode' option). This is also known as command mode
+- `Visual mode`                                     ==>  this is like Normal mode, but the movement commands extend a highlighted area. When a non-movement command is used, it is executed for the highlighted area
+- `Select mode`                                     ==>  this looks most like the MS-Windows selection mode. Typing a printable character deletes the selection and starts Insert mode
+- `Insert mode`                                     ==>  in Insert mode the text you type is inserted into the buffer
+- `Command-line mode`                               ==>  in Command-line mode (also called Cmdline mode) you can enter one line of text at the bottom of the window. This is for the Ex commands, ":", the pattern search commands, "?" and "/", and the filter command, "!"
+- `Ex mode`                                         ==>  like Command-line mode, but after entering a command you remain in Ex mode. Very limited editing of the command line
+- `Terminal-Job mode`                               ==>  interacting with a job in a terminal window. Typed keys go to the job and the job output is displayed in the terminal window. See terminal about how to switch to other modes
+
+There are seven ADDITIONAL modes. These are variants of the BASIC modes:
+- `Operator-pending mode`                           ==>  this is like Normal mode, but after an operator command has started, and Vim is waiting for a {motion} to specify the text that the operator will work on
+- `Replace mode`                                    ==>  replace mode is a special case of Insert mode. You can do the same things as in Insert mode, but for each character you enter, one character of the existing text is deleted
+- `Virtual Replace mode`                            ==>  virtual Replace mode is similar to Replace mode, but instead of file characters you are replacing screen real estate
+- `Insert Normal mode`                              ==>  entered when CTRL-O is typed in Insert mode (see i_CTRL-O). This is like Normal mode, but after executing one command Vim returns to Insert mode
+- `Terminal-Normal mode`                            ==>  using Normal mode in a terminal window. Making changes is impossible. Use an insert command, such as "a" or "i", to return to Terminal-Job mode
+- `Insert Visual mode`                              ==>  entered when starting a Visual selection from Insert mode, e.g., by using CTRL-O and then "v", "V" or CTRL-V. When the Visual selection ends, Vim returns to Insert mode
+- `Insert Select mode`                              ==>  entered when starting Select mode from Insert mode. E.g., by dragging the mouse or <S-Right>. When the Select mode ends, Vim returns to Insert mode
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Normal mode
+-----------
+
+- `.`                                               ==>  repeat the last action
+- ==
+- `r`                                               ==>  redo
+- `u`                                               ==>  undo
+- ==
+- `b`                                               ==>  skip back one word (jumps to the beginning of the word)
+- `w`                                               ==>  skip ahead one word (jumps to the beginning of the word)
+- `0`                                               ==>  move to beginning of line
+- `$`                                               ==>  move to end of line
+- `(`                                               ==>  move backward one sentence
+- `)`                                               ==>  move forward one sentence
+- `gg`                                              ==>  move to top of document
+- `G`                                               ==>  move to bottom of document
+- `D-[jk]`                                          ==>  move a line of text
+- ==
+- `CTRL-f`/`/`                                      ==>  forward search
+- `?`                                               ==>  backward search
+- `CTRL-r`                                          ==>  substitute
+- `n/N`                                             ==>  move forward/backward while searching
+- ==
+- `zz`                                              ==>  redraw screen, line [count] at center of window (default cursor line)
+- `zt`                                              ==>  redraw screen, line [count] at top of window (default cursor line)
+- `zb`                                              ==>  redraw screen, line [count] at bottom of window (default cursor line)
+- ==
+- `Ctrl-[e/d/f]`                                    ==>  scroll down a line / half screen / whole screen. Note that I mapped Ctrl-f to search. Use Ctrl-d (down) instead. It's easier to remember
+- `Ctrl-[y/u/b]`                                    ==>  scroll up a line / half screen / whole screen
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Insert mode
+  *:h insert.txt*
+-----------------
+
+These commands are used to start inserting text:
+- `i`                                               ==>  insert text before the cursor
+- `I`                                               ==>  insert text before the first non-blank character in the line
+- `a`                                               ==>  append text after the cursor
+- `A`                                               ==>  append text at the end of the line
+- `o`                                               ==>  begin a new line below the cursor and insert text
+- `O`                                               ==>  begin a new line above the cursor and insert text
+
+Also a *c* operator can be used to enter Insert mode. For example, *cw* will change the following word, starting from the cursor. Also there's a *s* operator, which replaces a char at the cursor.
+See more on delete and insert operators in the separate section.
+
+Special keys
+---
+In Insert and Replace mode, the following characters have a special meaning; other characters are inserted directly. To insert one of these special characters into the buffer, precede it with CTRL-V:
+- `CTRL-r` {register}                               ==>  insert the contents of a register. You'll usually want the `"` register, which contains the text of the last delete or yank. There are also clipboard registers `*` and `+`, which contain the text copied in the OS
+- `CTRL-k` {char1} [char2]                          ==>  enter digraph (see digraphs). When {char1} is a special key, the code for that key is inserted in <> form. For example, the string "<S-Space>" can be entered by typing <CTRL-K><S-Space> (two keys)
+- `CTRL-x`                                          ==>  enter CTRL-X mode. This is a sub-mode where commands can be given to complete words or scroll the window. See i_CTRL-X and ins-completion
+- `CTRL-w`                                          ==>  delete the word before the cursor
+- `CTRL-T`                                          ==>  insert one shiftwidth of indent at the start of the current line. The indent is always rounded to a 'shiftwidth'.
+- `CTRL-D`                                          ==>  delete one shiftwidth of indent at the start of the current line. The indent is always rounded to a 'shiftwidth'.
+- `<Tab>`                                           ==>  insert a tab
+- `<CR>`                                            ==>  begin new line
+
+Special special keys:
+- `CTRL-o`                                          ==>  execute a command and return to Insert mode
+
+Abbreviations:
+- `'xdate'`                                         ==>  insert a timestamp
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Visual mode
+  *:h visual.txt*
+-----------------
+
+- `v`                                               ==>  enter visual mode
+- `V`                                               ==>  enter visual line mode
+- `<CTRL-v>`                                        ==>  enter visual block mode. On Windows, where Ctrl-V is used to paste text, use another mapping - `<CTRL-q>`. There are blockwise-only operators (see *:h blockwise-operators*):
+  You can prepend and append characters blockwise on each selected line. Press `I`/`A` to do a blockwise Insert/Append respectively (see *:h v_b_I* or *:h v_b_A*). For example, it can be used to uncomment/comment out lines.
+  Also you can change characters on each line in the selected text block. To do a blockwise change (*:h v_b_c*) press `c`
+  Lastly, you can shift the selected block. To do a blockwise Shift press `<` or `>` (see *:h v_b_<* or *:h v_b_>)*
+- `<CTRL-g>`                                        ==>  enter Select mode (from the Visual mode)
+- `gw`                                              ==>  select a whole word under the cursor
+- `gv`                                              ==>  start visual mode with the same area as the previous selection and the same mode
+- `o`                                               ==>  jump to the either corner of the selected area
+- `gn`                                              ==>  search forward for the last used search pattern, like with `n`, and start Visual mode to select the match. If the cursor is on the match, visually selects it. Can be perfectly combined with an operator. If an operator is pending, operates on the match. For example, `dgn` deletes the text of the next match, while `cgn` replaces the text of the next match. This is a totally idiomatic way of doing replace operation in VIM
+- `gN`                                              ==>  like `gn` but searches backward, like with `N`
+- `y`                                               ==>  yank selection
+- `d`                                               ==>  cut selection
+- `p`                                               ==>  paste a register content in place of the selection. See _:h put-Visual-mode_
+- ==
+- `D-[jk]`                                          ==>  move selected line(s) of text
+- ==
+- `CTRL-f`                                          ==>  search for a selection
+- `CTRL-r`                                          ==>  substitute a selection in the whole file
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Command line/Cmdline mode
+  *:h cmdline.txt*
+-------------------------
+
+Command line editing
+---
+- `<Left>`                                          ==>  cursor left
+- `<Right>`                                         ==>  cursor right
+- `<S-Left>`/`<CTRL-Left>`                          ==>  cursor one WORD left
+- `<S-Right>`/`CTRL-Right>`                         ==>  cursor one WORD right
+- `<CTRL-b`/`<Home>`                                ==>  cursor to [b]eginning of command-line
+- `<CTRL-e>`/`<End>`                                ==>  cursor to [e]nd of command-line
+- `<CTRL-w>`                                        ==>  delete the [w]ord before the cursor
+- `<CTRL-r> {register}`                             ==>  insert the content of the {[r]egister}
+- `<CTRL-c>`                                        ==>  quit command-line without executing
+
+Command line completion
+---
+When editing the command-line, a few commands can be used to complete the word before the cursor. This is available for:
+- Command names: At the start of the command-line.
+- Tags: Only after the ":tag" command.
+- File names: Only after a command that accepts a file name or a setting for an option that can be set to a file name. This is called file name completion.
+- Shell command names: After ":!cmd", ":r !cmd" and ":w !cmd". $PATH is used.
+- Options: Only after the ":set" command.
+- Mappings: Only after a ":map" or similar command.
+- Variable and function names: Only after a ":if", ":call" or similar command.
+
+*These are the commands that can be used to invoke completion:*
+- `<CTRL-d`                                         ==>  list names that match the pattern in front of the cursor. When showing file names, directories are highlighted
+- `<Tab>`                                           ==>  a match is done on the pattern in front of the cursor. The match (if there are several, the first match) is inserted in place of the pattern. When pressed again and there were multiple matches, the next match is inserted. After the last match, the first is used again (wrap around)
+- `<S-Tab>`                                         ==>  like <Tab>, but begin with the last match and then go to the previous match. When pressed again and there were multiple matches, the previous match in inserted
+
+Some useful cmdline commands
+---
+- `:line`                                           ==>  jump to the line
+- `:[n,v,i]map`                                     ==>  see all mappings
+- `:h[elp] {subject}`                               ==>  see help for the {subject}
+- `:cd [dir]`                                       ==>  change CWD - applies to all windows; leave argument empty if you want to cd to $HOME
+- `:lcd [dir]`                                      ==>  change CWD - window-local; leave argument empty if you want to cd to $HOME
+- `:pw[d]`                                          ==>  print the current CWD
+- `:Helptags`                                       ==>  see all the help tags available (powered by fzf.vim)
+- `:! {command}`                                    ==>  execute the shell {command}
+- `:!!`                                             ==>  repeat the last executed shell command
+
+Special characters
+---
+- `%`/`#`                                           ==>  current and alternate file name respectively, relative to CWD (current working directory); see *:h :_%*
+
+There are different ways to insert special characters:
+1. While typing you can use the CTRL-R command. For example, `CTRL-R %` inserts the current file name.
+2. In some commands you can also expand special characters via <Tab>. For example, `:e %<Tab>` will expand the current file name.
+3. Also, a more advanced way, which works the best in commands/scripts: call `expand({string})` function like this: `<CTRL-r>=expand('%:p:h')`. When {string} starts with '%', '#' or '<', the expansion is done like for the |cmdline-special| variables with their associated modifiers. See *:h expand()*.
+
+See *:h cmdline-special*.
+
+There are also file name modifiers that can be used after "%" and "#" (and other special chars, see help):
+- `:p`                                              ==>  make file name a full path. Must be the first modifier. Also changes "~/" (and "~user/" for Unix and VMS) to the path for the home directory. If the name is a directory a path separator is added at the end
+- `:~`                                              ==>  reduce file name to be relative to the home directory, if possible. File name is unmodified if it is not below the home directory.
+- `:.`                                              ==>  reduce file name to be relative to current directory, if possible. File name is unmodified if it is not below the current directory. For maximum shortness, use ":~:.".
+- `:h`                                              ==>  head of the file name (the last component and any separators removed). Cannot be used with :e, :r or :t. Can be repeated to remove several components at the end. When the file name ends in a path separator, only the path separator is removed. Thus ":p:h" on a directory name results on the directory name itself (without trailing slash). When the file name is an absolute path (starts with "/" for Unix; "x:\" for Win32; "drive:" for Amiga), that part is not removed. When there is no head (path is relative to current directory) the result is empty.
+- `:t`                                              ==>  tail of the file name (last component of the name). Must precede any :r or :e.
+- `:r`                                              ==>  root of the file name (the last extension removed). When there is only an extension (file name that starts with '.', e.g., ".vimrc"), it is not removed. Can be repeated to remove several extensions (last one first).
+- `:e`                                              ==>  extension of the file name. Only makes sense when used alone. When there is no extension the result is empty. When there is only an extension (file name that starts with '.'), the result is empty. Can be repeated to include more extensions. If there are not enough extensions (but at least one) as much as possible are included.
+
+See *:h filename-modifiers*.
+
+Examples. File is "home/blinky/.vim/notes/mappings.txt", CWD is "home/blinky/.vim/notes":
+- `%`                                               ==>  "mappings.txt"
+- `%:h`                                             ==>  "./"
+- `%:p`                                             ==>  "/home/blinky/.vim/notes/mappings.txt"
+- `%:p:h`                                           ==>  "/home/blinky/.vim/notes/"
+- `%:p:h:h`                                         ==>  "/home/blinky/.vim/"
+
+Abbreviations:
+---
+- `$h`                                              ==>  edit in $HOME path
+- `$j`                                              ==>  edit in CWD path
+- `$c`                                              ==>  edit in current buffer's path
+
+Command line window
+---
+In the command line window you can select and execute the older commands and even edit them just like editing text in any window. It is a special kind of window, because you cannot leave it in a normal way.
+
+When the window opens it is filled with the command-line history. The last line contains the command as typed so far. The left column will show a character that indicates the type of command-line being edited.
+
+The command-line window is not a normal window: it is not possible to move to another window or edit another buffer.
+
+*Accessing and closing the command line window:*
+- `q:`                                              ==>  open the command line window; see _:h q:_
+- `{CMD-line}<Ctrl-f>`                              ==>  open the command line window; see _:h c_CTRL-F_
+- `<CR>`                                            ==>  execute the command-line under the cursor
+- `<CTRL-c`                                         ==>  continue in Command-line mode. The command-line under the cursor is used as the command-line
+- `:quit`/`<CTRL-w>q`/`<CTRL-w>c`                   ==>  discard the command line and go back to Normal mode
+
+Command line history
+---
+The command-lines that you enter are remembered in a history table. You can recall them with the up and down cursor keys. There are actually different history tables:
+- one for ':' commands
+- one for search strings
+- one for expressions
+
+These are completely separate. Each history can only be accessed when entering the same type of line.
+
+*These are the commands that can be used to access history:*
+- `<Up>`                                            ==>  recall older command-line from history, whose beginning matches the current command-line
+- `<Down>`                                          ==>  recall more recent command-line from history, whose beginning matches the current command-line
+- `<S-Up>`                                          ==>  recall older command-line from history
+- `<S-Down>`                                        ==>  recall more recent command-line from history
+- `<leader>fch`                                     ==>  open a command-line history powered by fzf.vim. Lists only command-lines (:his cmd)
+- `:his[tory]`                                      ==>  print the history of last entered commands (the same as ":his cmd")
+- `:his[tory] {name}`                               ==>  list the contents of history {name} which can be:
+  c[md] or :          command-line history
+  s[earch] or / or ?  search string history
+  a[ll]               all of the above
+
+*Notes:*
+- When you enter a command-line that is exactly the same as an older one, the old one is removed (to avoid repeated commands moving older commands out of the history).
+- Only commands that are typed are remembered. Ones that completely come from mappings are not put in the history.
+- All searches are put in the search history, including the ones that come from commands like "*" and "#".
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Paste mode
+  *:h 'paste'*
+--------------
+
+- `<leader>pp`                                      ==>  toggle paste mode on and off
+
+
+******************************************************************************
+
+Buffers, windows, and tabs
+  *:h buffers*
+  *:h windows*
+  *:h tabpage*
+==========================
+
+Summary:
+* A buffer is the in-memory text of a file.
+* A window is a viewport on a buffer.
+* A tab page is a collection of windows.
+
+A window is a viewport onto a buffer. You can use multiple windows on one buffer, or several windows on different buffers.
+
+A buffer is a file loaded into memory for editing. The original file remains unchanged until you write the buffer to the file.
+
+When you close a window containing a buffer, this buffer won't be closed but will be *hidden*, that is still loaded.
+
+A buffer can be in one of three states:
+- `active`                                          ==>  the buffer is displayed in a window. If there is a file for this buffer, it has been read into the buffer. The buffer may have been modified since then and thus be different from the file.
+- `hidden`                                          ==>  the buffer is not displayed. If there is a file for this buffer, it has been read into the buffer. Otherwise it's the same as an active buffer, you just can't see it.
+- `inactive`                                        ==>  the buffer is not displayed and does not contain anything. Options for the buffer are remembered if the file was once loaded. It can contain marks from the |viminfo| file. But the buffer doesn't contain text.
+
+Each buffer has a unique number and the number will not change within a Vim session.
+
+
+Buffers
+-------
+
+- `;`                                               ==>  open the buffer list search powered by fzf.vim. This is the only command you'll ever need to work with buffers
+- `<CTRL-g>`/`:f[ile]`                              ==>  prints the current file name (as typed, unless ":cd" was used), the cursor position (unless the 'ruler' option is set), and the file status (readonly, modified, read errors, new file)
+- {Cmdline}`%`/{Cmdline}`#`                         ==>  variables that hold current and alternate file name respectively
+
+But in order not to get lost when fzf.vim is not available, these are the standard commands:
+- `:buffers`                                        ==>  see all the open buffers (buffer list)
+- `:b[uffer] [N]`                                   ==>  go to buffer [N] from the buffer list. If [N] is not given, the current buffer remains being edited
+- `:bn[ext] [N]`                                    ==>  go to [N]th next buffer in buffer list. [N] defaults to one. Wraps around the end of the buffer list
+- `:bp[revious] [N]`                                ==>  to to [N]th previous buffer in buffer list. [N] defaults to one. Wraps around the start of the buffer list
+- `:bd[elete][!]`/`<leader>bd`                      ==>  unload buffer [N] (default: current buffer) and delete it from the buffer list. If the buffer was changed, this fails, unless when [!] is specified, in which case changes are lost. The file remains unaffected. Any windows for this buffer are closed. If buffer [N] is the current buffer, another buffer will be displayed instead
+- `<CTRL-^`                                         ==>  switch to the alternate buffer (#)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tabs
+----
+
+Opening a new tab page:
+- `<leader>tn`/`:tabnew`/`:tabe[dit]`               ==>  open a new tab page with an empty window, after the current tab page
+- `:tabnew {file}`/`:tabe[dit] {file}`              ==>  the same as above, but will open the {file} in this new tab
+
+Closing a tab page:
+- `<leader>tc`/`:tabc[lose]`                        ==>  close current tab page. This command fails when there is only one tab page on the screen. When a tab is closed the next tab page will become the current one
+- `<leader>to`/`:tabo[nly]`                         ==>  close all other tab pages
+
+Closing the last window of a tab page closes the tab page too, unless there is only one tab page.
+
+Switching to another tab page:
+- `<D-S-Left>`/`gt`/`<CTRL-w>gt`/`:tabn[ext]`       ==>  go to the next tab page. Wraps around from the last to the first one
+- `<D-S-Right>`/`gT`/`<CTRL-w>gT`/`:tabp[revious]`  ==>  go to the previous tab page. Wraps around from the first one to the last one
+- `<leader>{1-9}`/`{count}gt`                       ==>  select tab {count}
+- `<leader>0`/`:tabl[ast]`                          ==>  go to the last tab
+- `<leader>tl`/`g<Tab>`                             ==>  go to the last accessed tab
+
+Reordering tab pages:
+- `<leader>tm [N]`/`:tabm[ove] [N]`                 ==>  move the current tab page to after tab page N. Use zero to make the current tab page the first one. Without N the tab page is made the last one.
+- `:tabm[ove] +[N]`/`:tabm[ove] -[N]`               ==>  move the current tab page N places to the right (with +) or to the left (with -). N defaults to one
+
+You can also list the tab pages and the windows they contain via the `:tabs` command.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Windows
+-------
+
+Moving cursor to other windows:
+- `<CTRL-w>h`/`<CTRL-w><Left>`                      ==>  left window
+- `<CTRL-w>j`/`<CTRL-w><Down>`                      ==>  bottom window
+- `<CTRL-w>k`/`<CTRL-w><Up>`                        ==>  top window
+- `<CTRL-w>l`/`<CTRL-w><Right>`                     ==>  right window
+- `<CTRL-w>p`                                       ==>  go to previous (last accessed) window
+
+Closing a window:
+- `<CTRL-w>q`/`:q[uit]`                             ==>  quit current window
+- `<CTRL-w>o`                                       ==>  make the current window the only one on the screen. All other windows are closed
+- `q`                                               ==>  close the window, only works for some plugins
+
+Moving windows around:
+- `<CTRL-w>T`                                       ==>  move current window to a new tab page
+
+
+******************************************************************************
+
+Editing
+  *:h editing.txt*
+==================
+
+Editing a file with Vim means:
+
+1. Reading the file into a buffer
+2. Changing the buffer with editor commands
+3. Writing the buffer into a file
+
+Current/alternate file name:
+- As long as you don't write the buffer, the original file remains unchanged. If you start editing a file (read a file into the buffer), the file name is remembered as the "current file name". This is also known as the name of the current buffer. It can be used with "%" on the command line |:_%|
+- If there already was a current file name, then that one becomes the alternate file name. It can be used with "#" on the command line |:_#| and you can use the |CTRL-^| command to toggle between the current and the alternate file
+
+That is, you can think of an alternate file name as a last accessed buffer and of current file name as a current active buffer, in a current window.
+
+You can switch between current and alternate file name via `<Ctrl-^>`.
+
+All file names are remembered in the buffer list. When you enter a file name, for editing (e.g., with ":e filename") or writing (e.g., with ":w filename", but only for new empty buffers), the file name is added to the list. You can use the buffer list to remember which files you edited and to quickly switch from one file to another.
+
+
+Writing:
+- `:w[rite]`/`<leader>w`                            ==>  write the buffer to the current file. This is the normal way to save changes to a file
+- `:w[rite]!`/`<leader>ww`                          ==>  like ":write", but forcefully write when 'readonly' is set. Note: This may change the permission and ownership of the file and break (symbolic) links
+- `:w[rite] {file}`                                 ==>  write the bufffer to {file}, unless it already exists and the 'writeany' option is off
+- `:w[rite]! {file}`                                ==>  write the buffer to {file}. Overwrite an existing file
+- `:sav[eas][!] {file}`                             ==>  save the current buffer under the name {file} and set the filename of the current buffer to {file}. The previous name is used for the alternate file name. The [!] is needed to overwrite an existing file. When 'filetype' is empty filetype detection is done with the new name, before the file is written. When the write was successful 'readonly' is reset
+- `:W/<leader>W`                                    ==>  write a file as sudo (custom). Can be useful to write to a system file. More specifically, writes even if doesn't have user/group permissions to do so
+
+Let's clear up the difference between `:w {file}` and `:sav {file}`:
+* Assumed that *hello.txt* is being edited:
+  * `:w world.txt` will write hello.txt's content to the file world.txt while keeping hello.txt as the opened buffer in vim. It won't save changes for hello.txt. It won't open the buffer for world.txt
+  * `:sav world.txt` will first write hello.txt's content to the file world.txt, then hide buffer hello.txt, finally open world.txt as the current buffer. It'll also assign 'hello.txt' as an alternate file name
+* Assumed that I've opened a new empty buffer:
+  * `:w world.txt` will write the buffer to the file world.txt and assign this file name to the buffer. Successive writes will go to the world.txt
+  * `:sav world.txt` will write the buffer to the file world.txt and assign this file name to the buffer. Successive writes will go to the world.txt. However, it'll also assign the empty buffer as an alternate file name
+
+Writing with multiple buffers:
+- `:wa[ll]`                                         ==>  write all changed buffers. Buffers without a file name cause an error message. Buffers which are readonly are not written
+- `:wa[ll]!`                                        ==>  write all changed buffers, even the ones that are readonly. Buffers without a file name are not written and cause an error message
+
+Quiting:
+- `:q[uit]`/`<CTRL-w>q`/`<leader>q`                 ==>  quit the current window. Quit Vim if this is the last |edit window| (not counting help or preview windows). This fails when changes have been made, and when the last file in the argument list has not been edited. If there are other tab pages and quitting the last window in the current tab page, the current tab page is closed
+- `:q[uit]!`/`<leader>qq`                           ==>  quit without writing, also when the current buffer has changes
+
+Quiting with multiple buffers:
+- `:qa[ll]`                                         ==>  quit all buffers and exit Vim, unless there are some buffers which have been changed
+- `:qa[ll]!`                                        ==>  quit all buffers and exit Vim. Any changes to buffers are lost
+- `:quita[ll][!]`                                   ==>  same as ":qall"
+
+Writing and quiting:
+- `:wq/<leader>wq`                                  ==>  write the current file and close the window. If this was the last edit window, Vim quits. Writing fails when the file is read-only or the buffer does not have a name. Quitting fails when the last file in the argument list has not been edited
+- `:wq!`                                            ==>  write the current file and close the window. If this was the last edit window, Vim quits. Writing fails when the current buffer does not have a name
+- `:wq {file}`                                      ==>  write to {file} and close the window. Quitting fails when the last file in the argument list has not been edited. If this was the last edit window, Vim quits
+- `:wq! {file}`                                     ==>  write to {file} and close the current window. If this was the last edit window, Vim quits
+- `:x[it]!`                                         ==>  like ":wq", but write only when changes have been made (Vim will quit anyway)
+- `:exi[t]!`                                        ==>  same as :x[it]
+- `ZZ`                                              ==>  same as :x[it]
+- `ZQ`                                              ==>  same as ":q!"
+
+Writing and quiting with multiple buffers:
+- `:wqa[ll]`/`:xa[ll]`                              ==>  write all changed buffers and exit Vim. If there are buffers without a file name, which are readonly or which cannot be written for another reason, Vim will not quit
+- `:wqa[ll]!`/`xa[ll]!`                             ==>  write all changed buffers, even the ones that are readonly, and exit Vim. If there are buffers without a file name or which cannot be written for another reason, or there is a terminal with a running job, Vim will not quit
+
+
+******************************************************************************
+
+Register
+  *:h registers*
+================
+
+Vim uses multiple registers to store a deleted or yanked text.
+
+Plain registers:
+- `"`                                               ==>  unnamed register. Vim fills this register with text deleted with the "d", "c", "s", "x" commands or copied with the yank "y" command, regardless of whether or not a specific register was used (e.g.  "xdd). Think about this register as a register that points to the last used register. Thus when deleting text, the unnamed register and the numbered register 1 will contain the same text. When yanking text, the unnamed register and the numbered register 0 will contain the same text as well. Vim uses the content of the unnamed register by default for any put command (p/P) which doesn't explicitly specify a register
+- `0 to 9`                                          ==>  numbered register 0 contains the text from the most recent yank command
+- `1 to 9`                                          ==>  numbered register 1 contains the text deleted by the most recent delete or change command. With each successive deletion or change, Vim shifts the previous contents of register 1 into register 2, 2 into 3, and so forth, losing the previous contents of register 9. You can think about these registers as a history of delete/change (but not yank!)
+- `a-z, A-Z`                                        ==>  named registers. Vim fills these registers only when you say so. Specify them as lowercase letters to replace their previous contents or as uppercase letters to append to their previous contents
+- `-`                                               ==>  the last small (less than a line) delete
+
+Special registers:
+- `.`                                               ==>  the last inserted text. Note: this doesn't work with CTRL-R on the command-line (read-only)
+- `%`                                               ==>  the current file name (read-only)
+- `:`                                               ==>  the most recent executed command-line (read-only)
+- `/`                                               ==>  the most recent search pattern
+- `=`                                               ==>  this is not really a register that stores text, but a way to use an arbitrary expression in operators which accept a register. The expression register is read-write. When typing the '=' after " or CTRL-R the cursor moves to the command-line, where you can enter any expression (see |expression|). All normal command-line editing commands are available, including a special history for expressions
+- `_`                                               ==>  black hole register. When writing to this register, nothing happens. This can be used to delete text without affecting the normal registers. When reading from this register, nothing is returned.
+
+Clipboard registers - they contain text copied in the OS space:
+- `*`                                               ==>  the clipboard contents (X11: primary selection)
+- `+`                                               ==>  the clipboard contents (X11: secondary, or clipboard, selection)
+
+On Windows systems there registers are equal and contain the same content. However, there's two different so called "selections" on X11 (Unix) systems.
+The most used selection is the *PRIMARY* selection, which is used when the user "visually" selects some data (and you can paste this content with a middle mouse click). The *CLIPBOARD* selection is used when the user selects some data and explicitly requests it to be "copied" to the clipboard, such as by invoking "Copy" under the "Edit" menu of an application. An associated request of "Paste" results in the data of the CLIPBOARD selection being used.
+
+How to access the registers:
+- Just *prepend* the name of the register via `"{register}` for next delete or yank. Note that quote `"` is typed literally. See *:h quote*. For example:
+    * To paste from register "5, do `"5p`
+    * To delete line into register "b, do `"bdd`
+- In Insert and Cmdline modes you can also use `CTRL-r` to paste text from a specific register. Just *append* the name of the register the same way via `"{register}`. See *:h i_CTRL-R* and *:h c_CTRL-R*. For example, to paste content of the unnamed register, do `<CTRL-r>""`
+- `:reg[isters]` to see all the registers and their content
+- `:reg[isters] {arg}` to display the contents of the numbered and named registers that are mentioned in {arg}. For example, `:reg 1a` will display registers '1' and 'a'
+
+
+******************************************************************************
+
+Jumps, jump list
+  *:h jump-motions*
+===================
+
+A "jump" is a command that normally moves the cursor several lines away. If you make the cursor "jump" the position of the cursor before the jump is remembered.
+
+Jumps are remembered in a jump list. With the CTRL-O and CTRL-I command you can go to cursor positions before older jumps, and back again. Thus you can move up and down the list. There is a separate jump list for each window.
+
+- `<CTRL-o>`                                        ==>  go to [count] [o]lder cursor position in jump list
+- `<tab>/<CTRL-i>`                                  ==>  go to [count] newer cursor position in jump list
+- `:ju[mps]`                                        ==>  print the jump list
+
+
+******************************************************************************
+
+Marks/Bookmarks
+  *:h mark-motions*
+===================
+
+- `m{a-zA-Z}`                                       ==>  set mark {a-zA-Z} at cursor position
+- '{a-z}  `{a-z}                                    ==>  jump to the mark {a-z} in the current buffer
+- '{A-Z0-9}  `{A-Z0-9}                              ==>  to the mark {A-Z0-9} in the file where it was set
+- ''  ``                                            ==>  to the position before the latest jump, or where the last "m'" or "m`" command was given
+
+Jumping to a mark can be done in two ways:
+* With ` (backtick)                                 ==>  the cursor is positioned at the specified location and the motion is |exclusive|.
+* With ' (single quote)                             ==>  the cursor is positioned on the first non-blank character in the line of the specified location and the motion is linewise.
+
+A mark is not visible in any way. It is just a position in the file that is remembered. Do not confuse marks with named registers, they are totally unrelated.
+
+- 'a - 'z                                           ==>  lowercase marks, valid within one file
+- 'A - 'Z                                           ==>  uppercase marks, also called file marks, valid between files
+- '0 - '9                                           ==>  numbered marks, set from .viminfo file
+
+Lowercase marks 'a to 'z are remembered as long as the file remains in the buffer list. If you remove the file from the buffer list, all its marks are lost. If you delete a line that contains a mark, that mark is erased.
+
+Uppercase marks 'A to 'Z include the file name. You can use them to jump from file to file. You can only use an uppercase mark with an operator if the mark is in the current file. The line number of the mark remains correct, even if you insert/delete lines or edit another file for a moment.
+
+*IdeaVim note:* uppercase and numbered marks are synced with the IDEA's mnemonic bookmarks if the `set ideamarks` option is set.
+
+
+******************************************************************************
+
+Tags, tag stack
+  *:h tagsrch.txt*
+==================
+
+A tag is an identifier that appears in a "tags" file. It is a sort of label that can be jumped to. For example: In C programs each function name can be used as a tag. The "tags" file has to be generated by a program like ctags, before the tag commands can be used.
+
+On the tag stack is remembered which tags you jumped to, and from where.
+
+- `:ta[g][!] {name}`                                ==>  jump to the definition of {name}
+- `<CTRL-]>`                                        ==>  jump to the definition of the keyword under the cursor. Same as ":tag {name}", where {name} is the keyword under or after cursor
+- `<CTRL-t>`                                        ==>  jump to [count] older entry in the tag stack
+- `:tags`                                           ==>  show the contents of the tag stack. The active entry is marked with a '>'
+
+You can also use `<CTRL-o` (go back in jump list) instead of <CTRL-t> as tag jumps are also saved in the jump list.
+
+
+******************************************************************************
+
+Operators, Change
+  *:h operator*
+  *:h change.txt*
+=================
+
+This section describes the usage of operators and how to modify the text.
+
+To see help for an operator, refer to help by the operator key. Prepend "v_" (visual) or "i_" (insert) to see the given operator in context of the specific mode.
+
+The most essential operators are listed below.
+
+Deleting text:
+- `d{motion}`                                       ==>  delete {motion} text
+- `dd`                                              ==>  delete [count] lines
+- `D`                                               ==>  delete the characters under the cursor until the end of the line and [count]-1 more lines. Does the same as "d$"
+- `{Visual}d`/`{Visual}x`                           ==>  delete the highlighed text
+- `{Visual}D`/`{Visual}X`                           ==>  delete the highlighted lines. In Visual block mode, "D" deletes the highlighted text plus all text until the end of the line
+- ==
+- `x`                                               ==>  delete [count] characters under and after the cursor. Does the same as "dl"
+- `X`                                               ==>  delete [count] characters before the cursor. Does the same as "dh"
+
+Delete and Insert:
+- `{Visual}c`                                       ==>  delete the highlighted text and start insert; "c" stands for Change
+- `c{motion}`                                       ==>  delete the {motion} and start insert
+- `cc`                                              ==>  delete [count] lines and start insert
+- `C`                                               ==>  delete from the cursor position to the end of the line and [count]-1 more lines, and start insert
+- `{Visual}C`                                       ==>  delete the highlighted lines and start insert
+- ==
+- `s`                                               ==>  delete [count] characters and start insert (s stands for Substitute). Synonym for "cl"
+
+Copying and moving text:
+- `{Visual}y`                                       ==>  yank highlighed text
+- `y{motion}`                                       ==>  yank {motion} text
+- `yy`                                              ==>  yank [count] lines
+- `Y`                                               ==>  yank the characters under the cursor until the end of the line
+- ==
+- `p`                                               ==>  put the text after the cursor [count] times
+- `P`                                               ==>  put the text before the cursor [count] times
+
+Joining lines:
+- `J`                                               ==>  join [count] lines, with a minimum of two lines. Remove the indent and insert up to two spaces
+- `{Visual}J`                                       ==>  join the highlighted lines, with a minimum of two lines. Remove the indent and insert up to two spaces
+- `gJ`                                              ==>  join [count] lines, with a minimum of two lines. Don't insert or remove any spaces
+- `{Visual}gJ`                                      ==>  join the highlighted lines, with a minimum of two lines. Don't insert or remove any spaces
+
+These commands delete the <EOL> between lines. This has the effect of joining multiple lines into one line. You can repeat these commands and undo them.
+These commands, except "gJ", insert one space in place of the <EOL> unless there is trailing white space or the next line starts with a ')'. These commands, except "gJ", delete any leading white space on the next line.
+
+Simple changes:
+- `~`                                               ==>  switch case of the character under the cursor and move the cursor to the right
+- `{Visual}~`                                       ==>  switch case of highlighted text
+- `g~{motion}`                                      ==>  switch case of {motion} text
+- `g~~`                                             ==>  switch case of current line
+- ==
+- `{Visual}u`                                       ==>  make highlighted text lowercase
+- `gu{motion}`                                      ==>  make {motion} text lowercase
+- `guu`                                             ==>  make current line lowercase
+- `{Visual}U`                                       ==>  make highlighted text uppercase
+- `gU{motion}`                                      ==>  make {motion} text uppercase
+- `gUU`                                             ==>  make current line uppercase
+
+Shifting left and right:
+- `<{motion}`                                       ==>  shift {motion} lines one leftwards
+- `<<`                                              ==>  shift [count] lines one leftwards
+- `{Visual}[count]<`                                ==>  shift the highlighted lines [count] leftwards
+- `>{motion}`                                       ==>  shift {motion} lines one rightwards
+- `>>`                                              ==>  shift [count] lines one rightwards
+- `{Visual}[count]>`                                ==>  shift the highlighted lines [count] rightwards
+
+Formatting text:
+- `:[range]ce[nter] [width]`                        ==>  center lines in [range] between [width] columns
+- `:[range]ri[ght] [width]`                         ==>  right-align lines in [range] at [width] columns
+- `:[range]le[ft] [indent]`                         ==>  left-align lines in [range]. Sets the indent in the lines to [indent] (default 0)
+- `gq{motion}`                                      ==>  format the lines that {motion} moves over
+- `{Visual}gq`                                      ==>  format the highlighted text
+
+
+******************************************************************************
+
+Motion
+  *:h motion.txt*
+=================
+
+The most important concept one should understand is Operator + Motion.
+
+In an ordinary IDE you would visually select a text and apply an operator to it. However, VIM is different. First you choose an operator, and then you tell it what text to operate on by giving a motion.
+Even though VIM supports the usual workflow as well - you are free to enter visual mode and select the required text, following by applying an operator (see _:h visual.txt_), - this is not a very effective workflow. Motion gives you much more features, power, flexibility, and speeds up your workflow.
+
+See all the available operators above (refer to the ones that accept {motion}).
+
+Regarding the motions, see the most essential ones below.
+
+Most motions accept [count] argument, prepended. E.g. to move 5 lines downward, do '5j'.
+
+:h left-right-motions
+---
+
+These commands move the cursor to the specified column in the current line.
+They stop at the first column and at the end of the line, except "$", which may move to one of the next lines.
+- `h/<Left>`                                        ==>  [count] characters to the left *exclusive*
+- `l/<Right>`                                       ==>  [count] characters to the right *exclusive*
+- ==
+- `0`                                               ==>  to the first character of the line *exclusive*
+- `^`                                               ==>  to the first non-blank character of the line *exclusive*
+- `$`                                               ==>  to the end of the line *inclusive*
+- `g_`                                              ==>  to the last non-blank character of the line *inclusive*
+- ==
+- `f`{char}                                         ==>  [f]ind char; to [count]'th occurrence of {char} to the right. The cursor is placed on {char} |inclusive|
+- `t`{char}                                         ==>  [t]ill before [count]'th occurrence of {char} to the right. The cursor is placed on the character left of {char} |inclusive|
+- `F`{char}                                         ==>  [F]ind char; to the [count]'th occurrence of {char} to the left. The cursor is placed on {char} |exclusive|
+- `T`{char}                                         ==>  [T]ill char; after [count]'th occurrence of {char} to the left. The cursor is placed on the character right of {char} |exclusive|
+- `;`                                               ==>  repeat latest f, t, F or T [count] times
+- `,`                                               ==>  repeat latest f, t, F or T in opposite direction [count] times
+
+:h up-down-motions
+---
+
+These commands move to the specified line.
+They stop when reaching the first or the last line. The first two commands put the cursor in the same column (if possible) as it was after the last command that changed the column, except after the "$" command, then the cursor will be put on the last character of the line.
+- `k/<Up>`                                          ==>  [count] lines upward
+- `j/<Down>`                                        ==>  [count] lines downward
+- `gk/g<Up>`                                        ==>  [count] display lines upward. Differs from 'k' when lines wrap, and when used with an operator, because it's not linewise
+- `gj/g<Down>`                                      ==>  [count] display lines downward. Differs from 'j' when lines wrap, and when used with an operator, because it's not linewise
+- `G`                                               ==>  goto line [count], default last line
+- `gg`                                              ==>  goto line [count], default first line
+- `:[range]`                                        ==>  set the cursor on the last line number in [range]. [range] can also be just one line number, e.g., ":1"
+- `k/<Up>`                                          ==>  [count] lines upward
+- `k/<Up>`                                          ==>  [count] lines upward
+- `k/<Up>`                                          ==>  [count] lines upward
+
+:h word-motions
+---
+
+These commands move over words or WORDS.
+- `w`                                               ==>  forward to the beginning of word [count]
+- `W`                                               ==>  forward to the beginning of WORD [count]
+- `b`                                               ==>  backward to the beginning of word [count]
+- `B`                                               ==>  backward to the beginning of WORD [count]
+- ==
+- `e`                                               ==>  forward to the end of word [count]
+- `E`                                               ==>  forward to the end of WORD [count]
+- `ge`                                              ==>  backward to the end of word [count]
+- `gE`                                              ==>  backward to the end of WORD [count]
+
+word
+---
+
+A word consists of a sequence of letters, digits and underscores, or a
+sequence of other non-blank characters, separated with white space (spaces,
+tabs, <EOL>). This can be changed with the 'iskeyword' option. An empty line
+is also considered to be a word.
+
+WORD
+---
+
+A WORD consists of a sequence of non-blank characters, separated with white
+space. An empty line is also considered to be a WORD.
+
+:h object-motions
+---
+
+- `(`                                               ==>  [count] sentences backward.  |exclusive| motion
+- `)`                                               ==>  [count] sentences forward.   |exclusive| motion
+- `{`                                               ==>  [count] paragraphs backward. |exclusive| motion
+- `}`                                               ==>  [count] paragraphs forward.  |exclusive| motion
+
+sentence
+---
+
+A sentence is defined as ending at a '.', '!' or '?' followed by either the end of a line, or by a space or tab.
+Any number of closing ')', ']', '"' and ''' characters may appear after the '.', '!' or '?' before the spaces, tabs or end of line. A paragraph and section boundary is also a sentence boundary.
+
+paragraph
+---
+
+A paragraph begins after each empty line.
+
+:h text-objects
+---
+
+This is a series of commands that can only be used while in Visual mode or after an operator.
+The commands that start with *"a"* select "a"n object including white space, the commands starting with *"i"* select an "inner" object without white space, or just the white space. Thus the "inner" commands always select less text than the "a" commands.
+- `aw`                                              ==>  "a word". Leading or trailing white space is included, but not counted
+- `iw`                                              ==>  "inner word". White space between words is counted too
+- `aW`                                              ==>  "a WORD"
+- `iW`                                              ==>  "inner WORD"
+- `as`                                              ==>  "a sentence"
+- `is`                                              ==>  "inner sentence"
+- `ap`                                              ==>  "a paragraph"
+- `ip`                                              ==>  "inner paragraph"
+- `a] a[`                                           ==>  "a [...] block"
+- `i] i[`                                           ==>  "inner [...] block"
+- `a) a( ab`                                        ==>  "a (...) block"
+- `i) i( ib`                                        ==>  "inner (...) block"
+- `a} a{ aB`                                        ==>  "a {...} block"
+- `i} i{ iB`                                        ==>  "inner {...} block"
+- `a> a<`                                           ==>  "a <...> block"
+- `i> i<`                                           ==>  "inner <...> block"
+- `at`                                              ==>  "a <aaa>...</aaa> block"
+- `it`                                              ==>  "inner <aaa>...</aaa> block"
+- `a" a' a``                                        ==>  "a quoted string"
+- `i" i' i``                                        ==>  "inner quoted string"
+
+When used after an operator:
+* For non-block objects:
+  * For the "a" commands: The operator applies to the object and the white space after the object. If there is no white space after the object or when the cursor was in the white space before the object, the white space before the object is included.
+  * For the "inner" commands: If the cursor was on the object, the operator applies to the object. If the cursor was on white space, the operator applies to the white space.
+* For a block object:
+  * The operator applies to the block where the cursor is in, or the block on which the cursor is on one of the braces.
+  * For the "inner" commands the surrounding braces are excluded. For the "a" commands, the braces are included.
+
+Examples:
+---
+
+For illustration, here is a list of delete commands, grouped from small to big objects. Note that for a single character and a whole line the existing vi movement commands are used.
+- `"dl"`                                            ==>  delete character (alias: "x")
+- `"d2j"`                                           ==>  delete the current line and 2 lines below
+- `"dw"`                                            ==>  delete the next word
+- `"d2w"`                                           ==>  delete the next 2 words
+- `"diw"`                                           ==>  delete inner word
+- `"daw"`                                           ==>  delete a word
+- `"diW"`                                           ==>  delete inner WORD
+- `"daW"`                                           ==>  delete a WORD
+- `"dgn"`                                           ==>  delete the next search pattern match
+- `"dd"`                                            ==>  delete one line
+- `"dis"`                                           ==>  delete inner sentence
+- `"das"`                                           ==>  delete a sentence
+- `"dib"`                                           ==>  delete inner '(' ')' block
+- `"dab"`                                           ==>  delete a '(' ')' block
+- `"dip"`                                           ==>  delete inner paragraph
+- `"dap"`                                           ==>  delete a paragraph
+- `"diB"`                                           ==>  delete inner '{' '}' block
+- `"daB"`                                           ==>  delete a '{' '}' block
+
+Note the difference between using a movement command and a text object. The movement command operates from here (cursor position) to where the movement takes us. When using an object the whole object is operated upon, no matter where on the object the cursor is.
+For example, compare "dw" and "daw": "dw" deletes from the cursor position to the start of the next word, "daw" deletes the word under the cursor and the space after or before it.
+
+That is, it's better to think of this design as *operator + target*, where target can be a motion or a text object.
+
+
+******************************************************************************
+
+Range
+  *:h :range*
+=============
+
+Some commands accept a line range they shall operate on. It consists of one or more line numbers, separated with ',' or ';'.
+
+For the most commands you can provide a range via Visual mode (see *:h v_:*). The code _'<,'>_ is used for this range, which makes it possible to select a similar line from the command-line history for repeating a command on different Visually selected lines.
+
+Line numbers may be specified with:
+- `{number}`                                        ==>  an absolute line number
+- `.`                                               ==>  the current line
+- `$`                                               ==>  the last line in the file
+- `%`                                               ==>  equal to 1,$ (the entire file)
+- `/{pattern}[/]`                                   ==>  the next line where {pattern} matches
+- `?{pattern}[?]`                                   ==>  the previous line where {pattern} matches *:?*
+- `\/`                                              ==>  the next line where the previously used search pattern matches
+- `\?`                                              ==>  the previous line where the previously used search pattern matches
+- `\&`                                              ==>  the next line where the previously used substitute pattern matches
+
+
+******************************************************************************
+
+Pattern, Regex, Search
+  *:h :pattern.txt*
+======================
+
+Magic
+---
+
+Some characters in the pattern, such as letters, are taken literally. They match exactly the same character in the text. When preceded with a backslash however, these characters may get a special meaning. For example, "a" matches the letter "a", while "\a" matches any alphabetic character.
+
+Other characters have a special meaning without a backslash. They need to be preceded with a backslash to match literally. For example "." matches any character while "\." matches a dot.
+
+If a character is taken literally or not depends on the 'magic' option and the items in the pattern mentioned next. The 'magic' option should always be set.
+
+Use of "\m" makes the pattern after it be interpreted as if 'magic' is set, ignoring the actual value of the 'magic' option.
+Use of "\M" makes the pattern after it be interpreted as if 'nomagic' is used.
+Use of "\v" means that after it, all ASCII characters except '0'-'9', 'a'-'z', 'A'-'Z' and '_' have special meaning: "very magic".
+
+Examples:
+  \v \m   \M   \V        matches
+  a  a    a    a         literal 'a'
+  \a \a   \a   \a        any alphabetic character
+  .  .    \.   \.        any character
+  \. \.   .    .         literal dot
+  $  $    $    \$        end-of-line
+  *  *    \*   \*        any number of the previous atom
+  () \(\) \(\) \(\)      group as an atom
+  |  \|   \|   \|        nothing: separates alternatives
+  \\ \\   \\   \\        literal backslash
+  \{ {    {    {         literal curly brace
+
+See _:h /magic_.
+
+
+The most useful pattern items are listed below
+---
+
+All values are given as if magic mode has been enabled.
+
+Multi items:
+- `*`                                               ==>  0 or more
+- `\+`                                              ==>  1 or more
+- `\=`                                              ==>  0 or 1
+- `\?`                                              ==>  0 or 1
+- `\{n,m}`                                          ==>  matches n to m of the preceding atom, as many as possible
+- `\{n}`                                            ==>  matches n of the preceding atom
+- `\{n,}`                                           ==>  matches at least n of the preceding atom, as many as possible
+- `\{,m}`                                           ==>  matches 0 to m of the preceding atom, as many as possible
+- `\{-n,m}`                                         ==>  matches n to m of the preceding atom, as few as possible
+- `\{-n}`                                           ==>  matches n of the preceding atom
+- `\{-n,}`                                          ==>  matches at least n of the preceding atom, as few as possible
+- `\{-,m}`                                          ==>  matches 0 to m of the preceding atom, as few as possible
+
+n and m are positive decimal numbers or zero.
+
+If a "-" appears immediately after the "{", then a shortest match first algorithm is used (see example below). In particular, "\{-}" is the same as "*" but uses the shortest match first algorithm. BUT: A match that starts earlier is preferred over a shorter match: "a\{-}b" matches "aaab" in "xaaab".
+
+Ordinary atoms:
+- `^`                                               ==>  start of line
+- `$`                                               ==>  end of line
+- `.`                                               ==>  any single character
+- `\<`                                              ==>  beginning of a word
+- `\>`                                              ==>  end of a word
+- `\<word\>`                                        ==>  match the whole word
+- `[]`                                              ==>  a collection, matches any single character inside the []
+- `[^]`                                             ==>  all but characters specified inside the []; e.g. [^\s] matches all but whitespace
+- `\(\)`                                            ==>  capture group
+- `\1, \2, .., \9`                                  ==>  matches the same string that was matched by the [N-th] sub-expression in \(\). Note: The numbering of groups is done based on which "\(" comes first in the pattern (going left to right), NOT based on what is matched first
+- `\t`                                              ==>  <Tab>
+- `\n`                                              ==>  end-of-line
+- `\r`                                              ==>  <CR>
+
+Character classes:
+- `\s`                                              ==>  whitespace character
+- `\S`                                              ==>  non-whitespace character
+- `\d`                                              ==>  digit
+- `\D`                                              ==>  non-digit
+- `\a`                                              ==>  alphabetic character
+- `\A`                                              ==>  non-alphabetic character
+- `\w`                                              ==>  word character
+- `\W`                                              ==>  non-word character
+
+Examples
+---
+Pattern        matches
+[xyz]          any 'x', 'y' or 'z'
+[a-zA-Z]$      any alphabetic character at the end of a line
+\c[a-z]$       same
+a*             "", "a", "aa", "aaa", etc.
+a\+            a", "aa", "aaa", etc.
+.*             anything, also an empty string, no end-of-line
+^.\+$          any non-empty line
+\s\+           . white space of at least one character
+foo\=          "fo" and "foo"
+ab\{2,3}c      "abbc" or "abbbc"
+a\{5}          "aaaaa"
+ab\{2,}c       "abbc", "abbbc", "abbbbc", etc.
+ab\{,3}c       "ac", "abc", "abbc" or "abbbc"
+a[bc]\{3}d     "abbbd", "abbcd", "acbcd", "acccd", etc.
+a\(bc\)\{1,2}d "abcd" or "abcbcd"
+a[bc]\{-}[cd]  "abc" in "abcd"
+a[bc]*[cd]     "abcd" in "abcd"
+\v\C<map>      "map"
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Search commands
+  *:h search-commands*
+---------------
+
+- `/{pattern}`                                      ==>  search forward for the [count]'th occurrence of {pattern}
+- `/<cr>`                                           ==>  search forward for the [count]'th occurrence of the latest used pattern
+- `?{pattern}`                                      ==>  search backward for the [count]'th occurrence of {pattern}
+- `?<cr>`                                           ==>  search backward for the [count]'th occurrence of the latest used pattern
+- `n`                                               ==>  repeat the latest "/" or "?"
+- `N`                                               ==>  repeat the latest "/" or "?" in opposite direction
+- `*`                                               ==>  search forward for the [count]'th occurrence of the word nearest to the cursor
+- `#`                                               ==>  same as "*", but search backward
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ignorecase/Smartcase
+  *:h /ignorecase*
+  *:h :smartcase*
+--------------------
+
+Ignorecase
+---
+If the 'ignorecase' option is on, the case of normal letters is ignored.
+'smartcase' can be set to ignore case when the pattern contains lowercase letters only.
+
+When `\c` appears anywhere in the pattern, the whole pattern is handled like 'ignorecase' is on. The actual value of 'ignorecase' and 'smartcase' is ignored.
+`\C` does the opposite: Force matching case for the whole pattern
+
+Smartcase
+---
+Override the 'ignorecase' option if the search pattern contains upper case characters.
+
+Only used when the search pattern is typed and 'ignorecase' option is on. Used for the commands "/", "?", "n", "N", ":g" and ":s".
+Not used for "*", "#", "gd", tag search, etc. After "*" and "#" you can make 'smartcase' used by doing a "/" command, recalling the search pattern from history and hitting <Enter>.
+
+Example
+---
+pattern 'ignorecase' 'smartcase' matches  ~
+  foo       off           -        foo
+  foo        on           -        foo Foo FOO
+  Foo        on          off       foo Foo FOO
+  Foo        on          on        Foo
+ \cfoo       -            -        foo Foo FOO
+ foo\C       -            -        foo
+
+
+******************************************************************************
+
+Substitution
+  *:h :substitute*, *:h :s*
+===========================
+
+:[range]s[ubstitute]/{pattern}/{string}/[flags] [count]
+---
+For each line in [range] replace a match of {pattern} with {string}:
+
+When [range] and [count] are omitted, replace in the current line only.
+When [count] is given, replace in [count] lines, starting with the last line in [range]. When [range] is omitted start in the current line.
+
+:[range]s[ubstitute] [flags] [count] / :[range]&[&][flags] [count]
+---
+Repeat last :substitute with same search pattern and substitute string, but without the same flags. You may add [flags], see |:s_flags|. Note that after `:substitute` the '&' flag can't be used, it's recognized as a pattern separator.
+
+&
+---
+Synonym for `:s` (repeat last substitute). Note that the flags are not remembered, thus it might actually work differently. You can use `:&&` to keep the flags.
+
+g&
+---
+Synonym for `:%s//~/&` (repeat last substitute with last search pattern on all lines with the same flags). For example, when you first do a substitution with `:s/pattern/repl/flags` and then `/search` for something else, `g&` will do `:%s/search/repl/flags`.
+
+
+The flags that you can use for the substitute commands (see _:h :s_flags_):
+- `&`                                               ==>  must be the first one: Keep the flags from the previous substitute command
+- `c`                                               ==>  confirm each substitution. Vim highlights the matching string. You can type:
+-   `y`                                             ==>  to substitute this match
+-   `l`                                             ==>  to substitute this match and then quit ("last")
+-   `n`                                             ==>  to skip this match
+-   `<Esc>`                                         ==>  to quit substituting
+-   `a`                                             ==>  to substitute this and all remaining matches
+-   `q`                                             ==>  to quit substituting
+-   `<CTRL-E>`                                      ==>  to scroll the screen up
+-   `<CTRL-Y>`                                      ==>  to scroll the screen down
+- `g`                                               ==>  replace all occurrences in the line. Without this argument, replacement occurs only for the first occurrence in each line
+- `i`                                               ==>  ignore case for the pattern. The 'ignorecase' and 'smartcase' options are not used
+- `I`                                               ==>  don't ignore case for the pattern. The 'ignorecase' and 'smartcase' options are not used
+
+
+Examples:
+- `:%s/this/that/c`                                 ==>  replace 'this' with 'that' in the entire file (see _:h :%_), asking for a confirmation before substiting
+- `:.s/this/that/`                                  ==>  replace in the current line only, no flags; the . can be ommited
+- `:1,5/this/that/`                                 ==>  replace in the lines 1-5 only, no flags
+- `:.,$s/this/that/g`                               ==>  replace starting from the current line, replacing all occurrences in lines
+- `:.s/this/that/ 2`                                ==>  replace in 2 lines, starting from the current line; the . can be ommited
+- `:s g`                                            ==>  repeat last substitution without its flags, but adding a new flag `g` to replace all occurrences in lines; the same command - :&
+- `:&&`                                             ==>  repeat last substitution with the same flags
+- _%s /- \([^ ]\+\)\(\s*\)==>/- `\1`\2_             ==>  ok, this is a tricky one:
+  I personally used it to surround commands that are followed by explanation in this doc. They didn't have `` before so I came up with this command to batch surround them.
+  The first capture group _\([^ ]\+\)_ matches 1 or more non-whitespace characters. It's followed by a second group _\(\s*\)_ which matches 0 or more whitespaces. It's all finalized by _==>_. Altogether this search pattern matches the part before explanation, including "- " at start of the line.
+  Then we replace it with _- `\1`\2 ==>_, where we use reuse group one (_\1_) representing the command, and group two (_\2_) representing the whitespaces before _==>_. Note that the first group is surrounded in "`" now.
+- `%s/\(\.\)\s\{2\}\(\a\)/\1 \2/cg`                 ==>  replaces two spaces with one between sentences, replacing each occurrence in a line with confirmation. For some reason when copying from VIM help, it copies two spaces
+
+
+******************************************************************************
+
+Miscellaneous
+=============
+
+Custom helpers
+--------------
+
+- `<leader>ve`                                      ==>  edit this config; the config will be sourced automatically on write
+- `<leader>e`                                       ==>  open a file with the current buffer's path prefilled
+- `<leader>te`                                      ==>  open a file in a new tab with the current buffer's path prefilled
+- `<leader><cr>`                                    ==>  disable highlight when <leader><cr> is pressed
+- `<leader>cd`                                      ==>  switch CWD to the directory of the open buffer
+
+
+******************************************************************************
+
+Plugins
+=======
+
+[Plug] fzf.vim
+--------------
+
+- `<leader>ff`                                      ==>  open the file search (in the current CWD)
+- `<leader>;/<leader>f`                             ==>  open the MRU files search
+- `;/<leader>fb`                                    ==>  open the buffer search
+- `<leader>fc`                                      ==>  open the command search
+- `<leader>fch`                                     ==>  open the command history search
+- `<leader>fm`                                      ==>  open the maps search
+- `<leader>fs`                                      ==>  open the snippets search (UltiSnips)
+- `<leader>fg`                                      ==>  open the commits log search (fugitive)
+- `<leader>g/<CTRL-g>`                              ==>  open the ripgrep word search
+- `<leader>fw`                                      ==>  open the word search with a word at cursor or selected word (visual mode)
+- `<leader>fe`                                      ==>  instantly search for a word at cursor or selected word (visual mode)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] easymotion
+-----------------
+
+See `:h easymotion`.
+
+Mappings
+---
+- `f{char}{char}{label}` - press `f`, followed by two chars you want to search for. You'll be presented with a view containing highlighted symbols that you can jump to just by typing those symbols
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] surround.vim
+-------------------
+
+See `:h surround.txt`.
+
+Mappings
+---
+- `ys{motion}{replacement}`                         ==>  surround the {motion} with the provided {replacement}. E.g. `ysiw)` wraps an inner word with parentheses
+- `{Visual}S{replacement}`                          ==>  surround a selection with the provided {replacement}
+- `cs{w|W|p|s}{replacement}`                        ==>  surround the word, WORD, paragraph, or section with the provided {replacement}. Behaves as if `ysi` was pressed. E.g. `csw` equals `ysiw`
+- `cs{target}{replacement}`                         ==>  change the {target} surroundings with the {replacement} surroundings. E.g. `cs"'` changes " to '
+- `ds{target}`                                      ==>  delete the {target} surroundings. E.g. `ds"` deletes double quotes from the inner-word
+
+Targets
+---
+The |ds| and |cs| commands both take a target as their first argument.
+The possible targets are based closely on the |text-objects| provided by Vim. All targets are currently just one character.
+
+- Parentheses: (, ), b
+- Braces: {, }, B
+- Square brackets: [, ]
+- Angle brackets: <, >
+- HTML/XML tags: t
+- Quote marks: ', ", `
+- word, WORD, sentence, paragraph: w, W, s, p. These targets are special, as they do not work in `ds` and only work in `cs`, behaving in the way as if `ysi` was pressed. That is, `csw` is equal to `ysiw`. So, when used with cs, you can consider them a shortcut for ysi
+
+Replacements
+---
+A replacement argument is a single character, and is required by |cs|, |ys|, and |vS|.
+Undefined replacement characters (with the exception of alphabetic characters) default to placing themselves at the beginning and end of the destination, which can be useful for characters like / and |.
+
+- Parentheses: (, ), b
+- Braces: {, }, B
+- Square brackets: [, ]
+- Angle brackets: >
+- HTML/XML tags: t, <. It prompts for a tag to wrap into. Note that "<" as a tag rather than an angle bracket compared to the target
+- Function call: f. It prompts for a function name to wrap into
+- Quote marks: ', ", `
+
+Also, not related to the plugin, but these are my custom pure-vim-script mappings:
+- `$1`                                              ==>  surround with ()
+- `$2`                                              ==>  surround with []
+- `$3`                                              ==>  surround with {} (line)
+- `$4`                                              ==>  surround with {} (block)
+- `$$`                                              ==>  surround with ""
+- `$q`                                              ==>  surround with ''
+- `$w`                                              ==>  surround with ``
+- `$e`                                              ==>  surround with <>
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] Commentary
+-----------------
+
+- `gcc/<leader>c`                                   ==>  comment out a line
+- `gc{motion}`                                      ==>  comment out the target of a motion; e.g:
+-   `gcap/<leader>cp`                               ==>  comment out a paragraph
+- `{Visual}gc/{Visual}<leader>c`                    ==>  comment out a selection (visual mode)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] yankstack.vim
+--------------------
+
+- `nmap <CTRL-p>`                                   ==>  <Plug>yankstack_substitute_older_paste
+- `nmap <CTRL-n>`                                   ==>  <Plug>yankstack_substitute_newer_paste
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] NERD Tree
+----------------
+
+- `<leader>n`                                       ==>  open/close the [N]ERD Tree
+- ==
+- `o/<CR>`                                          ==>  open selected file
+- `t`                                               ==>  open selected file in a new tab
+- `T`                                               ==>  open selected file in a new tab but keep the focus on the current tab
+- `x`                                               ==>  close the current nodes parent
+- `X`                                               ==>  recursively close all children of the current node
+- ==
+- `cd`                                              ==>  change the CWD to the selected dir
+- `m`                                               ==>  open the actions menu
+- ==
+- `r`                                               ==>  recursively refresh the current directory
+- `R`                                               ==>  recursively refresh the current root
+- ==
+- `I`                                               ==>  toggle whether hidden files displayed
+- ==
+- `B`                                               ==>  toggle whether the bookmark table is displayed
+- `:Bookmark [name]`                                ==>  bookmark selected node [as name]
+- `D`                                               ==>  delete the current bookmark (while focused on the bookmarks table)
+- ==
+- `q`                                               ==>  quit
+- `?`                                               ==>  see help
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] Mundo
+----------------
+
+- `<leader>u`                                       ==>  open/close the m[u]ndo tree
+- `p`                                               ==>  diff selected undo and current state
+- `d`                                               ==>  vert diff of undo with current state
+- `q`                                               ==>  quit
+- `?`                                               ==>  see help
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] Goyo
+-----------
+
+- `<leader>z`                                       ==>  enter the Goyo mode ([z]en mode)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] Fugitive
+---------------
+
+- `<leader>gl`                                      ==>  copy the [l]ink to the [l]ine of a [G]it repository to the clipboard
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] easy-align
+-----------------
+
+Help - *:h easy-align*.
+
+Interactive mode
+  *:h easy-align-interactive-mode*
+---
+
+- {Visual}`ga`                                      ==>  easy-[a]lign on a selection; [g] is a namespace like in plenty of other system commands
+- `ga`{motion}                                      ==>  easy-align on a {motion}
+
+How to use:
+- 1. (Optional) <cr> to cycle between alignment mode (left, right, or center)
+- 2. (Optional) change options in the way you want. See all the possible alignment options - _:h easy-align-alignment-options-in-interactive-mode_
+- 3. (Optional) N-th delimiter (default: 1)
+-   1 Around the 1st occurrences of delimiters
+-   2 Around the 2nd occurrences of delimiters
+-   ...
+-   * Around all occurrences of delimiters
+-   ** Left-right alternating alignment around all delimiters
+-   - Around the last occurrences of delimiters (-1)
+-   -2 Around the second to last occurrences of delimiters
+- 4. Delimiter key (a single keystroke; <Space>, =, :, ., |, &, #, ,) or an arbitrary regular expression preceded by <CTRL-X>
+
+Live interactive mode
+  *:h easy-align-live-interactive-mode*
+---
+
+In the "live interactive mode" you can preview the result of the alignment on-the-fly as you type in.
+
+Live interactive mode can be started with `:LiveEasyAlign` command. Or you can switch to live interactive mode while in ordinary interactive mode by pressing CTRL-P (P for Preview).
+
+In live interactive mode, you have to type in the same delimiter (or CTRL-X on regular expression) again to finalize the alignment. This allows you to preview the result of the alignment and freely change the delimiter using backspace key without leaving the interactive mode.
+
+Non-interactive mode (cmd)
+  *:h easy-align-non-interactive-mode*
+---
+
+Using predefined delimiters:
+`:[range]EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]`
+
+Using regular expression:
+`:[range]EasyAlign[!] [N-th] /REGEXP/ [OPTIONS]`
+
+
+For example, to align this document:
+---
+Interactive:
+- visually select all file
+- ga
+- press '1' to align only around the first occurences of the "==>" delimiter (some explanations contain it too)
+- press <CTRL-g> once to not ignore comments and strings
+- press <CTRL-x> to use a regular expression, and type "\s==>\s"
+- press <CTRL-f> to filter for lines that contain commands, and type "^[-\*] "
+Cmd:
+- `:%EasyAlign 1/\s==>\s/ig[]g/^[-\*] /`
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] UltiSnips
+----------------
+
+Help - *:h UltiSnips*.
+
+- `{Insert}<c-j>`                                   ==>  expand the selected snippet
+- `{while expanded}<c-j>`                           ==>  jump to the next trigger
+- `{while expanded}<c-k>`                           ==>  jump to the previous trigger
+- `{Insert}<c-tab>`                                 ==>  built-in snippet autocompletion
+- `:Snippets`/`<leader>fs`                          ==>  check all available snippets with respect to the current filetype (powered by fzf.vim)
+
+Put your own snippets by path .vim/UltiSnips/<filetype>.snippets (for the specific filetype) or .vim/UltiSnips/all.snippets (global). See _:h UltiSnips-how-snippets-are-loaded_ for more info.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] vim-indent-object
+----------------
+
+Help - *:h indent-object.txt*.
+
+- [count]`ai`                                       ==>  [a]n [i]ndentation level and line above
+- [count]`ii`                                       ==>  [i]nner [i]ndentation level (no line above)
+- [count]`aI`                                       ==>  an indentation level and lines above/below
+- [count]`iI`                                       ==>  inner indentation level (no lines above/below)
+
+Note: the `iI` mapping is included for completeness, but effectively it's a synonym for `ii`.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Plug] exchange
+----------------
+
+Help - *:h exchange.txt*.
+
+- `cx{motion}`                                      ==>  Used in pairs. FIRST USE: define the first region of text to be exchanged. Any valid {motion} can be used. SECOND USE: define the second region of text and perform the exchange. Note: If a region was defined accidentally, it can be cleared with |cxc|
+- `cxx`                                             ==>  Like |cx|, but for the current line. |linewise|
+- `cxc`                                             ==>  Clear any defined region of text (previously defined by a |cx| command)
+- `{Visual}X`                                       ==>  Can be used in |visual-mode|.
+
+
+******************************************************************************
+
+Configuration
+=============
+
+Options
+  *:h options.txt*
+  *:h option-list*
+------------------
+
+Vim has a number of internal variables and switches which can be set to achieve special effect. These options come in three forms:
+* boolean (toggle)                                  ==>  can only be on or off
+* number                                            ==>  has a numeric value
+* string                                            ==>  has a string value
+
+List options:
+- `:set[!]`                                         ==>  show all options that differ from their default value. When [!] is present every option is on a separate line
+- `:set[!] all`                                     ==>  show all but terminal options
+- `:set {option}?`                                  ==>  show value of {option}
+
+Change option:
+- `:set {option}`                                   ==>  the resulting effect depends on the option's type: toggle option: switch it on; number option: show value; string option: show value
+- `:set no{option}`                                 ==>  toggle option: switch it off
+- `:set {option}!`                                  ==>  toggle option: invert value
+- `:set {option}={value}`                           ==>  set string or number option to {value}
+- `:set {option}+={value}`                          ==>  add the {value} to a number option, or append the {value} to a string option
+- `:set {option}^={value}`                          ==>  multiply the {value} to a number option, or prepend the {value} to a string option
+- `:set {option}-={value}`                          ==>  subtract the {value} from a number option, or remove the {value} from a string option, if it is there
+
+The {option} arguments to ":set" may be repeated. For example - `:set ai nosi sw=3 ts=3`.
+
+
+******************************************************************************
+
+Mappings and keys
+=================
+
+Key codes
+---------
+
+See *:h key-codes* - these are the names for keys (including special) that are used in the documentation.
+They can also be used with the ":map" command (insert the key name by pressing CTRL-K and then the key you want the name for)
+
+A few important notes:
+* When you map or see a mapping where a key is combined with a special key, like in <Ctrl-{char}>, the case of {char} does not matter; thus CTRL-A and CTRL-a are equivalent
+* However, in a command like <CTRL-W>T the case of the last character does matter, as it's out of scope of the special key sequence. The same applies to all the other mappings that do not have special character: e.g. `a` and `A` are different mappings
+* `<key>` means the special key typed - e.g. <Esc> or <CTRL-G> (CTRL-g). This notation can be used in a double quoted strings, using "\<" at the start, e.g. "\<CTRL-Space>". This is especially useful for plugins that provide key maps customization via global variables
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+System key namespaces
+---------------------
+
+You might've probably noticed that some mappings start with 'g', e.g. `gu` (make the text lowercase).
+Though it's not a written rule, de-facto it's a VIM's key namespace as well as z, [, ], and <CTRL-w>.
+
+More on it - https://vi.stackexchange.com/questions/18744/what-is-the-meaning-of-g.
+
+
+******************************************************************************
+
+Final notes
+-----------
+
+To align this file around ==>, execute `:%EasyAlign 1/\s==>\s/ig[]g/^[-\*] /`.
+When you copy fragments of :help, they end up with two spaces between words. To normalize spaces, execute `%s/\(\.\)\s\{2\}\(\a\)/\1 \2/cg`.
+
+<EOF>

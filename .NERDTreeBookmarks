@@ -1,0 +1,11 @@
+zshcfg ~/.zshrc
+------ ~
+vimcfg ~/.vim/my_configs.vim
+.vimrc ~/.vimrc
+.vim ~/.vim
+------ ~
+------ ~
+.gitignore ~/.gitignore
+.ignore ~/.ignore
+------ ~
+.NERDTreeBookmarks ~/.NERDTreeBookmarks

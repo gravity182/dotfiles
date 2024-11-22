@@ -1,0 +1,23 @@
+[core]
+    eol = lf
+    autocrlf = input
+    excludesfile = ~/.gitignore
+    filemode = false
+    pager = delta
+[merge]
+    conflictstyle = zdiff3
+[include]
+    # these configs should contain only work or personal-related config
+    # they're excluded from the dotfiles repo
+    path = ~/.gitconfig_personal
+    path = ~/.gitconfig_work
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true  # use n and N to move between diff sections
+    side-by-side = false
+    line-numbers = true
+    hyperlinks = true
+    hyperlinks-file-link-format = "code://file/{path}:{line}"
+    theme = Monokai Extended
+

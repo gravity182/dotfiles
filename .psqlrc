@@ -1,0 +1,117 @@
+-- -------------------------
+--  ____  ____   ___  _     
+-- |  _ \/ ___| / _ \| |    
+-- | |_) \___ \| | | | |    
+-- |  __/ ___) | |_| | |___ 
+-- |_|   |____/ \__\_\_____|
+--                          
+-- Documentation: https://www.postgresql.org/docs/current/app-psql.html
+-- -------------------------
+
+
+-- enable quiet mode for the duration of the .psqlrc startup
+-- should go first
+\set QUIET 1
+
+-- customize prompts
+\set PROMPT1 '%M:%> %n@%/%R%#%x '
+\set PROMPT2 '%M %n@%/%R %# '
+
+-- different history for each database
+\set HISTFILE ~/.psql_history-:DBNAME
+-- history size
+\set HISTSIZE 5000
+-- Ignore duplicate lines from history
+\set HISTCONTROL ignoredups
+
+-- stop command processing after an error
+\set ON_ERROR_STOP on
+-- rollback on any error when executing non-interactively (like the 'off' mode),
+-- and ignore errors when interactive (like the 'on' mode)
+\set ON_ERROR_ROLLBACK interactive
+
+-- enable pager
+\pset pager on
+
+-- display null values as '[null]' instead a blank
+-- this allows to avoid confusion with empty strings
+\pset null '<NULL>'
+
+-- autocomplete preserved whatever case you started using, falling back to lower
+\set COMP_KEYWORD_CASE preserve-lower
+
+-- show query times
+\timing
+
+-- When querying large tables sometimes the output renders text that is difficult to read. Switch to expanded table format automatically in this case
+\x auto
+
+-- verbosity of error reports
+\set VERBOSITY verbose
+
+-- ----------------------
+-- Environment variables
+-- ----------------------
+
+-- PSQL_PAGER has a precedence over PAGER
+\setenv PSQL_PAGER 'less'
+\setenv LESS '-igRFXMS --tabs=4 --mouse'
+\setenv EDITOR 'vi'
+
+-- ----------------------
+-- shortcuts
+-- ----------------------
+
+\set version 'SELECT version();'
+\set extensions 'select * from pg_available_extensions;'
+\set help '\\?'
+\set q '\\q'
+\set wq '\\q'
+
+-- Administration queries
+
+\set conninfo 'SELECT usename, count(*) FROM pg_stat_activity group by usename;'
+
+\set activity 'SELECT datname, pid, usename, client_addr, client_hostname, state, query FROM pg_stat_activity;'
+
+\set transactions 'SELECT datname, pid, usename, client_addr, client_hostname, state, query FROM pg_stat_activity WHERE state like ''%transaction%'';'
+
+\set waits 'SELECT pg_stat_activity.pid, pg_stat_activity.query, pg_stat_activity.waiting, now() - pg_stat_activity.query_start AS \"totaltime\", pg_stat_activity.backend_start FROM pg_stat_activity WHERE pg_stat_activity.query !~ \'%IDLE%\'::text AND pg_stat_activity.waiting = true;'
+
+\set locks  'SELECT bl.pid AS blocked_pid, a.usename AS blocked_user, kl.pid AS blocking_pid, ka.usename AS blocking_user, a.query AS blocked_statement FROM pg_catalog.pg_locks bl JOIN pg_catalog.pg_stat_activity a ON bl.pid = a.pid JOIN pg_catalog.pg_locks kl JOIN pg_catalog.pg_stat_activity ka ON kl.pid = ka.pid ON bl.transactionid = kl.transactionid AND bl.pid != kl.pid WHERE NOT bl.granted;'
+
+\set dbsize 'SELECT datname, pg_size_pretty(pg_database_size(datname)) db_size FROM pg_database ORDER BY db_size;'
+
+\set tablesize 'SELECT nspname || \'.\' || relname AS \"relation\", pg_size_pretty(pg_relation_size(C.oid)) AS "size" FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace) WHERE nspname NOT IN (\'pg_catalog\', \'information_schema\') ORDER BY pg_relation_size(C.oid) DESC LIMIT 40;'
+
+\set settings 'SELECT name, setting, unit, context FROM pg_settings;'
+
+\set uptime 'SELECT now() - pg_postmaster_start_time() AS uptime;'
+
+
+\set QUIET 0
+
+
+-- output a welcome message on each psql startup
+\echo 'Welcome to PostgreSQL!'
+\echo Server date: `date '+%Y-%m-%d %H:%M:%S'`'\n'
+
+\echo 'Type \\? or :help to show help on PSQL'
+\echo 'Type \\h [commands] to show help on SQL commands'
+\echo 'Type \\q or :q/:wq to quit\n'
+
+\echo 'Administrative queries:'
+\echo '  :version\t-- Database version'
+\echo '  :extensions\t-- Available extensions'
+\echo '  :conninfo\t-- Server connections'
+\echo '  :activity\t-- Server queries'
+\echo '  :transactions\t-- Current transactions'
+\echo '  :waits\t-- Waiting queires'
+\echo '  :locks\t-- Lock info'
+\echo '  :dbsize\t-- Database Size'
+\echo '  :tablesize\t-- Tables Size'
+\echo '  :settings\t-- Server Settings'
+\echo '  :uptime\t-- Server Uptime'
+
+\echo '-------------------------------------\n'
+

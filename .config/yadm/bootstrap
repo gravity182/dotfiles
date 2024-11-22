@@ -1,0 +1,60 @@
+#!/bin/bash
+set -euo pipefail
+
+# files to be executed during each bootstrap stage
+# change the order of files if necessary
+BS_PRE=("helpers.sh")
+BS_SHELL=("shell.sh")
+BS_POST=("bin.sh" "vim.sh")
+STAGES=("BS_PRE" "BS_SHELL" "BS_POST")
+# Directory to look for bootstrap executables in
+BOOTSTRAP_D="${BASH_SOURCE[0]}.d"
+
+BOLD_RED='\033[1;31m'
+BOLD_YELLOW='\033[1;33m'
+BOLD_GREEN='\033[1;32m'
+RESET='\033[0m'
+
+echo -e "${BOLD_GREEN}Bootstraping your shell${RESET}"
+
+if [[ ! -d "$BOOTSTRAP_D" ]]; then
+    echo -e "${BOLD_RED}Error: bootstrap directory '$BOOTSTRAP_D' not found${RESET}" >&2
+    exit 1
+fi
+
+# check if all files are present and executable
+for stage in ${STAGES[@]}; do
+    declare -n arr="$stage"
+    for bootstrap in "${arr[@]}"; do
+        bootstrap="$BOOTSTRAP_D/$bootstrap"
+        if [[ ! -r "$bootstrap" || ! -x "$bootstrap" ]]; then
+            echo -e "${BOLD_RED}Error: bootstrap '$bootstrap' is not executable or missing${RESET}" >&2
+            exit 1
+        fi
+    done
+done
+
+# boostrap
+set +e
+for stage in ${STAGES[@]}; do
+    echo "----------------------"
+    echo -e "${BOLD_YELLOW}Current stage: ${stage##BS_}${RESET}"
+    declare -n arr="$stage"
+    for bootstrap in "${arr[@]}"; do
+        bootstrap="$BOOTSTRAP_D/$bootstrap"
+        echo "Executing '$bootstrap'"
+        if ! source "$bootstrap"; then
+            echo -e "${BOLD_RED}Error: bootstrap '$bootstrap' failed${RESET}" >&2
+            exit 1
+        fi
+    done
+done
+set -e
+
+echo "-------------------"
+echo -e "${BOLD_GREEN}Bootstrap finished!${RESET}"
+# repeated login is required
+# e.g. $SHELL stays the same even when opening zsh,
+# because SHELL is a login shell that was initially set for the user
+echo -e "${BOLD_GREEN}Please open a new shell for changes to take effect${RESET}"
+

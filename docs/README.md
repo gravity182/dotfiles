@@ -1,7 +1,9 @@
 # Dotfiles
 
 This is my dotfiles repo.
-Look around, maybe you'll find something useful for yourself.
+I spent a lot of time optimizing my setup and especially zsh setup.
+An ordinary zsh session starts in under ~110 ms.
+Look around, maybe you'll find something useful.
 
 Basic overview of the essential utils I personally use daily:
 - [zsh](https://www.zsh.org/)

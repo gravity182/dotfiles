@@ -4,8 +4,7 @@ This is my dotfiles repo.
 I spent a lot of time optimizing my setup and especially the zsh setup.
 An ordinary zsh session starts in under ~110 ms.
 
-What can be generated dynamically is generated dynamically during the bootstrap stage. This allows the repo to stay lightweight and guarantees you always get the up-to-date configuration. For instance, vim plugins and completion scripts.
-Look around, maybe you'll find something useful.
+What can be generated dynamically is generated dynamically during the bootstrap stage. This allows the repo to stay lightweight and guarantees you always get the up-to-date configuration. For instance, vim plugins and completion scripts are generated dynamically.
 
 Basic overview of the essential utils I personally use daily:
 - [zsh](https://www.zsh.org/) - shell. Configured to work in a vim mode

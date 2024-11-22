@@ -4,16 +4,17 @@ This is my dotfiles repo.
 Look around, maybe you'll find something useful for yourself.
 
 Basic overview of the essential utils I personally use daily:
-- zsh
-- vim
-- fzf
-- ripgrep
-- fd-find
-- zoxide for fast directory cd
-- bat
-- ncdu
-- jq
-- delta as a git diff pager
+- [zsh](https://www.zsh.org/)
+- [vim](https://www.vim.org/)
+- [tmux](https://github.com/tmux/tmux)
+- [fzf](https://github.com/junegunn/fzf) - fuzzy finder
+- [ripgrep](https://github.com/BurntSushi/ripgrep) - like `grep` but better
+- [fd-find](https://github.com/sharkdp/fd) - like `find` but better
+- [zoxide](https://github.com/ajeetdsouza/zoxide) - like `cd` but better
+- [bat](https://github.com/sharkdp/bat) - like `cat` but better
+- [ncdu](https://dev.yorhel.nl/ncdu) - file explorer
+- [jq](https://github.com/jqlang/jq) - json manipulation
+- [delta](https://github.com/dandavison/delta) - git diff pager
 
 All of them are already preconfigured.
 

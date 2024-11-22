@@ -1,7 +1,7 @@
 # Dotfiles
 
 This is my dotfiles repo.
-I spent a lot of time optimizing my setup and especially zsh setup.
+I spent a lot of time optimizing my setup and especially the zsh setup.
 An ordinary zsh session starts in under ~110 ms.
 Look around, maybe you'll find something useful.
 
@@ -14,9 +14,9 @@ Basic overview of the essential utils I personally use daily:
 - [fd-find](https://github.com/sharkdp/fd) - like `find` but better
 - [zoxide](https://github.com/ajeetdsouza/zoxide) - like `cd` but better
 - [bat](https://github.com/sharkdp/bat) - like `cat` but better
-- [ncdu](https://dev.yorhel.nl/ncdu) - file explorer
 - [jq](https://github.com/jqlang/jq) - json manipulation
 - [delta](https://github.com/dandavison/delta) - git diff pager
+- [ncdu](https://dev.yorhel.nl/ncdu) - file explorer
 
 All of them are already preconfigured.
 
@@ -26,8 +26,7 @@ First, put the repository's content into your home directory. For example:
 ```shell
 cd ~
 git clone git@github.com:blinky-z/dotfiles.git dotfiles
-mv dotfiles/* dotfiles/.* .
-rm -rf dotfiles
+mv dotfiles/* dotfiles/.* . && rm -rf dotfiles
 ```
 
 Then run:

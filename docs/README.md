@@ -35,5 +35,5 @@ Then run:
 ./.config/yadm/bootstrap
 ```
 
-The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils. I recommend you to look at the scripts yourself and adjust setup to your liking before running. High chances are you don't need everything I use.
+The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils. I recommend you to look at the scripts yourself and adjust the setup to your liking before running. High chances are you don't need everything I use.
 

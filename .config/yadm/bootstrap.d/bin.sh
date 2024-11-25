@@ -2,29 +2,40 @@
 set -euo pipefail
 
 system_type=$(uname -s)
+system_arch=$(uname -m)
 
 # change path temporarily; add to .zshrc for permanent effect
 export PATH=$PATH:$HOME/.arkade/bin/:$HOME/.local/bin
-echo "The path now is $PATH"
+
+BOLD_RED='\033[1;31m'
+BOLD_YELLOW='\033[1;33m'
+BOLD_GREEN='\033[1;32m'
+RESET='\033[0m'
+function log_install_pre() {
+    echo "\n--------------------------------------"
+    echo -e "${BOLD_YELLOW}Installing $1${RESET}"
+    echo "--------------------------------------"
+}
+
 
 if ! _has curl; then
-    echo "Installing curl"
+    log_install_pre 'curl'
     sudo apt install -y curl
 fi
 
 if ! _has wget; then
-    echo "Installing wget"
+    log_install_pre 'wget'
     sudo apt install -y wget
 fi
 
 if ! _has zoxide; then
-    echo "Installing zoxide"
+    log_install_pre 'zoxide'
     curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 fi
 
 
 if ! _has fd; then
-    echo "Installing fd-find"
+    log_install_pre 'fd-find'
     curl -fsSLO https://github.com/sharkdp/fd/releases/download/v10.1.0/fd-v10.1.0-x86_64-unknown-linux-gnu.tar.gz
     mkdir -pv ~/.fd-find
     tar -xf fd-v10.1.0-x86_64-unknown-linux-gnu.tar.gz --strip-components=1 -C ~/.fd-find
@@ -36,7 +47,7 @@ fi
 
 
 if ! _has rg; then
-    echo "Installing ripgrep"
+    log_install_pre 'ripgrep'
     curl -fsSLO https://github.com/BurntSushi/ripgrep/releases/download/14.1.0/ripgrep-14.1.0-aarch64-unknown-linux-gnu.tar.gz
     mkdir -pv ~/.ripgrep
     tar -xf ripgrep-14.1.0-aarch64-unknown-linux-gnu.tar.gz --strip-components=1 -C ~/.ripgrep
@@ -48,7 +59,7 @@ fi
 
 
 if ! _has fzf; then
-    echo "Installing fzf"
+    log_install_pre 'fzf'
     rm -rf ~/.fzf
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install --all
@@ -56,7 +67,7 @@ fi
 
 
 if ! _has bat; then
-    echo "Installing bat"
+    log_install_pre 'bat'
     curl -fsSLO https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-aarch64-unknown-linux-gnu.tar.gz
     mkdir -pv ~/.bat
     tar -xf bat-v0.24.0-aarch64-unknown-linux-gnu.tar.gz --strip-components=1 -C ~/.bat
@@ -68,25 +79,25 @@ fi
 
 
 if ! _has tree; then
-    echo "Installing tree"
+    log_install_pre 'tree'
     sudo apt install -y tree
 fi
 
 
 if ! volta -v &>/dev/null; then
-    echo "Installing volta"
+    log_install_pre 'volta'
     curl https://get.volta.sh | bash -s -- --skip-setup
 fi
 
 
 if ! node -v &>/dev/null; then
-    echo "Installing node"
+    log_install_pre 'node'
     ~/.volta/bin/volta install node
 fi
 
 
 if ! _has tldr; then
-    echo "Installing tldr"
+    log_install_pre 'tldr'
     ~/.volta/bin/volta install tldr
     mkdir -pv "$ZSH_CUSTOM/plugins/tldr"
     ln -sf "$HOME/.volta/tools/shared/tldr/bin/completion/zsh/_tldr" "$ZSH_CUSTOM/completions/_tldr"
@@ -95,28 +106,33 @@ fi
 
 
 if ! _has ncdu; then
-    echo "Installing ncdu"
+    log_install_pre 'ncdu'
     sudo apt update && sudo apt install -y ncdu
 fi
 
 if ! _has btop; then
-    echo "Installing btop"
+    log_install_pre 'btop'
     sudo apt install -y btop
 fi
 
 if ! _has ansible; then
-    echo "Installing ansible"
+    log_install_pre 'ansible'
     sudo apt install -y ansible
 fi
 
 if ! _has ansible-lint; then
-    echo "Installing ansible-lint"
+    log_install_pre 'ansible-lint'
     sudo apt install -y ansible-lint
 fi
 
 if ! _has ffmpeg; then
-    echo "Installing ffmpeg"
-    curl -fsSL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz -o ffmpeg-latest.tar.xz
+    log_install_pre 'ffmpeg'
+    if [[ $system_arch == 'arm64' ]]; then
+        curl -fsSL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linuxarm64-gpl.tar.xz -o ffmpeg-latest.tar.xz
+    else
+        curl -fsSL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz -o ffmpeg-latest.tar.xz
+    fi
+
     mkdir -p ~/.ffmpeg
     tar -xf ffmpeg-latest.tar.xz --strip-components=1 -C ~/.ffmpeg
     rm ffmpeg-latest.tar.xz
@@ -124,44 +140,44 @@ if ! _has ffmpeg; then
 fi
 
 if ! _has gifsicle; then
-    echo "Installing gifsicle"
+    log_install_pre 'gifsicle'
     sudo apt install -y gifsicle
 fi
 
 if ! _has pipx; then
-    echo "Installing pipx"
+    log_install_pre 'pipx'
     sudo apt install -y pipx
     register-python-argcomplete --shell zsh pipx > $ZSH_CUSTOM/completions/_pipx
 fi
 
 if ! _has yt-dlp; then
-    echo "Installing yt-dlp"
+    log_install_pre 'yt-dlp'
     # use the nightly version
     pipx install --pip-args '\--pre' yt-dlp
 fi
 
 if ! _has figlet; then
-    echo "Installing figlet"
+    log_install_pre 'figlet'
     sudo apt install -y figlet
 fi
 
 if ! _has jq; then
-    echo "Installing jq"
+    log_install_pre 'jq'
     sudo apt install -y jq
 fi
 
 if ! _has hyperfine; then
-    echo "Installing hyperfine"
+    log_install_pre 'hyperfine'
     sudo apt install -y hyperfine
 fi
 
 if ! _has zip; then
-    echo "Installing zip"
+    log_install_pre 'zip'
     sudo apt install -y zip
 fi
 
 if ! _has aws; then
-    echo "Installing AWS CLI"
+    log_install_pre 'AWS CLI'
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
         && unzip "awscliv2.zip" \
         && sudo ./aws/install \
@@ -169,7 +185,7 @@ if ! _has aws; then
 fi
 
 if ! _has delta; then
-    echo "Installing git-delta"
+    log_install_pre 'git-delta'
     curl -fsSL https://github.com/dandavison/delta/releases/download/0.18.2/delta-0.18.2-x86_64-unknown-linux-gnu.tar.gz -o "delta.tar.gz"
     mkdir -p ~/.delta
     tar -xf delta.tar.gz --strip-components=1 -C ~/.delta
@@ -178,41 +194,41 @@ if ! _has delta; then
 fi
 
 if ! _has arkade; then
-    echo "Installing arkade"
+    log_install_pre 'arkade'
     curl -sLS https://get.arkade.dev | sudo sh
     arkade completion zsh > $ZSH_CUSTOM/completions/_arkade
 fi
 
 if ! _has kubectl; then
-    echo "Installing kubectl"
+    log_install_pre 'kubectl'
 	arkade get kubectl
     kubectl completion zsh > $ZSH_CUSTOM/completions/_kubectl
 fi
 
 if ! _has kubectx; then
-	echo "Installing kubectx"
+    log_install_pre 'kubectx'
 	arkade get kubectx
 fi
 
 if ! _has kubens; then
-	echo "Installing kubens"
+    log_install_pre 'kubens'
 	arkade get kubens
 fi
 
 if ! _has helm; then
-	echo "Installing helm"
+    log_install_pre 'helm'
 	arkade get helm
     helm completion zsh > $ZSH_CUSTOM/completions/_helm
 fi
 
 if ! _has stern; then
-	echo "Installing stern"
+    log_install_pre 'stern'
 	arkade get stern
     stern --completion zsh > $ZSH_CUSTOM/completions/_stern
 fi
 
 if ! _has cmctl; then
-	echo "Installing cmctl - a CLI for cert-manager"
+	log_install_pre "cmctl - a CLI for cert-manager"
 	arkade get cmctl
     cmctl completion zsh > $ZSH_CUSTOM/completions/_cmctl
 fi

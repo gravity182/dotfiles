@@ -27,7 +27,7 @@ First, put the repository's content into your home directory. For example:
 ```shell
 cd ~
 git clone https://github.com/blinky-z/dotfiles.git dotfiles
-mv -n dotfiles/* dotfiles/.* . && rm -rf dotfiles
+mv -n dotfiles/* dotfiles/.* .; rm -rf dotfiles
 ```
 
 Then run:

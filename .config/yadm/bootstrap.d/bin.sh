@@ -3,6 +3,10 @@ set -euo pipefail
 
 system_type=$(uname -s)
 
+# change path temporarily; add to .zshrc for permanent effect
+export PATH=$PATH:$HOME/.arkade/bin/:$HOME/.local/bin
+echo "The path now is $PATH"
+
 if ! _has curl; then
     echo "Installing curl"
     sudo apt install -y curl
@@ -176,9 +180,6 @@ fi
 if ! _has arkade; then
     echo "Installing arkade"
     curl -sLS https://get.arkade.dev | sudo sh
-    # change path temporarily; add to .zshrc for permanent effect
-    path+=($HOME/.arkade/bin/)
-    export PATH
     arkade completion zsh > $ZSH_CUSTOM/completions/_arkade
 fi
 

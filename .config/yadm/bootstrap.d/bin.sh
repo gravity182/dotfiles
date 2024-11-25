@@ -12,7 +12,7 @@ BOLD_YELLOW='\033[1;33m'
 BOLD_GREEN='\033[1;32m'
 RESET='\033[0m'
 function log_install_pre() {
-    echo "\n--------------------------------------"
+    echo "--------------------------------------"
     echo -e "${BOLD_YELLOW}Installing $1${RESET}"
     echo "--------------------------------------"
 }

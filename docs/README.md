@@ -26,8 +26,8 @@ All of them are already preconfigured.
 First, put the repository's content into your home directory. For example:
 ```shell
 cd ~
-git clone git@github.com:blinky-z/dotfiles.git dotfiles
-mv dotfiles/* dotfiles/.* . && rm -rf dotfiles
+git clone https://github.com/blinky-z/dotfiles.git dotfiles
+mv -n dotfiles/* dotfiles/.* . && rm -rf dotfiles
 ```
 
 Then run:

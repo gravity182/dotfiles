@@ -112,10 +112,10 @@ fi
 
 if ! _has ffmpeg; then
     echo "Installing ffmpeg"
-    curl -fsSLO https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.0-latest-linux64-gpl-7.0.tar.xz
+    curl -fsSL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz -o ffmpeg-latest.tar.xz
     mkdir -p ~/.ffmpeg
-    tar -xf ffmpeg-n7.0-latest-linux64-gpl-7.0.tar.xz --strip-components=1 -C ~/.ffmpeg
-    rm ffmpeg-n7.0-latest-linux64-gpl-7.0.tar.xz
+    tar -xf ffmpeg-latest.tar.xz --strip-components=1 -C ~/.ffmpeg
+    rm ffmpeg-latest.tar.xz
     ln -sf "$HOME/.ffmpeg/bin/ffmpeg" "$HOME/.local/bin/ffmpeg"
 fi
 
@@ -178,6 +178,7 @@ if ! _has arkade; then
     curl -sLS https://get.arkade.dev | sudo sh
     # change path temporarily; add to .zshrc for permanent effect
     path+=($HOME/.arkade/bin/)
+    export PATH
     arkade completion zsh > $ZSH_CUSTOM/completions/_arkade
 fi
 

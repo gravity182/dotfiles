@@ -794,6 +794,8 @@ alias gitcfg_ignore="$EDITOR ~/.gitignore; git config --global core.excludesfile
 alias gitcfg_username='git config user.name'
 alias gitcfg_email='git config user.email'
 
+alias git_squash_all='git reset $(git commit-tree "HEAD^{tree}" -m "Initial commit")'
+
 # -------------------
 # Java
 # -------------------

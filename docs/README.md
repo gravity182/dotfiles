@@ -6,6 +6,8 @@ An ordinary zsh session starts in under ~110 ms.
 
 ![Terminal & Shell Preview](assets/terminal-preview.png)
 
+The terminal of my choice is the brand new [Windows Terminal](https://github.com/microsoft/terminal). The color theme of my choice is [Catppuccin](https://github.com/catppuccin) (Mocha). I use it both for the [terminal](https://github.com/catppuccin/windows-terminal) (you need to install it manually) and [tmux](https://github.com/catppuccin/tmux) (already configured).
+
 What can be generated dynamically is generated dynamically during the bootstrap stage. This allows the repo to stay lightweight and guarantees you always get the up-to-date configuration. For instance, vim plugins and completion scripts are generated dynamically.
 
 Basic overview of the essential utils I personally use daily:

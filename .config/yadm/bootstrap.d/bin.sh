@@ -7,16 +7,6 @@ system_arch=$(uname -m)
 # change path temporarily; add to .zshrc for permanent effect
 export PATH=$PATH:$HOME/.arkade/bin/:$HOME/.local/bin
 
-BOLD_RED='\033[1;31m'
-BOLD_YELLOW='\033[1;33m'
-BOLD_GREEN='\033[1;32m'
-RESET='\033[0m'
-function log_install_pre() {
-    echo "--------------------------------------"
-    echo -e "${BOLD_YELLOW}Installing $1${RESET}"
-    echo "--------------------------------------"
-}
-
 
 if ! _has curl; then
     log_install_pre 'curl'

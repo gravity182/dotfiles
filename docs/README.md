@@ -41,3 +41,5 @@ Then run:
 
 The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils. I recommend you to look at the scripts yourself and adjust the setup to your liking before running. High chances are you don't need everything I use.
 
+After script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.
+

@@ -449,14 +449,15 @@ alias whereami='pwd'
 alias catn='cat -n'
 
 # use eza instead of ls
-alias ls='eza --color=auto'
+alias eza='eza --color=auto --classify=auto --icons=never'
+alias ls='eza'
 alias l='eza --git-ignore'
 alias ll='eza --all --header --long'
 alias llm='eza --all --header --long --sort=modified'
 alias li='eza --all --header --long --inode'
 alias la='eza -lbhHigUmuSa'
 # lits dot files only
-alias ldot='ls -ld .*'
+alias ldot='eza -ld .*'
 
 alias tree='eza --tree'
 alias tree1='tree --level 1'

@@ -448,21 +448,19 @@ alias whereami='pwd'
 #   number all output lines
 alias catn='cat -n'
 
-# -l
-#   use a long listing format
-# -a, --all
-#   do not ignore entries starting with .
-# -h, --human-readable
-#   with -l and -s, print sizes like 1K 234M 2G etc.
-# --file-type
-#   like -F but doesn't append * to executable files
-alias ls='ls --color --file-type'
-alias ll='ls --color -lah --file-type'
-# lits dot files
-alias ldot='ls --color -ldh .*'
+# use eza instead of ls
+alias ls='eza --color=auto'
+alias l='eza --git-ignore'
+alias ll='eza --all --header --long'
+alias llm='eza --all --header --long --sort=modified'
+alias li='eza --all --header --long --inode'
+alias la='eza -lbhHigUmuSa'
+# lits dot files only
+alias ldot='ls -ld .*'
 
-alias tree1='tree -L 1'
-alias tree2='tree -L 2'
+alias tree='eza --tree'
+alias tree1='tree --level 1'
+alias tree2='tree --level 2'
 
 if _has rg; then
     alias rg='rg --smart-case 2>/dev/null'

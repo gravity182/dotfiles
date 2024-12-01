@@ -4,8 +4,13 @@ set -euo pipefail
 system_type=$(uname -s)
 system_arch=$(uname -m)
 
+echo -e "${BOLD_GREEN}Detected system arch: ${BOLD_YELLOW}$system_arch${RESET}"
+
 # change path temporarily; add to .zshrc for permanent effect
 export PATH=$PATH:$HOME/.arkade/bin/:$HOME/.local/bin
+
+mkdir -pv ~/.local/bin
+mkdir -pv ~/.local/share/man/{man1,man5}
 
 
 if ! _has curl; then
@@ -21,6 +26,32 @@ fi
 if ! _has zoxide; then
     log_install_pre 'zoxide'
     curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+fi
+
+if ! _has eza; then
+    log_install_pre 'eza - a modern alternative to ls'
+    if [[ $system_arch == "x86_64" ]]; then
+        curl -fsSL https://github.com/eza-community/eza/releases/download/v0.20.10/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
+    elif [[ $system_arch == "arm64" ]]; then
+        curl -fsSLO https://github.com/eza-community/eza/releases/download/v0.20.10/eza_aarch64-unknown-linux-gnu.tar.gz -o eza.tar.gz
+    fi
+    curl -fsSL https://github.com/eza-community/eza/releases/download/v0.20.10/completions-0.20.10.tar.gz -o eza-completions.tar.gz
+    curl -fsSL https://github.com/eza-community/eza/releases/download/v0.20.10/man-0.20.10.tar.gz -o eza-man.tar.gz
+
+    mkdir -pv ~/.eza/{completions,man}
+
+    tar -xf eza.tar.gz --strip-components=1 -C ~/.eza
+    tar -xf eza-completions.tar.gz --strip-components=3 -C ~/.eza/completions
+    tar -xf eza-man.tar.gz --strip-components=3 -C ~/.eza/man
+    rm -f eza.tar.gz
+    rm -f eza-completions.tar.gz
+    rm -f eza-man.tar.gz
+
+    ln -sf "$HOME/.eza/eza" "$HOME/.local/bin/eza"
+    ln -sf "$HOME/.eza/completions/_eza" "$ZSH_CUSTOM/completions/_eza"
+    ln -sf "$HOME/.eza/man/eza.1" "$HOME/.local/share/man/man1/eza.1"
+    ln -sf "$HOME/.eza/man/eza_colors.5" "$HOME/.local/share/man/man5/eza_colors.5"
+    ln -sf "$HOME/.eza/man/eza_colors-explanation.5" "$HOME/.local/share/man/man5/eza_colors-explanation.5"
 fi
 
 

@@ -64,6 +64,8 @@ DISABLE_MAGIC_FUNCTIONS=false
 # This makes repository status check for large repositories
 # much, much faster.
 DISABLE_UNTRACKED_FILES_DIRTY=true
+# this breaks colored output in `ls` for some configurations
+DISABLE_LS_COLORS=true
 ENABLE_CORRECTION=true
 # this can cause issues in fzf-tab (https://github.com/Aloxaf/fzf-tab/pull/236#issuecomment-1125102707)
 COMPLETION_WAITING_DOTS=false

@@ -25,13 +25,13 @@ if [[ -z "${TMUX}" ]] && [[ -n "$TTY" ]] && [[ -n "$DISPLAY" ]]; then
     exec tmux new-session -A -s $USER >/dev/null 2>&1
 fi
 
-# another helper function to measure the startup time
+# a helper function to measure the startup time
 timezsh() {
     shell=${1-$SHELL}
     for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
 
-# this is the best method to measure startup time
+# this is the best method to measure the startup time
 # see https://www.reddit.com/r/zsh/comments/1bqtb7m/comment/kx5x33l
 tracezsh() {
     ( exec -l zsh --sourcetrace 2>&1 ) | ts -i '%.s'
@@ -46,7 +46,8 @@ fi
 
 
 # --------------------------------------
-# oh-my-zsh
+# oh-my-zsh settings
+# see https://github.com/ohmyzsh/ohmyzsh/wiki/Settings
 # --------------------------------------
 
 # this check takes some time during startup
@@ -54,21 +55,19 @@ fi
 zstyle ':omz:update' mode disabled
 zstyle ':omz:update' frequency 28
 
-# oh-my-zsh settings
-# see https://github.com/ohmyzsh/ohmyzsh/wiki/Settings
-# ------------------
 # .zcompdump is a cache file used by compinit (completions)
 # version is included because the cache file is incompatible between zsh versions
 ZSH_COMPDUMP="${ZDOTDIR:-${HOME}}/.zcompdump-${ZSH_VERSION}"
 CASE_SENSITIVE=false
 DISABLE_MAGIC_FUNCTIONS=false
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
+# disable marking untracked files under VCS as dirty.
+# This makes repository status check for large repositories
 # much, much faster.
 DISABLE_UNTRACKED_FILES_DIRTY=true
 ENABLE_CORRECTION=true
 # this can cause issues in fzf-tab (https://github.com/Aloxaf/fzf-tab/pull/236#issuecomment-1125102707)
 COMPLETION_WAITING_DOTS=false
+
 ZSH_THEME='powerlevel10k/powerlevel10k'
 
 # --------------------------------------
@@ -126,7 +125,7 @@ zstyle ':omz:plugins:*' aliases no
 source "$HOME/.zconfig/functions/helpers.zsh"
 
 # --------------------
-# Completions
+# Completions (fpath)
 # --------------------
 
 # brew shell completion

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 
 if ! _has tmux; then
     log_install_pre 'tmux'
@@ -7,10 +7,10 @@ if ! _has tmux; then
 fi
 
 log_install_pre 'tmux plugins'
-# start a server but don't attach to it
+[[ -d ~/.tmux/plugins/tpm ]] || git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 tmux start-server
-# # create a new session but don't attach to it either
 tmux new-session -d
+tmux source ~/.tmux.conf
 # # install the plugins
 ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 tmux kill-server

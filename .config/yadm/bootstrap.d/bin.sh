@@ -57,10 +57,14 @@ fi
 
 if ! _has fd; then
     log_install_pre 'fd-find'
-    curl -fsSLO https://github.com/sharkdp/fd/releases/download/v10.1.0/fd-v10.1.0-x86_64-unknown-linux-gnu.tar.gz
+    if [[ $system_arch == 'arm64' ]]; then
+        curl -fsSL https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-aarch64-unknown-linux-gnu.tar.gz -o fd.tar.gz
+    else
+        curl -fsSL https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-gnu.tar.gz -o fd.tar.gz
+    fi
     mkdir -pv ~/.fd-find
-    tar -xf fd-v10.1.0-x86_64-unknown-linux-gnu.tar.gz --strip-components=1 -C ~/.fd-find
-    rm fd-v10.1.0-x86_64-unknown-linux-gnu.tar.gz
+    tar -xf fd.tar.gz --strip-components=1 -C ~/.fd-find
+    rm fd.tar.gz
     ln -sf "$HOME/.fd-find/fd" "$HOME/.local/bin/fd"
     ln -sf "$HOME/.fd-find/autocomplete/_fd" "$ZSH_CUSTOM/completions/_fd"
     ln -sf "$HOME/.fd-find/fd.1" "$HOME/.local/share/man/man1/fd.1"
@@ -69,10 +73,14 @@ fi
 
 if ! _has rg; then
     log_install_pre 'ripgrep'
-    curl -fsSLO https://github.com/BurntSushi/ripgrep/releases/download/14.1.0/ripgrep-14.1.0-aarch64-unknown-linux-gnu.tar.gz
+    if [[ $system_arch == 'arm64' ]]; then
+        curl -fsSL https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-aarch64-unknown-linux-gnu.tar.gz -o ripgrep.tar.gz
+    else
+        curl -fsSL https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz -o ripgrep.tar.gz
+    fi
     mkdir -pv ~/.ripgrep
-    tar -xf ripgrep-14.1.0-aarch64-unknown-linux-gnu.tar.gz --strip-components=1 -C ~/.ripgrep
-    rm ripgrep-14.1.0-aarch64-unknown-linux-gnu.tar.gz
+    tar -xf ripgrep.tar.gz --strip-components=1 -C ~/.ripgrep
+    rm ripgrep.tar.gz
     ln -sf "$HOME/.ripgrep/rg" "$HOME/.local/bin/rg"
     ln -sf "$HOME/.ripgrep/complete/_rg" "$ZSH_CUSTOM/completions/_rg"
     ln -sf "$HOME/.ripgrep/doc/rg.1" "$HOME/.local/share/man/man1/rg.1"

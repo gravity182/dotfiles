@@ -464,7 +464,7 @@ alias tree1='tree --level 1'
 alias tree2='tree --level 2'
 
 if _has rg; then
-    alias rg='rg --smart-case 2>/dev/null'
+    alias rg='rg --smart-case --hidden --no-ignore-vcs'
 fi
 
 alias tarc='tar -czvf'

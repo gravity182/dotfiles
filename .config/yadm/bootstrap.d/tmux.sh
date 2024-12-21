@@ -11,7 +11,6 @@ log_install_pre 'tmux plugins'
 tmux start-server
 tmux new-session -d
 tmux source ~/.tmux.conf
-# # install the plugins
 ~/.tmux/plugins/tpm/scripts/install_plugins.sh
-tmux kill-server
+tmux source ~/.tmux.conf
 

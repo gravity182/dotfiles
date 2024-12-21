@@ -89,10 +89,14 @@ fi
 
 if ! _has bat; then
     log_install_pre 'bat'
-    curl -fsSLO https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-aarch64-unknown-linux-gnu.tar.gz
+    if [[ $system_arch == 'arm64' ]]; then
+        curl -fsSL https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-aarch64-unknown-linux-gnu.tar.gz -o bat.tar.gz
+    else
+        curl -fsSL https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz -o bat.tar.gz
+    fi
     mkdir -pv ~/.bat
-    tar -xf bat-v0.24.0-aarch64-unknown-linux-gnu.tar.gz --strip-components=1 -C ~/.bat
-    rm bat-v0.24.0-aarch64-unknown-linux-gnu.tar.gz
+    tar -xf bat.tar.gz --strip-components=1 -C ~/.bat
+    rm bat.tar.gz
     ln -sf "$HOME/.bat/bat" "$HOME/.local/bin/bat"
     ln -sf "$HOME/.bat/autocomplete/bat.zsh" "$ZSH_CUSTOM/completions/bat.zsh"
     ln -sf "$HOME/.bat/bat.1" "$HOME/.local/share/man/man1/bat.1"

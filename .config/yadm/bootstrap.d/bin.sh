@@ -30,13 +30,14 @@ fi
 
 if ! _has eza; then
     log_install_pre 'eza - a modern alternative to ls'
-    if [[ $system_arch == "x86_64" ]]; then
-        curl -fsSL https://github.com/eza-community/eza/releases/download/v0.20.10/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
-    elif [[ $system_arch == "arm64" ]]; then
-        curl -fsSLO https://github.com/eza-community/eza/releases/download/v0.20.10/eza_aarch64-unknown-linux-gnu.tar.gz -o eza.tar.gz
+    version='0.20.10'
+    if [[ $system_arch == "arm64" ]]; then
+        curl -fsSL https://github.com/eza-community/eza/releases/download/v$version/eza_aarch64-unknown-linux-gnu.tar.gz -o eza.tar.gz
+    else
+        curl -fsSL https://github.com/eza-community/eza/releases/download/v$version/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
     fi
-    curl -fsSL https://github.com/eza-community/eza/releases/download/v0.20.10/completions-0.20.10.tar.gz -o eza-completions.tar.gz
-    curl -fsSL https://github.com/eza-community/eza/releases/download/v0.20.10/man-0.20.10.tar.gz -o eza-man.tar.gz
+    curl -fsSL https://github.com/eza-community/eza/releases/download/v$version/completions-$version.tar.gz -o eza-completions.tar.gz
+    curl -fsSL https://github.com/eza-community/eza/releases/download/v$version/man-$version.tar.gz -o eza-man.tar.gz
 
     mkdir -pv ~/.eza/{completions,man}
 
@@ -57,10 +58,11 @@ fi
 
 if ! _has fd; then
     log_install_pre 'fd-find'
+    version='v10.2.0'
     if [[ $system_arch == 'arm64' ]]; then
-        curl -fsSL https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-aarch64-unknown-linux-gnu.tar.gz -o fd.tar.gz
+        curl -fsSL https://github.com/sharkdp/fd/releases/download/$version/fd-$version-aarch64-unknown-linux-gnu.tar.gz -o fd.tar.gz
     else
-        curl -fsSL https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-gnu.tar.gz -o fd.tar.gz
+        curl -fsSL https://github.com/sharkdp/fd/releases/download/$version/fd-$version-x86_64-unknown-linux-gnu.tar.gz -o fd.tar.gz
     fi
     mkdir -pv ~/.fd-find
     tar -xf fd.tar.gz --strip-components=1 -C ~/.fd-find

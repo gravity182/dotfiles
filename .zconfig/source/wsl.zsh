@@ -1,3 +1,10 @@
+# __        ______  _     
+# \ \      / / ___|| |    
+#  \ \ /\ / /\___ \| |    
+#   \ V  V /  ___) | |___ 
+#    \_/\_/  |____/|_____|
+#                         
+
 if [[ -z "$WSL_DISTRO_NAME" ]]; then
     return 1
 fi
@@ -10,6 +17,9 @@ alias wslconfig="sudo $EDITOR /etc/wsl.conf"
 alias wslcfg='wslconfig'
 
 wuser="ersho"
+
+# functions
+# -------------------
 
 # Mount a removable USB drive
 function mount_usb() {

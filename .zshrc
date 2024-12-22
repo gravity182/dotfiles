@@ -44,6 +44,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+ZCONFIG_DIR="$HOME/.config/zsh"
 
 # --------------------------------------
 # oh-my-zsh settings
@@ -122,9 +123,9 @@ zstyle ':omz:plugins:*' aliases no
 # --------------------------------------
 
 # might want to convert it to the autoload style to reduce startup time
-# fpath+="$HOME/.zconfig/functions"
+# fpath+="$ZCONFIG_DIR/functions"
 # autoload ...
-source "$HOME/.zconfig/functions/helpers.zsh"
+source "$ZCONFIG_DIR/functions/helpers.zsh"
 
 # --------------------
 # Completions (fpath)
@@ -137,11 +138,13 @@ if _is_osx; then
 fi
 
 # this must be added to fpath before loading omz
-# adding it as a plugin is correct, but not optimal (see https://github.com/zsh-users/zsh-completions/issues/603)
+# adding it as a plugin is correct, but not very optimal
+# see https://github.com/zsh-users/zsh-completions/issues/603
 fpath+="$ZSH_CUSTOM/plugins/zsh-completions/src"
 
 # if you want to navigate through completions in vi-like style (hjkl)
 # not needed when fzf-tab installed
+# 
 # zmodload zsh/complist
 # bindkey -M menuselect 'h' vi-backward-char
 # bindkey -M menuselect 'k' vi-up-line-or-history
@@ -1110,7 +1113,7 @@ fi
 # Source other configs
 # =====================
 
-find ~/.zconfig/source -type f | sort | while read -r file; do
+find $ZCONFIG_DIR/source -type f | sort | while read -r file; do
     source "$file"
 done
 

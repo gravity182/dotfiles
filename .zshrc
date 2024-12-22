@@ -742,58 +742,12 @@ function manf2() {
 
 # -------------------
 # Git
+# ---
+# Note: aliases are set in .gitconfig
 # -------------------
-
-alias gc='git commit'
-alias gca='git commit --amend'
-
-alias gst='git stash'
-function gstu() {
-    if [[ -n $1 ]]; then
-        # pass the message through if provided
-        git stash push --include-untracked --message $1
-    else
-        git stash push --include-untracked
-    fi
-}
-alias gstu='gstu'
-
-alias gp='git push'
-alias gpf='git push -f'
-
-alias grb='git rebase'
-alias grba='git rebase --abort'
-function grbi() {
-    if [[ $1 =~ $number_regex ]]; then
-        # rebase commits down to the commit relative to HEAD
-        git rebase --interactive HEAD~$1
-    else
-        # rebase commits down to the specific commit hash
-        git rebase --interactive $1
-    fi
-}
-alias grbi='grbi'
-# git rebase on|origin master
-alias grbom='git fetch; git rebase $(git_main_branch)'
-alias grbomi='git fetch; git rebase -i $(git_main_branch)'
-
-alias grs='git reset'
-alias grss='git reset --soft'
-alias grsh='git reset --hard'
-
-alias gl='git log --stat --graph --decorate'
-# git log one-line
-alias glo='git log --graph --pretty='\''%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'\'
-
-alias grefl='git reflog --relative-date'
 
 alias gitcfg="$EDITOR ~/.gitconfig"
 alias gitcfg_ignore="$EDITOR ~/.gitignore; git config --global core.excludesfile ~/.gitignore"
-
-alias gitcfg_username='git config user.name'
-alias gitcfg_email='git config user.email'
-
-alias git_squash_all='git reset $(git commit-tree "HEAD^{tree}" -m "Initial commit")'
 
 # -------------------
 # Misc aliases

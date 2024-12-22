@@ -2,7 +2,7 @@
 set -eu
 
 if [[ "$OSTYPE" != "darwin"* ]]; then
-    return 1
+    return 0
 fi
 
 if ! _has brew; then

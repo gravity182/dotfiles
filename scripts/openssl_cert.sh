@@ -5,5 +5,6 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
-openssl s_client -servername "$1" -connect "$1":443
+domain="$1"
+openssl s_client -servername "$domain" -connect "$domain":443
 

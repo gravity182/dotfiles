@@ -5,9 +5,6 @@
 # /____||____/ |_| |_||_| \_\ \____|
 #
 
-# uncomment the next line to profile your boot script; execute `zprof` to see data
-# zmodload zsh/zprof
-
 # Start tmux on every shell login
 # 1. if we are not already inside a tmux session,
 # 2. and if a terminal is interactive (not automation),
@@ -25,17 +22,6 @@ if [[ -z "${TMUX}" ]] && [[ -n "$TTY" ]] && [[ -n "$DISPLAY" ]]; then
     exec tmux new-session -A -s $USER >/dev/null 2>&1
 fi
 
-# a helper function to measure the startup time
-timezsh() {
-    shell=${1-$SHELL}
-    for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
-}
-
-# this is the best method to measure the startup time
-# see https://www.reddit.com/r/zsh/comments/1bqtb7m/comment/kx5x33l
-tracezsh() {
-    ( exec -l zsh --sourcetrace 2>&1 ) | ts -i '%.s'
-}
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -44,7 +30,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-ZCONFIG_DIR="$HOME/.config/zsh"
+ZCONFIG_DIR="$HOME/.config/zsh.d"
 
 # --------------------------------------
 # oh-my-zsh settings
@@ -100,19 +86,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 fi
 
-# measure startup time of each plugin
-# for plugin ($plugins); do
-#   timer=$(($(date +%s%N)/1000000))
-#   if [ -f $ZSH_CUSTOM/plugins/$plugin/$plugin.plugin.zsh ]; then
-#     source $ZSH_CUSTOM/plugins/$plugin/$plugin.plugin.zsh
-#   elif [ -f $ZSH/plugins/$plugin/$plugin.plugin.zsh ]; then
-#     source $ZSH/plugins/$plugin/$plugin.plugin.zsh
-#   fi
-#   now=$(($(date +%s%N)/1000000))
-#   elapsed=$(($now-$timer))
-#   echo $elapsed"ms"":" $plugin
-# done
-
 # I don't need any aliases
 zstyle ':omz:plugins:*' aliases no
 # you can allow specific plugins though
@@ -160,8 +133,38 @@ fpath+="$ZSH_CUSTOM/plugins/zsh-completions/src"
 
 source $ZSH/oh-my-zsh.sh
 
-# compinit is called by oh-my-zsh already
-# autoload -U compinit; compinit
+
+# ======================================
+# Zsh tuning
+# ======================================
+
+# uncomment the next line to profile your boot script; execute `zprof` to see data
+# zmodload zsh/zprof
+
+# a helper function to measure the startup time
+timezsh() {
+    shell=${1-$SHELL}
+    for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
+}
+
+# this is the best method to measure the startup time
+# see https://www.reddit.com/r/zsh/comments/1bqtb7m/comment/kx5x33l
+tracezsh() {
+    ( exec -l zsh --sourcetrace 2>&1 ) | ts -i '%.s'
+}
+
+# uncomment the next lines to measure startup time of each plugin
+# for plugin ($plugins); do
+#   timer=$(($(date +%s%N)/1000000))
+#   if [ -f $ZSH_CUSTOM/plugins/$plugin/$plugin.plugin.zsh ]; then
+#     source $ZSH_CUSTOM/plugins/$plugin/$plugin.plugin.zsh
+#   elif [ -f $ZSH/plugins/$plugin/$plugin.plugin.zsh ]; then
+#     source $ZSH/plugins/$plugin/$plugin.plugin.zsh
+#   fi
+#   now=$(($(date +%s%N)/1000000))
+#   elapsed=$(($now-$timer))
+#   echo $elapsed"ms"":" $plugin
+# done
 
 
 # ======================================
@@ -317,7 +320,7 @@ zstyle ':completion:*:(ssh|scp|sftp|rsh|rsync):*:hosts' hosts
 # -----------------------
 
 # --cmd cd will replace the `cd` command
-# cd=z, cdi=zi
+# that is, cd=z, cdi=zi
 eval "$(zoxide init zsh --cmd cd)"
 
 # -----------------
@@ -335,12 +338,13 @@ fi
 # ---
 # To see the full list of active aliases, run `alias`
 # To search for a specific alias, run `alf`
+# 
 # Remember that aliases are expanded when the function definition is parsed,
-# so in general you want to define aliases before functions
+# so usually you want to define aliases before functions
 # ===============
 
 # -------------------
-# Config aliases
+# Configs
 # -------------------
 
 alias zshconfig="$EDITOR ~/.zshrc; zshreload"
@@ -392,12 +396,14 @@ function .dotsync-sys() {
 }
 
 # -------------------
-# Core utils aliases
+# Core utils
 # -------------------
 
 alias hs='history'
 
 if _has fd; then
+    alias fd='fd --hidden --no-ignore-vcs --follow'
+
     alias fdf='fd -t f --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
     alias fdd='fd -t d --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
     alias fdd1='fd -t d -d 1 --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
@@ -421,8 +427,10 @@ elif _is_osx; then
     alias df='df -H -Y -I -l 2>/dev/null'
 fi
 
+alias bat='bat --style=auto'
+
 # use bat by default
-alias cat='bat --style=auto'
+alias cat='bat'
 
 # -r, -R, --recursive
 #   remove directories and their contents recursively
@@ -447,12 +455,9 @@ function mkcd() {
 
 alias whereami='pwd'
 
-# -n, --number
-#   number all output lines
-alias catn='cat -n'
+alias eza='eza --color=auto --classify=auto --icons=never'
 
 # use eza instead of ls
-alias eza='eza --color=auto --classify=auto --icons=never'
 alias ls='eza'
 alias l='eza --git-ignore'
 alias ll='eza --all --header --long'
@@ -483,8 +488,8 @@ alias tarx='tar -xvf'
 alias tarls='tar -tvf'
 
 # shows job's PID
-# execute `bg %n` to restart a suspended job and run it in the background
-# execute `fg %n` switch a job running in the background into the foreground (it'll also automatically restart the job)
+# execute `bg %n` to continue a suspended job and run it in the background
+# execute `fg %n` switch a job running in the background into the foreground (it'll also automatically continue the job)
 # execute `kill %n` or `kill <pid>` to kill the job
 alias jobs='jobs -l'
 
@@ -568,7 +573,7 @@ function ssh_tun_close_all() {
 }
 
 # ------------------------
-# lsof
+# Observability
 # ------------------------
 
 alias lsof_inet="lsof -i -P -n"
@@ -736,17 +741,8 @@ function manf2() {
 }
 
 # -------------------
-# Security
-# -------------------
-
-alias generate_secure_pwd_base64='openssl rand -base64 32'
-alias generate_secure_pwd='pwgen -s -1 32'
-
-# -------------------
 # Git
 # -------------------
-
-number_regex='^[0-9]+$'
 
 alias gc='git commit'
 alias gca='git commit --amend'
@@ -800,20 +796,10 @@ alias gitcfg_email='git config user.email'
 alias git_squash_all='git reset $(git commit-tree "HEAD^{tree}" -m "Initial commit")'
 
 # -------------------
-# Java
-# -------------------
-
-alias clear_m2='rm -rf ~/.m2'
-
-# -------------------
-# JavaScript
-# -------------------
-
-alias yi='yarn install'
-
-# -------------------
 # Misc aliases
 # -------------------
+
+alias ai='aichat'
 
 # apply the provided functions ($2...) to all files or dirs found by the provided glob ($1)
 # all functions must accept exactly one argument, which would be the path of a found file/dir
@@ -1101,7 +1087,7 @@ alias fd_regex_help=rust_regex_help
 alias rg_regex_help=rust_regex_help
 
 # AWS CLI
-# ----------
+# -------
 
 if _has aws; then
     # prefill the path to aws_completer for faster startup
@@ -1116,6 +1102,30 @@ fi
 find $ZCONFIG_DIR/source -type f | sort | while read -r file; do
     source "$file"
 done
+
+# =============
+# Final config
+# ---
+# Dependent on the source files above or overwrites
+# =============
+
+# Normalize `open` across Linux, macOS, and Windows
+if ! _is_osx; then
+	if [[ -n "$WSL_DISTRO_NAME" ]]; then
+		alias open='explorer.exe'
+	else
+		alias open='xdg-open'
+	fi
+fi
+function open() {
+	if [[ -z "$1" ]]; then
+		open .
+	else
+		open "$1"
+	fi
+}
+alias open='open'
+
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh directly
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

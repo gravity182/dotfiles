@@ -12,7 +12,6 @@ export PATH=$PATH:$HOME/.arkade/bin/:$HOME/.local/bin
 mkdir -pv ~/.local/bin
 mkdir -pv ~/.local/share/man/{man1,man5}
 
-
 if ! _has curl; then
     log_install_pre 'curl'
     sudo apt install -y curl
@@ -21,6 +20,11 @@ fi
 if ! _has wget; then
     log_install_pre 'wget'
     sudo apt install -y wget
+fi
+
+if ! _has dig; then
+    log_install_pre 'dnsutils'
+    sudo apt install -y dnsutils
 fi
 
 if ! _has zoxide; then

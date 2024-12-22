@@ -27,19 +27,20 @@ All of them are already preconfigured.
 
 ## Quick start
 
-First, put the repository's content into your home directory. For example:
+Execute the following step-by-step:
 ```shell
 cd ~
 git clone https://github.com/blinky-z/dotfiles.git dotfiles
-mv -n dotfiles/* dotfiles/.* .; rm -rf dotfiles
-```
-
-Then run:
-```shell
+mv dotfiles/* dotfiles/.* .; rm -rf dotfiles
 ./.config/yadm/bootstrap
 ```
 
-The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils. I recommend you to look at the scripts yourself and adjust the setup to your liking before running. High chances are you don't need everything I use.
+> [!WARNING]
+> Make sure to backup your home dir beforehard.
+> This repo will overwrite everything upon installation.
 
-After script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.
+The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils.
+I recommend you to look at the scripts yourself and adjust the setup to your liking before running. High chances are you don't need everything I use.
+
+After the bootstrap script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.
 

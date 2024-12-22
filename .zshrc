@@ -1081,7 +1081,7 @@ sbtrkt 	    fuzzy-match                     Items that match sbtrkt
 "
 # rust regex help (used by fzf, rg, fd)
 # see https://docs.rs/regex/1.10.3/regex/#syntax
-alias rs_regex_help="echo \"\
+alias rust_regex_help="echo \"\
 .          any character except new line
 [0-9]      any ASCII digit
 [xyz]      A character class matching either x, y or z
@@ -1094,8 +1094,8 @@ x{n}       exactly n x
 ^          the beginning of a haystack
 $          the end of a haystack\"
 "
-alias fd_regex_help=rs_regex_help
-alias rg_regex_help=rs_regex_help
+alias fd_regex_help=rust_regex_help
+alias rg_regex_help=rust_regex_help
 
 # AWS CLI
 # ----------
@@ -1106,32 +1106,13 @@ if _has aws; then
     complete -C '/usr/local/bin/aws_completer' aws
 fi
 
-
-# Kubernetes
-# ----------
-
-# it's recommended to put kube config into a user-owned file in order to use kubectl without sudo
-export KUBECONFIG="$HOME/.kube/config-homeserver:$HOME/.kube/config-jelly"
-
-alias k='kubectl'
-
-function kube_run_busybox() {
-    kubectl run -it busybox --image=busybox --restart=Never
-}
-
-function kube_clean_evicted() {
-    kubectl get pods -A -o json \
-        | jq '.items[] | select((.status.reason == "Evicted") or (.status.phase == "Succeeded")) | "kubectl delete pods \(.metadata.name) -n \(.metadata.namespace)"' \
-        | xargs -n 1 $SHELL -c
-}
-
 # =====================
 # Source other configs
 # =====================
 
 find ~/.zconfig/source -type f | sort | while read -r file; do
-    source "$file" <&3
-done 3<&0
+    source "$file"
+done
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh directly
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

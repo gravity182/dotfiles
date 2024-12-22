@@ -27,7 +27,7 @@ All of them are already preconfigured.
 
 ## Quick start
 
-Execute the following step-by-step:
+Execute the following:
 ```shell
 cd ~
 git clone https://github.com/blinky-z/dotfiles.git dotfiles
@@ -35,12 +35,13 @@ mv dotfiles/* dotfiles/.* .; rm -rf dotfiles
 ./.config/yadm/bootstrap
 ```
 
-> [!WARNING]
-> Make sure to backup your home dir beforehard.
-> This repo will overwrite everything upon installation.
-
 The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils.
 I recommend you to look at the scripts yourself and adjust the setup to your liking before running. High chances are you don't need everything I use.
 
 After the bootstrap script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.
+
+> [!WARNING]
+> Make sure to backup your home dir beforehard.
+> 
+> This repo will overwrite everything upon installation.
 

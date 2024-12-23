@@ -927,102 +927,97 @@ fi
 # to enable on macOS + brew, execute /opt/homebrew/opt/fzf/install;
 # to enable on Ubuntu (provided fzf has been installed directly from the git repo), execute ~/.fzf/install;
 # this will generate the ~/.fzf.zsh file which should be sourced here
-[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+source ~/.fzf.zsh
 
-# fzf configuration
-if _has fzf; then
-    # Specify the default command that fzf shall execute on empty stdin
-    export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
+# Specify the default command that fzf shall execute on empty stdin
+export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
 
-    # see https://github.com/junegunn/fzf#key-bindings-for-command-line
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
+# see https://github.com/junegunn/fzf#key-bindings-for-command-line
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
 
-    # these default options will be used everytime you call fzf
-    FZF_MIN_HEIGHT="40%"
-    export FZF_DEFAULT_OPTS="--height $FZF_MIN_HEIGHT
-      --border horizontal
-      --layout reverse
-      --info default
-      --separator ''
-      --prompt '∷ '
-      --pointer '>'
-      --marker '>'
-      --bind 'ctrl-space:toggle+down'
-      --bind 'ctrl-/:toggle-preview'
-      --bind 'ctrl-y:accept'
-      --bind 'ctrl-d:half-page-down,ctrl-u:half-page-up'
-      "
+# these default options will be used everytime you call fzf
+FZF_MIN_HEIGHT="40%"
+export FZF_DEFAULT_OPTS="--height $FZF_MIN_HEIGHT
+  --border horizontal
+  --layout reverse
+  --info default
+  --separator ''
+  --prompt '∷ '
+  --pointer '>'
+  --marker '>'
+  --bind 'ctrl-space:toggle+down'
+  --bind 'ctrl-/:toggle-preview'
+  --bind 'ctrl-y:accept'
+  --bind 'ctrl-d:half-page-down,ctrl-u:half-page-up'
+  "
 
-    # these options overwrite the default ones above
-    export FZF_BINDING_OPTS="--border rounded
-      --layout default
-      --info inline-right
-      --color header:italic
-      --separator '─'
-      "
-    export FZF_CTRL_T_OPTS="$FZF_BINDING_OPTS
-      --preview 'bat --color=always --style=numbers --line-range=:500 {}'
-      --bind 'ctrl-/:change-preview-window(hidden|)'
-      --walker-skip .git,node_modules,target
-      "
-    export FZF_ALT_C_OPTS="$FZF_BINDING_OPTS
-      --preview 'tree -L 2 -C {}'
-      --bind 'ctrl-/:change-preview-window(hidden|)'
-      --walker-skip .git,node_modules,target
-      "
-    export FZF_CTRL_R_OPTS="$FZF_BINDING_OPTS
-      --preview 'echo {}'
-      --preview-window down:5:hidden:wrap
-      --bind 'ctrl-/:toggle-preview'
-      "
+# these options overwrite the default ones above
+export FZF_BINDING_OPTS="--border rounded
+  --layout default
+  --info inline-right
+  --color header:italic
+  --separator '─'
+  "
+export FZF_CTRL_T_OPTS="$FZF_BINDING_OPTS
+  --preview 'bat --color=always --style=numbers --line-range=:500 {}'
+  --bind 'ctrl-/:change-preview-window(hidden|)'
+  "
+export FZF_ALT_C_OPTS="$FZF_BINDING_OPTS
+  --preview 'tree -L 2 -C {}'
+  --bind 'ctrl-/:change-preview-window(hidden|)'
+  "
+export FZF_CTRL_R_OPTS="$FZF_BINDING_OPTS
+  --preview 'echo {}'
+  --preview-window down:5:hidden:wrap
+  --bind 'ctrl-/:toggle-preview'
+  "
 
-    # map Ctrl-E to the cd/dir search (the same as Alt-C)
-    zle     -N              fzf-cd-widget
-    bindkey -M emacs '\C-e' fzf-cd-widget
-    bindkey -M vicmd '\C-e' fzf-cd-widget
-    bindkey -M viins '\C-e' fzf-cd-widget
+# map Ctrl-E to the cd/dir search (the same as Alt-C)
+zle     -N              fzf-cd-widget
+bindkey -M emacs '\C-e' fzf-cd-widget
+bindkey -M vicmd '\C-e' fzf-cd-widget
+bindkey -M viins '\C-e' fzf-cd-widget
 
-    # type **<tab> to complete the sentence
-    # see https://github.com/junegunn/fzf?tab=readme-ov-file#fuzzy-completion-for-bash-and-zsh
-    export FZF_COMPLETION_TRIGGER='**'
-    export FZF_COMPLETION_OPTS="--bind 'ctrl-/:change-preview-window(hidden|)'"
+# type **<tab> to complete the sentence
+# see https://github.com/junegunn/fzf?tab=readme-ov-file#fuzzy-completion-for-bash-and-zsh
+export FZF_COMPLETION_TRIGGER='**'
+export FZF_COMPLETION_OPTS="--bind 'ctrl-/:change-preview-window(hidden|)'"
 
-    # Use fd to generate an input for path completion
-    # - The first argument to the function ($1) is the base path to start traversal
-    # - See the source code (completion.{bash,zsh}) for the details.
-    function _fzf_compgen_path() {
-        fd --hidden --no-ignore-vcs --follow . "$1" 2>/dev/null
-    }
+# Use fd to generate an input for path completion
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+function _fzf_compgen_path() {
+    fd --hidden --no-ignore-vcs --follow . "$1" 2>/dev/null
+}
 
-    # Use fd to generate an input for dir completion
-    function _fzf_compgen_dir() {
-        fd -t d --hidden --no-ignore-vcs --follow . "$1" 2>/dev/null
-    }
+# Use fd to generate an input for dir completion
+function _fzf_compgen_dir() {
+    fd -t d --hidden --no-ignore-vcs --follow . "$1" 2>/dev/null
+}
 
-    # Advanced customization of fzf options via _fzf_comprun function
-    #
-    # Note these completions are not really useful as it's a different mechanism
-    # compared to the standard zsh completions which support more commands
-    #
-    # - The first argument to the function is the name of the command.
-    # - You should make sure to pass the rest of the arguments to fzf.
-    function _fzf_comprun() {
-        local command=$1
-        shift
+# Advanced customization of fzf options via _fzf_comprun function
+#
+# Note these completions are not really useful as it's a different mechanism
+# compared to the standard zsh completions which support more commands
+#
+# - The first argument to the function is the name of the command.
+# - You should make sure to pass the rest of the arguments to fzf.
+function _fzf_comprun() {
+    local command=$1
+    shift
 
-        # add custom commands to leverage from autocompletion here
-        # note that some commands already use autocompletion (like cd) and don't require an input
-        # on the other hand, tree is a custom command which requires input
-        case "$command" in
-            cd)           fzf --preview 'tree -L 2 -C {} | head -200' "$@" ;;
-            tree)         fzf --preview 'tree -L 2 -C {} | head -200' "$@" ;;
-            export|unset) fzf --preview "eval 'echo \$'{}"            "$@" ;;
-            ssh)          fzf --preview 'dig {}'                      "$@" ;;
-            *)            fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}' "$@" ;;
-        esac
-    }
-fi
+    # add custom commands to leverage from autocompletion here
+    # note that some commands already use autocompletion (like cd) and don't require an input
+    # on the other hand, tree is a custom command which requires input
+    case "$command" in
+        cd)           fzf --preview 'tree -L 2 -C {} | head -200' "$@" ;;
+        tree)         fzf --preview 'tree -L 2 -C {} | head -200' "$@" ;;
+        export|unset) fzf --preview "eval 'echo \$'{}"            "$@" ;;
+        ssh)          fzf --preview 'dig {}'                      "$@" ;;
+        *)            fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}' "$@" ;;
+    esac
+}
 
 alias fzf_regex_help="echo \"\
 sbtrkt      fuzzy-match                     Items that match sbtrkt
@@ -1076,7 +1071,7 @@ done
 
 # Normalize `open` across Linux, macOS, and Windows
 if ! _is_osx; then
-    if [[ -n "$WSL_DISTRO_NAME" ]]; then
+    if _is_wsl; then
         alias open='explorer.exe'
     else
         alias open='xdg-open'

@@ -16,6 +16,12 @@ function _is_linux() {
     fi
     return 1
 }
+function _is_wsl() {
+    if [[ -n "$WSL_DISTRO_NAME" ]]; then
+        return 0
+    fi
+    return 1
+}
 
 # Helper functions
 # ----------------

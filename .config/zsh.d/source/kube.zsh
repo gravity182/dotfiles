@@ -14,7 +14,7 @@ fi
 
 # it's recommended to put kube config into a user-owned file in order to use kubectl without sudo
 KUBECONFIG=""
-find ~/.kube -type f -maxdepth 1 | sort | while read -r file; do
+[[ -d ~/.kube ]] && find ~/.kube -type f -maxdepth 1 | sort | while read -r file; do
     [[ "$file" =~ "config-"* ]] && KUBECONFIG+="$file:"
 done
 export KUBECONFIG

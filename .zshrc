@@ -946,6 +946,8 @@ export FZF_DEFAULT_OPTS="--height $FZF_MIN_HEIGHT
   --prompt '∷ '
   --pointer '>'
   --marker '>'
+  --bind 'tab:down'
+  --bind 'shift-tab:up'
   --bind 'ctrl-space:toggle+down'
   --bind 'ctrl-/:toggle-preview'
   --bind 'ctrl-y:accept'

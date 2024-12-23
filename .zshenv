@@ -29,8 +29,8 @@ export LESS="-igRFXM --tabs=4 --mouse"
 # should be respected by delta diff as well
 export BAT_THEME="Monokai Extended"
 
-# colorize man pages; no need to use the colored-man-pages plugin anymore
-# UPD: it works worse than the plugin actually, so I had to disable it
+# # colorize man pages; no need to use the colored-man-pages plugin anymore
+# # UPD: it works worse than the plugin actually, so I had to disable it
 # export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # # needed to fix colors
 # export MANROFFOPT="-c"

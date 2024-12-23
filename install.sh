@@ -1,8 +1,8 @@
-#!/bin/sh
-set -e
-set -o noglob
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
-doIt() {
+function doIt() {
     cd ~
     rm -rf /tmp/dotfiles
     git clone https://github.com/blinky-z/dotfiles.git /tmp/dotfiles
@@ -13,7 +13,7 @@ doIt() {
     ./.config/yadm/bootstrap
 }
 
-if [ "$1" = "--force" ]; then
+if [ "$1" == "--force" ]; then
     doIt
 else
     printf 'This may overwrite existing files in your home directory. Continue? (y/n) '

@@ -202,8 +202,6 @@ LANG=en_US.UTF-8
 LC_ALL=en_US.UTF-8
 LC_CTYPE=en_US.UTF-8
 
-export EDITOR='vim'
-
 # -----------------------
 # History
 # -----------------------
@@ -331,6 +329,68 @@ eval "$(zoxide init zsh --cmd cd)"
 if [[ -z "$SSH_AGENT_PID" ]]; then
     eval "$(ssh-agent -s)" &>/dev/null
 fi
+
+
+# ===============
+# EXPORTS START
+# To see the full list of active exports, run `export`
+# To search, run `exf`
+# ===============
+
+# -------------------
+# Core userland utils
+# -------------------
+
+export EDITOR='vim'
+
+export PAGER="less"
+# -i - ignore case when searching; works like smart case
+# -g - highlight only the current string found by search
+# -R - raw output colors; required for bat/delta
+# -F - exit immediately if the output size is smaller than the vertical size of the terminal
+export LESS="-igRFXM --tabs=4 --mouse"
+
+# should be respected by delta diff as well
+export BAT_THEME="Monokai Extended"
+
+# UPD: it works worse than the plugin actually, so I had to disable it
+# colorize man pages; no need to use the colored-man-pages plugin anymore
+# export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+# # needed to fix colors
+# export MANROFFOPT="-c"
+
+# colorize help pages
+alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
+
+# -------------------
+# Java exports
+# -------------------
+
+# select the default java version via `sdk default java <ver>`
+export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
+export GRAALVM_HOME="$HOME/.sdkman/candidates/java/17.0.10-graal"
+export GRADLE_USER_HOME="$HOME/.gradle"
+
+# -------------------
+# JavaScript exports
+# -------------------
+
+export VOLTA_HOME="$HOME/.volta"
+
+if [[ -d "$VOLTA_HOME/bin" ]]; then
+    path+="$VOLTA_HOME/bin"
+fi
+
+# -------------------
+# Unset exports
+# -------------------
+
+#unset
+
+# ===============
+# EXPORTS END
+# ===============
 
 
 # ===============
@@ -610,7 +670,7 @@ alias curl_script="curl -sSfL"
 alias wget_stdout="wget -O-"
 
 # ------------------------
-# Misc URLs and requests
+# HTTP/DNS requests
 # ------------------------
 
 function curl_ping() {
@@ -781,11 +841,12 @@ alias execute_on_dirs='run_on_dirs'
 alias execute_on_files='run_on_files'
 
 # or just:
-#   $ fd -t f -g "*.mohidden" -x mv {} ../
+#   `fd -t f -g "*.mohidden" -x mv {} ../`
 # where {} is a file found by fd search
+# the command above moves all files one dir level up
 #
 # another example: file conversion with successive deletion:
-#   $ fd -t f -g ".webp" -x ffmpeg_img2jpg {} && rm {}
+#   `fd -t f -g ".webp" -x ffmpeg_img2jpg {} && rm {}`
 # the command above converts all .webp files to .jpg format and then deletes them
 
 # view raw keycodes that terminal sends
@@ -799,66 +860,6 @@ alias monitor_keycode='sed -n l'
 
 # ===============
 # ALIASES END
-# ===============
-
-
-# ===============
-# EXPORTS START
-# To see the full list of active exports, run `export`
-# To search, run `exf`
-# ===============
-
-# -------------------
-# Core userland utils
-# -------------------
-
-export PAGER="less"
-# -i - ignore case when searching; works like smart case
-# -g - highlight only the current string found by search
-# -R - raw output colors; required for bat/delta
-# -F - exit immediately if the output size is smaller than the vertical size of the terminal
-export LESS="-igRFXM --tabs=4 --mouse"
-
-# should be respected by delta diff as well
-export BAT_THEME="Monokai Extended"
-
-# UPD: it works worse than the plugin actually, so I had to disable it
-# colorize man pages; no need to use the colored-man-pages plugin anymore
-# export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-# # needed to fix colors
-# export MANROFFOPT="-c"
-
-# colorize help pages
-alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
-alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
-
-# -------------------
-# Java exports
-# -------------------
-
-# select the default java version via `sdk default java <ver>`
-export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
-export GRAALVM_HOME="$HOME/.sdkman/candidates/java/17.0.10-graal"
-export GRADLE_USER_HOME="$HOME/.gradle"
-
-# -------------------
-# JavaScript exports
-# -------------------
-
-export VOLTA_HOME="$HOME/.volta"
-
-if [[ -d "$VOLTA_HOME/bin" ]]; then
-    path+="$VOLTA_HOME/bin"
-fi
-
-# -------------------
-# Unset exports
-# -------------------
-
-#unset
-
-# ===============
-# EXPORTS END
 # ===============
 
 

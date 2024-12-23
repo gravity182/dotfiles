@@ -120,6 +120,9 @@
 [diff]
     # Detect copies as well as renames
     renames = copies
+[grep]
+    lineNumber = true
+    extendedRegexp = true
 [help]
     format = man
     # suggest correct commands

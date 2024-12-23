@@ -1,24 +1,17 @@
 # language and tool agnostic ignore file
-# e.g. it's used by ripgrep and fd
+# for instance, it's used by ripgrep and fd
+# ---
+# paths starting with '/' are relative to the home dir, where this file is located
 #
-# paths starting with '/' are relative to the home dir where this file is located
 
 .vscode/
 .vscode-server/
 .idea/
 .git/
 node_modules/
+target/
 
 # folders located in home
-/Library/
-/Applications/
-/Downloads/
-/IdeaSnapshots/
-/Movies/
-/Music/
-/Pictures/
-/Desktop/
-/Public/
 /.sdkman/
 /.android/
 /.ansible/
@@ -38,9 +31,7 @@ node_modules/
 /.yarn/
 /.zsh_sessions/
 /.META-INF/
-/.viminfo
-/.vim/temp_dirs/undodir/
 /.local/lib/
-/.local/bin/
 /.vim/tmp/
+/.viminfo
 

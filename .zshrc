@@ -945,6 +945,7 @@ if _has fzf; then
       --layout reverse
       --info default
       --separator ''
+      --prompt '∷ '
       --pointer '>'
       --marker '>'
       --bind 'ctrl-space:toggle+down'
@@ -959,7 +960,6 @@ if _has fzf; then
       --info inline-right
       --color header:italic
       --separator '─'
-      --prompt '∷ '
       "
     export FZF_CTRL_T_OPTS="$FZF_BINDING_OPTS
       --preview 'bat --color=always --style=numbers --line-range=:500 {}'

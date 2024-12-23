@@ -42,3 +42,5 @@ node_modules/
 /.vim/temp_dirs/undodir/
 /.local/lib/
 /.local/bin/
+/.vim/tmp/
+

@@ -979,14 +979,14 @@ Synonym for `:%s//~/&` (repeat last substitute with last search pattern on all l
 The flags that you can use for the substitute commands (see _:h :s_flags_):
 - `&`                                               ==>  must be the first one: Keep the flags from the previous substitute command
 - `c`                                               ==>  confirm each substitution. Vim highlights the matching string. You can type:
--   `y`                                             ==>  to substitute this match
--   `l`                                             ==>  to substitute this match and then quit ("last")
--   `n`                                             ==>  to skip this match
--   `<Esc>`                                         ==>  to quit substituting
--   `a`                                             ==>  to substitute this and all remaining matches
--   `q`                                             ==>  to quit substituting
--   `<CTRL-e>`                                      ==>  to scroll the screen up
--   `<CTRL-y>`                                      ==>  to scroll the screen down
+-   > `y`                                             ==>  to substitute this match
+-   > `l`                                             ==>  to substitute this match and then quit ("last")
+-   > `n`                                             ==>  to skip this match
+-   > `<Esc>`                                         ==>  to quit substituting
+-   > `a`                                             ==>  to substitute this and all remaining matches
+-   > `q`                                             ==>  to quit substituting
+-   > `<CTRL-e>`                                      ==>  to scroll the screen up
+-   > `<CTRL-y>`                                      ==>  to scroll the screen down
 - `g`                                               ==>  replace all occurrences in the line. Without this argument, replacement occurs only for the first occurrence in each line
 - `i`                                               ==>  ignore case for the pattern. The 'ignorecase' and 'smartcase' options are not used
 - `I`                                               ==>  don't ignore case for the pattern. The 'ignorecase' and 'smartcase' options are not used

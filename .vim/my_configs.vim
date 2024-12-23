@@ -569,11 +569,6 @@ set noshowmode
 " :help fzf-vim
 " --------------------
 
-" fzf path
-set runtimepath+=/opt/homebrew/opt/fzf
-set runtimepath+=/usr/local/opt/fzf
-set runtimepath+=~/.fzf
-
 nnoremap <leader>ff  :Files<CR>
 
 nnoremap <leader>;   :History<CR>
@@ -604,16 +599,20 @@ imap <c-x><c-l> <plug>(fzf-complete-line)
 autocmd! FileType fzf set laststatus=0 noshowmode noruler
     \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 
-let $FZF_DEFAULT_OPTS = "--border rounded
-  \ --layout default
-  \ --info 'inline-right'
-  \ --separator '─'
-  \ --prompt '∷ '
-  \ --pointer '>'
-  \ --marker '>'
-  \ --bind 'ctrl-space:toggle+down'
-  \ --bind 'ctrl-/:toggle-preview'"
-let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.7 } }
+if !exists("g:fzf_opts_initiated")
+    let $FZF_DEFAULT_OPTS .= "--border rounded
+      \ --layout default
+      \ --info 'inline-right'
+      \ --separator '─'
+      \ --prompt '∷ '
+      \ --pointer '>'
+      \ --marker '>'
+      \ "
+    let g:fzf_opts_initiated = 1
+endif
+
+" popup window (center of the screen))
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
 
 command! -bar -bang Maps call fzf#vim#maps("n", <bang>0)
 command! -bar -bang MapsN call fzf#vim#maps("n", <bang>0)

@@ -39,6 +39,7 @@ Plug 'amix/vim-zenroom2'
 
 Plug 'junegunn/vim-easy-align'
 
+Plug '~/.fzf'
 Plug 'junegunn/fzf.vim'
 
 Plug 'ryanoasis/vim-devicons'

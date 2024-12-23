@@ -438,7 +438,7 @@ function .dotsync() {
         return 0
     fi
     yadm add -u
-    yadm commit
+    yadm commit --reedit-message=HEAD
     yadm push
 }
 
@@ -451,7 +451,7 @@ function .dotsync-sys() {
         return 0
     fi
     sysyadm add -u
-    sysyadm commit
+    sysyadm commit --reedit-message=HEAD
     sysyadm push
 }
 

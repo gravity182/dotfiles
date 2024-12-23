@@ -6,8 +6,8 @@ system_arch=$(uname -m)
 
 echo -e "${BOLD_GREEN}Detected system arch: ${BOLD_YELLOW}$system_arch${RESET}"
 
-# change path temporarily; add to .zshrc for permanent effect
-export PATH=$PATH:$HOME/.arkade/bin/:$HOME/.local/bin
+# change path temporarily
+export PATH=$PATH:$HOME/.local/bin
 
 mkdir -pv ~/.local/bin
 mkdir -pv ~/.local/share/man/{man1,man5}
@@ -237,38 +237,39 @@ if ! _has arkade; then
     curl -sLS https://get.arkade.dev | sudo sh
     arkade completion zsh > $ZSH_CUSTOM/completions/_arkade
 fi
+export PATH=$PATH:$HOME/.arkade/bin/
 
 if ! _has kubectl; then
     log_install_pre 'kubectl'
-	arkade get kubectl
+    arkade get kubectl
     kubectl completion zsh > $ZSH_CUSTOM/completions/_kubectl
 fi
 
 if ! _has kubectx; then
     log_install_pre 'kubectx'
-	arkade get kubectx
+    arkade get kubectx
 fi
 
 if ! _has kubens; then
     log_install_pre 'kubens'
-	arkade get kubens
+    arkade get kubens
 fi
 
 if ! _has helm; then
     log_install_pre 'helm'
-	arkade get helm
+    arkade get helm
     helm completion zsh > $ZSH_CUSTOM/completions/_helm
 fi
 
 if ! _has stern; then
     log_install_pre 'stern'
-	arkade get stern
+    arkade get stern
     stern --completion zsh > $ZSH_CUSTOM/completions/_stern
 fi
 
 if ! _has cmctl; then
-	log_install_pre "cmctl - a CLI for cert-manager"
-	arkade get cmctl
+    log_install_pre "cmctl - a CLI for cert-manager"
+    arkade get cmctl
     cmctl completion zsh > $ZSH_CUSTOM/completions/_cmctl
 fi
 

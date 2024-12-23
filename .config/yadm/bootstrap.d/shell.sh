@@ -8,13 +8,6 @@ if ! _has zsh; then
     sudo apt update && sudo apt install -y zsh
 fi
 
-echo "Sourcing .zprofile"
-source ~/.zprofile
-if [[ -z "$ZSH" ]] || [[ -z "$ZSH_CUSTOM" ]]; then
-    echo 'Please set $ZSH and $ZSH_CUSTOM vars' >&2
-    return 1
-fi
-
 # --------------------
 # home set up
 # --------------------

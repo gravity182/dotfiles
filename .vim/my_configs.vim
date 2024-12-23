@@ -11,22 +11,23 @@
 
 
 " ====================
-" Set options
+" Options
 " ====================
 
-" colorscheme
-" TODO: this option does not what you think - read more if it's really necessary
-" set background=dark
+" make Vim more useful
+set nocompatible
 
+" this block is required when running inside tmux and for some themes
+" see this issue https://github.com/vim/vim/issues/993#issuecomment-241255881
+" also read :h xterm-true-color
 if exists('+termguicolors')
     set termguicolors
-    " this block is required when running inside tmux and for some themes
-    " see this issue https://github.com/vim/vim/issues/993#issuecomment-241255881
-    " also read :h xterm-true-color
     let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 
+" colorscheme
+set background=dark
 " colorscheme spaceduck
 " colorscheme onedark
 colorscheme catppuccin_mocha
@@ -74,9 +75,12 @@ set smarttab
 set list
 set listchars=tab:>-
 
-" do not add empty newlines at the end of files
-set binary
+" do not enable binary mode by default
+set nobinary
+
+" add empty newlines at the end of files
 set eol
+set fixeol
 
 " Highlight current line
 set cursorline
@@ -176,7 +180,9 @@ set nogdefault
 " CTRL-Y    - accept the currently selected match and stop completion
 set wildmenu
 
-set scrolloff=3
+set cmdheight=1
+
+set scrolloff=7
 set sidescroll=1
 set sidescrolloff=2
 set display+=truncate
@@ -345,7 +351,7 @@ nmap <SwipeRight> gt
 " visual select a word under the cursor
 nnoremap gw viw
 
-" Remap VIM 0 to first non-blank character
+" Remap 0 to first non-blank character
 nmap 0 ^
 
 " make Y yank to the end of line, which is more logical

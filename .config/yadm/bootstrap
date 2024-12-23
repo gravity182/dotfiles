@@ -15,7 +15,13 @@ BOLD_YELLOW='\033[1;33m'
 BOLD_GREEN='\033[1;32m'
 RESET='\033[0m'
 
-echo -e "${BOLD_GREEN}Bootstraping your shell${RESET}"
+echo -e "${BOLD_GREEN}Bootstraping your shell...${RESET}"
+
+source ~/.zprofile
+if [[ -z "$ZSH" ]] || [[ -z "$ZSH_CUSTOM" ]]; then
+    echo 'Please set $ZSH and $ZSH_CUSTOM vars pointing to the oh-my-zsh dir' >&2
+    return 1
+fi
 
 if [[ ! -d "$BOOTSTRAP_D" ]]; then
     echo -e "${BOLD_RED}Error: bootstrap directory '$BOOTSTRAP_D' not found${RESET}" >&2
@@ -33,6 +39,7 @@ for stage in ${STAGES[@]}; do
         fi
     done
 done
+
 
 # boostrap
 set +e

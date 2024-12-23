@@ -61,5 +61,5 @@ echo -e "${BOLD_GREEN}Bootstrap finished!${RESET}"
 # repeated login is required
 # e.g. $SHELL stays the same even when opening zsh,
 # because SHELL is a login shell that was initially set for the user
-echo -e "${BOLD_GREEN}Please open a new shell for changes to take effect${RESET}"
+echo -e "${BOLD_GREEN}Please open a new session for changes to take effect${RESET}"
 

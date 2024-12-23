@@ -37,8 +37,3 @@ I recommend you to look at the scripts yourself and adjust the setup to your lik
 
 After the bootstrap script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.
 
-> [!WARNING]
-> Make sure to backup your home dir beforehand.
->
-> This repo may overwrite your files upon installation.
-

@@ -79,7 +79,7 @@ set nostartofline
 " Show the cursor position
 set ruler
 
-" Configure backspace so it acts as it should act
+" Allow backspace in insert mode
 set backspace=indent,eol,start
 set whichwrap+=<,>,h,l
 
@@ -145,7 +145,16 @@ set ai "Auto indent
 set si "Smart indent
 set wrap "Wrap lines
 
-" enable command-line completions
+" Allow cursor keys in insert mode
+set esckeys
+
+" Optimize for fast terminal connections
+set ttyfast
+
+" Do not add the g flag to search/replace by default
+set nogdefault
+
+" enhance command-line completions
 "
 " While the completion is active, navigate with the following keys:
 " CTRL-P    - go to the previous entry

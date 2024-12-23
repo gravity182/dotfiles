@@ -138,7 +138,7 @@ Visual mode
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Command line/Cmdline mode
+Command-line mode
   *:h cmdline.txt*
 -------------------------
 
@@ -148,7 +148,7 @@ Command line editing
 - `<Right>`                                         ==>  cursor right
 - `<S-Left>`/`<CTRL-Left>`                          ==>  cursor one WORD left
 - `<S-Right>`/`CTRL-Right>`                         ==>  cursor one WORD right
-- `<CTRL-b`/`<Home>`                                ==>  cursor to [b]eginning of command-line
+- `<CTRL-b>`/`<Home>`                               ==>  cursor to [b]eginning of command-line
 - `<CTRL-e>`/`<End>`                                ==>  cursor to [e]nd of command-line
 - `<CTRL-w>`                                        ==>  delete the [w]ord before the cursor
 - `<CTRL-r> {register}`                             ==>  insert the content of the {[r]egister}
@@ -166,9 +166,16 @@ When editing the command-line, a few commands can be used to complete the word b
 - Variable and function names: Only after a ":if", ":call" or similar command.
 
 *These are the commands that can be used to invoke completion:*
-- `<CTRL-d`                                         ==>  list names that match the pattern in front of the cursor. When showing file names, directories are highlighted
+- `<CTRL-d>`                                        ==>  list names that match the pattern in front of the cursor. When showing file names, directories are highlighted
 - `<Tab>`                                           ==>  a match is done on the pattern in front of the cursor. The match (if there are several, the first match) is inserted in place of the pattern. When pressed again and there were multiple matches, the next match is inserted. After the last match, the first is used again (wrap around)
 - `<S-Tab>`                                         ==>  like <Tab>, but begin with the last match and then go to the previous match. When pressed again and there were multiple matches, the previous match in inserted
+
+*While the completion is active, navigate with the following keys:*
+- `<CTRL-p>`                                        ==>  go to the previous entry
+- `<CTRL-N>`                                        ==>  go to the next entry
+- `CTRL-E`                                          ==>  end completion, go back to what was there before selecting a match
+- `CTRL-Y`                                          ==>  accept the currently selected match and stop completion
+- `<CR>`                                            ==>  in menu completion, when the cursor is just after a dot: move into a submenu
 
 Some useful cmdline commands
 ---
@@ -229,8 +236,8 @@ The command-line window is not a normal window: it is not possible to move to an
 - `q:`                                              ==>  open the command line window; see _:h q:_
 - `{CMD-line}<Ctrl-f>`                              ==>  open the command line window; see _:h c_CTRL-F_
 - `<CR>`                                            ==>  execute the command-line under the cursor
-- `<CTRL-c`                                         ==>  continue in Command-line mode. The command-line under the cursor is used as the command-line
-- `:quit`/`<CTRL-w>q`/`<CTRL-w>c`                   ==>  discard the command line and go back to Normal mode
+- `<CTRL-c`                                         ==>  continue in command-line mode. The command-line under the cursor is used as the command-line
+- `:q[uit]`/`<CTRL-w>q`/`<CTRL-w>c`                 ==>  discard the command line and go back to Normal mode
 
 Command line history
 ---
@@ -1287,9 +1294,10 @@ Vim has a number of internal variables and switches which can be set to achieve 
 * string                                            ==>  has a string value
 
 List options:
+- `:set {option}?`                                  ==>  show value of {option}
+- `:verbose set {option}?`                          ==>  show value of {option} and last location where it was set
 - `:set[!]`                                         ==>  show all options that differ from their default value. When [!] is present every option is on a separate line
 - `:set[!] all`                                     ==>  show all but terminal options
-- `:set {option}?`                                  ==>  show value of {option}
 
 Change option:
 - `:set {option}`                                   ==>  the resulting effect depends on the option's type: toggle option: switch it on; number option: show value; string option: show value
@@ -1300,7 +1308,7 @@ Change option:
 - `:set {option}^={value}`                          ==>  multiply the {value} to a number option, or prepend the {value} to a string option
 - `:set {option}-={value}`                          ==>  subtract the {value} from a number option, or remove the {value} from a string option, if it is there
 
-The {option} arguments to ":set" may be repeated. For example - `:set ai nosi sw=3 ts=3`.
+The {option} arguments may be repeated. For example - `:set ai nosi sw=3 ts=3`.
 
 
 ******************************************************************************
@@ -1312,7 +1320,8 @@ Key codes
 ---------
 
 See *:h key-codes* - these are the names for keys (including special) that are used in the documentation.
-They can also be used with the ":map" command (insert the key name by pressing CTRL-K and then the key you want the name for)
+
+They can also be used with the ":map" command (insert the key name by pressing CTRL-K and then the key you want the name for).
 
 A few important notes:
 * When you map or see a mapping where a key is combined with a special key, like in <Ctrl-{char}>, the case of {char} does not matter; thus CTRL-A and CTRL-a are equivalent
@@ -1332,7 +1341,7 @@ More on it - https://vi.stackexchange.com/questions/18744/what-is-the-meaning-of
 
 ******************************************************************************
 
-Final notes
+Document notes
 -----------
 
 To align this file around ==>, execute `:%EasyAlign 1/\s==>\s/ig[]g/^[-\*] /`.

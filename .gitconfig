@@ -52,7 +52,7 @@
     remotes = remote --verbose
 
     # Amend the currently staged files to the latest commit.
-    amend = commit --amend --reuse-message=HEAD
+    amend = commit --amend --reedit-message=HEAD
 
     untrack = rm --cached
 

@@ -44,8 +44,40 @@ set encoding=UTF-8
 
 set autoindent
 
+" Respect modeline in files
+set modeline
+set modelines=4
+
 " show line numbers
 set number
+
+" tabs and spaces
+" 1 tab == 4 spaces
+set shiftwidth=4
+set tabstop=4
+" Use spaces instead of tabs when inserting
+set expandtab
+" Be smart when using tabs ;)
+set smarttab
+
+" display tabs
+" this is useful cause I don't wanna have tabs in my files at all
+" spaces are always better
+set list
+set listchars=tab:>-
+
+" Highlight current line
+set cursorline
+set cursorlineopt=number,line
+
+" Always show status line
+set laststatus=2
+
+" Don’t reset cursor to start of line when moving around.
+set nostartofline
+
+" Show the cursor position
+set ruler
 
 " Configure backspace so it acts as it should act
 set backspace=indent,eol,start
@@ -75,13 +107,6 @@ set showmatch
 " How many tenths of a second to blink when matching brackets
 set mat=2
 
-" Enable paste mode by default, so that indendation is not performed for pasted text
-" no need to enable in GUI mode (read :h 'paste' for details)
-" UPD: actually I doubt it needs to be enabled by default, because it disables a lot of useful options
-" if !has("gui_running")
-"     set paste
-" endif
-
 " No annoying sound on errors
 set noerrorbells
 set novisualbell
@@ -92,7 +117,7 @@ set tm=500
 set foldcolumn=1
 
 " Resize panes when window/terminal gets resize
-" autocmd VimResized * :wincmd =
+autocmd VimResized * :wincmd =
 
 " Set utf8 as standard encoding and en_US as the standard language
 set encoding=utf8
@@ -112,15 +137,6 @@ autocmd BufEnter * silent! lcd %:p:h
 " these values should make vim more responsive
 set timeout ttimeout timeoutlen=1000 ttimeoutlen=100
 
-" tabs and spaces
-" 1 tab == 4 spaces
-set shiftwidth=4
-set tabstop=4
-" Use spaces instead of tabs when inserting
-set expandtab
-" Be smart when using tabs ;)
-set smarttab
-
 " Disable linebreak
 set nolinebreak
 set tw=0
@@ -129,9 +145,17 @@ set ai "Auto indent
 set si "Smart indent
 set wrap "Wrap lines
 
-set ruler
+" enable command-line completions
+"
+" While the completion is active, navigate with the following keys:
+" CTRL-P    - go to the previous entry
+" CTRL-N    - go to the next entry
+" <CR>      - in menu completion, when the cursor is just after a dot: move into a submenu
+" CTRL-E    - end completion, go back to what was there before selecting a match
+" CTRL-Y    - accept the currently selected match and stop completion
 set wildmenu
-set scrolloff=1
+
+set scrolloff=3
 set sidescroll=1
 set sidescrolloff=2
 set display+=truncate
@@ -145,12 +169,6 @@ set formatoptions+=j
 if has('langmap') && exists('+langremap') && &langremap
     set nolangremap
 endif
-
-" display tabs
-" this is useful because I don't wanna have tabs in my files at all
-" spaces are always better
-set list
-set listchars=tab:>-
 
 
 " ====================

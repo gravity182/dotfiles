@@ -74,6 +74,10 @@ set smarttab
 set list
 set listchars=tab:>-
 
+" do not add empty newlines at the end of files
+set binary
+set eol
+
 " Highlight current line
 set cursorline
 set cursorlineopt=number,line
@@ -784,4 +788,3 @@ function! VisualSelection(direction, extra_filter, cr) range
     let @/ = l:pattern
     let @" = l:saved_reg
 endfunction
-

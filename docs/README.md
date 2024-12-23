@@ -29,7 +29,9 @@ All of them are already preconfigured.
 
 Execute the following:
 ```shell
-curl -sSfLO https://raw.githubusercontent.com/blinky-z/dotfiles/refs/heads/main/install.sh && chmod u+x install.sh && ./install.sh
+curl -sSfLO https://raw.githubusercontent.com/blinky-z/dotfiles/refs/heads/main/install.sh \
+    && chmod u+x install.sh \
+    && ./install.sh
 ```
 
 The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils.

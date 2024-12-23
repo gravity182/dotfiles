@@ -10,10 +10,10 @@ Introduction
 
 This document aims to provide an overview of how VIM works and help to memorize its mappings.
 
-Vim is powerful, no doubt, but maybe a bit too powerful? I strongly believe you don't need all of its features and mappings for casual configs editing and writing. Therefore, this document only concentrates on the essentials.
-Note that this document also contains my custom mappings, and some of them may replace standard ones. However, I created these mappings with VIM's ideology in mind so they should feel natural and complementary.
+This document only concentrates on the essentials.
+Note that this document also contains my custom mappings, and some of them may replace standard ones. However, I created these mappings with VIM's ideology in mind so they should feel natural and complementary enough.
 
-This document uses VIM's very own help notation (see _:h notation_) so that everything's written here should be easy to understand.
+This document uses VIM's help notation (see _:h notation_) so that everything's written here should be easy to understand.
 This document is written in the _junegunn/vim-journal_ format.
 
 

@@ -42,6 +42,17 @@ endif
 
 set encoding=UTF-8
 
+" Configure backups, swapfiles, and persistent undo history
+set writebackup
+set backupdir=~/.vim/tmp/backups
+set directory=~/.vim/tmp/swaps
+set undofile
+set undodir=~/.vim/tmp/undo
+
+" Don’t create backups when editing files in certain directories
+set backupskip=/tmp/*
+
+" Copy indent from current line when starting a new line
 set autoindent
 
 " Respect modeline in files

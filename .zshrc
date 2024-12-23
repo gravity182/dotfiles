@@ -290,27 +290,25 @@ zstyle ':completion:*' squeeze-slashes true
 zstyle ':completion:*' complete-options true
 zstyle ':completion:*' keep-prefix true
 
-FZF_MIN_HEIGHT='18'
-zstyle ':fzf-tab:*' fzf-pad 4
-zstyle ':fzf-tab:*' fzf-min-height $FZF_MIN_HEIGHT
+# respect FZF_DEFAULT_OPTS
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
+zstyle ':fzf-tab:*' fzf-min-height 18
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' continuous-trigger '/'
 
 # for some reason this ctrl-space binding from the default opts isn't honored
 # add it one more time
-zstyle ':fzf-tab:complete:*' fzf-bindings 'ctrl-space:toggle+down'
+zstyle ':fzf-tab:*' fzf-bindings 'ctrl-space:toggle+down'
 
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'tree -L 2 -C $realpath'
+zstyle ':fzf-tab:complete:cd:*'                       fzf-preview 'tree -L 2 -C $realpath'
 zstyle ':fzf-tab:complete:(ssh|scp|sftp|rsh|rsync):*' fzf-preview 'dig $word'
-zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
+zstyle ':fzf-tab:complete:systemctl-*:*'              fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
 
-# disable multi-selection by default
-zstyle ':fzf-tab:complete:*' fzf-flags '--no-multi'
-# whitelist commands which are allowed multi-selection
-zstyle ':fzf-tab:complete:(ls|rm):*' fzf-flags '--multi'
+# allow multi-selection by default
+zstyle ':fzf-tab:complete:*' fzf-flags '--multi'
 
-zstyle ':completion:*:ssh:argument-1:'       tag-order  hosts users
-zstyle ':completion:*:scp:argument-rest:'    tag-order  hosts files users
+zstyle ':completion:*:ssh:argument-1:'                  tag-order  hosts users
+zstyle ':completion:*:scp:argument-rest:'               tag-order  hosts files users
 zstyle ':completion:*:(ssh|scp|sftp|rsh|rsync):*:hosts' hosts
 
 # -----------------------
@@ -941,6 +939,7 @@ if _has fzf; then
     export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
 
     # these default options will be used everytime you call fzf
+    FZF_MIN_HEIGHT="40%"
     export FZF_DEFAULT_OPTS="--height $FZF_MIN_HEIGHT
       --border horizontal
       --layout reverse
@@ -949,23 +948,34 @@ if _has fzf; then
       --pointer '>'
       --marker '>'
       --bind 'ctrl-space:toggle+down'
-      --bind 'ctrl-/:toggle-preview'"
+      --bind 'ctrl-/:toggle-preview'
+      --bind 'ctrl-y:accept'
+      --bind 'ctrl-d:half-page-down,ctrl-u:half-page-up'
+      "
+
+    # these options overwrite the default ones above
     export FZF_BINDING_OPTS="--border rounded
       --layout default
       --info inline-right
+      --color header:italic
       --separator '─'
-      --prompt '∷ '"
-
-    export FZF_CTRL_T_OPTS="$FZF_BINDING_OPTS --preview 'bat --color=always --style=numbers --line-range=:500 {}'
+      --prompt '∷ '
+      "
+    export FZF_CTRL_T_OPTS="$FZF_BINDING_OPTS
+      --preview 'bat --color=always --style=numbers --line-range=:500 {}'
       --bind 'ctrl-/:change-preview-window(hidden|)'
-      --color header:italic"
-    export FZF_CTRL_R_OPTS="$FZF_BINDING_OPTS --preview 'echo {}'
-      --preview-window up:3:hidden:wrap
+      --walker-skip .git,node_modules,target
+      "
+    export FZF_ALT_C_OPTS="$FZF_BINDING_OPTS
+      --preview 'tree -L 2 -C {}'
+      --bind 'ctrl-/:change-preview-window(hidden|)'
+      --walker-skip .git,node_modules,target
+      "
+    export FZF_CTRL_R_OPTS="$FZF_BINDING_OPTS
+      --preview 'echo {}'
+      --preview-window down:5:hidden:wrap
       --bind 'ctrl-/:toggle-preview'
-      --color header:italic"
-    export FZF_ALT_C_OPTS="$FZF_BINDING_OPTS --preview 'tree -L 2 -C {}'
-      --bind 'ctrl-/:change-preview-window(hidden|)'
-      --color header:italic"
+      "
 
     # map Ctrl-E to the cd/dir search (the same as Alt-C)
     zle     -N              fzf-cd-widget

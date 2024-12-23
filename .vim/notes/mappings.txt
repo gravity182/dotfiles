@@ -172,9 +172,9 @@ When editing the command-line, a few commands can be used to complete the word b
 
 *While the completion is active, navigate with the following keys:*
 - `<CTRL-p>`                                        ==>  go to the previous entry
-- `<CTRL-N>`                                        ==>  go to the next entry
-- `CTRL-E`                                          ==>  end completion, go back to what was there before selecting a match
-- `CTRL-Y`                                          ==>  accept the currently selected match and stop completion
+- `<CTRL-n>`                                        ==>  go to the next entry
+- `CTRL-e`                                          ==>  end completion, go back to what was there before selecting a match
+- `CTRL-y`                                          ==>  accept the currently selected match and stop completion
 - `<CR>`                                            ==>  in menu completion, when the cursor is just after a dot: move into a submenu
 
 Some useful cmdline commands
@@ -985,8 +985,8 @@ The flags that you can use for the substitute commands (see _:h :s_flags_):
 -   `<Esc>`                                         ==>  to quit substituting
 -   `a`                                             ==>  to substitute this and all remaining matches
 -   `q`                                             ==>  to quit substituting
--   `<CTRL-E>`                                      ==>  to scroll the screen up
--   `<CTRL-Y>`                                      ==>  to scroll the screen down
+-   `<CTRL-e>`                                      ==>  to scroll the screen up
+-   `<CTRL-y>`                                      ==>  to scroll the screen down
 - `g`                                               ==>  replace all occurrences in the line. Without this argument, replacement occurs only for the first occurrence in each line
 - `i`                                               ==>  ignore case for the pattern. The 'ignorecase' and 'smartcase' options are not used
 - `I`                                               ==>  don't ignore case for the pattern. The 'ignorecase' and 'smartcase' options are not used

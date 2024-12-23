@@ -112,15 +112,14 @@ autocmd BufEnter * silent! lcd %:p:h
 " these values should make vim more responsive
 set timeout ttimeout timeoutlen=1000 ttimeoutlen=100
 
-" Use spaces instead of tabs
-set expandtab
-
-" Be smart when using tabs ;)
-set smarttab
-
+" tabs and spaces
 " 1 tab == 4 spaces
 set shiftwidth=4
 set tabstop=4
+" Use spaces instead of tabs when inserting
+set expandtab
+" Be smart when using tabs ;)
+set smarttab
 
 " Disable linebreak
 set nolinebreak
@@ -139,13 +138,19 @@ set display+=truncate
 
 set autoread
 
-" Delete comment character when joining commented lines.
+" Delete comment character when joining commented lines
 set formatoptions+=j
 
-" Disable a legacy behavior that can break plugin maps.
+" Disable a legacy behavior that can break plugin maps
 if has('langmap') && exists('+langremap') && &langremap
     set nolangremap
 endif
+
+" display tabs
+" this is useful because I don't wanna have tabs in my files at all
+" spaces are always better
+set list
+set listchars=tab:>-
 
 
 " ====================
@@ -242,7 +247,8 @@ nnoremap <C-r> :s/
 xnoremap <silent> <C-r> :call VisualSelection('replace', '', 0)<CR>
 
 " Toggle paste mode on and off
-nmap <leader>pp :setlocal paste!<cr>
+" also sets the expandtab option so that tabs in the pasted content is replaced with spaces
+nmap <silent> <leader>pp :setlocal paste!<cr>:setlocal expandtab<cr>
 
 " Specify the behavior when switching between buffers
 try
@@ -322,13 +328,32 @@ endif
 " Switch CWD with the directory of the open buffer preselected
 nmap <leader>cd :cd <C-r>=escape(expand("%:p:h"), " ")<cr>/
 
+" Strip trailing whitespace (,ss)
+function! StripTrailingWhitespaces()
+    let save_cursor = getpos(".")
+    let old_query = getreg('/')
+    :%s/\s\+$//e
+    call setpos('.', save_cursor)
+    call setreg('/', old_query)
+endfunction
+
+function! FormatFile()
+    retab
+    call StripTrailingWhitespaces()
+endfunction
+
+" format the file
+" replaces tabs with spaces and strips trailing whitespaces
+noremap <leader>ss :call FormatFile()<cr>
+
 " save/exit mappings
 
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
 command! W execute 'w !sudo tee % > /dev/null' <bar> edit!
 
-nmap <leader>w  :w<cr>
+" formats and saves the current buffer
+nmap <leader>w  :call FormatFile()<cr>:w<cr>
 nmap <leader>q  :q<cr>
 
 " unmap Ex mode

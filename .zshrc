@@ -13,7 +13,7 @@
 #    with autostarting X at login,
 # 4. then try to attach, if the attachment fails, start a new session.
 #
-# remember: if server is not running yet, 
+# remember: if server is not running yet,
 #   any env vars available at the moment of starting a new session (and a server, consequently)
 #   will become server-wide
 # in order to pass session-wide vars, use the '-e' option
@@ -117,7 +117,7 @@ fpath+="$ZSH_CUSTOM/plugins/zsh-completions/src"
 
 # if you want to navigate through completions in vi-like style (hjkl)
 # not needed when fzf-tab installed
-# 
+#
 # zmodload zsh/complist
 # bindkey -M menuselect 'h' vi-backward-char
 # bindkey -M menuselect 'k' vi-up-line-or-history
@@ -208,17 +208,17 @@ export EDITOR='vim'
 # History
 # -----------------------
 
-# When the history file is re-written, write out a copy of the file named $HISTFILE.new 
+# When the history file is re-written, write out a copy of the file named $HISTFILE.new
 # and then rename it over the old one (atomic rename)
 setopt HIST_SAVE_BY_COPY
 # ignore duplicate entries
 setopt HISTIGNOREDUPS
 # prevents the current line from being saved if it begins with a space
 setopt HISTIGNORESPACE
-# When writing out the history file, by default zsh uses ad-hoc file locking to avoid known problems with 
-# locking on some operating systems. 
-# With this option locking is done by means of the system’s fcntl call, where this method is available. 
-# On recent operating systems this may provide better performance, 
+# When writing out the history file, by default zsh uses ad-hoc file locking to avoid known problems with
+# locking on some operating systems.
+# With this option locking is done by means of the system’s fcntl call, where this method is available.
+# On recent operating systems this may provide better performance,
 # in particular avoiding history corruption when files are stored on NFS
 setopt HIST_FCNTL_LOCK
 
@@ -245,7 +245,7 @@ VI_MODE_CURSOR_OPPEND=0
 
 # this remaps `vv` to `E` (but overrides `visual-mode`)
 # unfortunately `vv` doesn't work due to low keytimeout
-bindkey -M vicmd 'E' edit-command-line 
+bindkey -M vicmd 'E' edit-command-line
 
 # -----------------------
 # Completions (zstyle)
@@ -338,7 +338,7 @@ fi
 # ---
 # To see the full list of active aliases, run `alias`
 # To search for a specific alias, run `alf`
-# 
+#
 # Remember that aliases are expanded when the function definition is parsed,
 # so usually you want to define aliases before functions
 # ===============
@@ -481,7 +481,7 @@ alias tarc='tar -czvf'
 #   Usage: tarx archive.tar.gz [file1 file2..] [-C/--directory=DIR]
 # Note: you don't need to specify a compression method when extracting or listing an archive
 # Note: use 'extract' plugin if tar isn't enough (https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/extract). Notably, this plugins supports rar and zip archives
-# 
+#
 alias tarx='tar -xvf'
 
 # Tar list files inside an archive
@@ -595,10 +595,10 @@ alias curl_info="curl -LI"
 # this command is better suited for scripts:
 # -s - silent mode
 # -S - show errors even when -s is used
-# -f - fail silently (no output at all) on server errors. 
-#      This is mostly done to better enable scripts etc to better deal with failed attempts. 
-#      In normal cases when an HTTP server fails to deliver a document, it returns an HTML document 
-#      stating so (which often also describes why and more). 
+# -f - fail silently (no output at all) on server errors.
+#      This is mostly done to better enable scripts etc to better deal with failed attempts.
+#      In normal cases when an HTTP server fails to deliver a document, it returns an HTML document
+#      stating so (which often also describes why and more).
 #      This flag will prevent curl from outputting that and return error 22
 # -L - follow redirects
 alias curl_script="curl -sSfL"
@@ -783,7 +783,7 @@ alias execute_on_files='run_on_files'
 # or just:
 #   $ fd -t f -g "*.mohidden" -x mv {} ../
 # where {} is a file found by fd search
-# 
+#
 # another example: file conversion with successive deletion:
 #   $ fd -t f -g ".webp" -x ffmpeg_img2jpg {} && rm {}
 # the command above converts all .webp files to .jpg format and then deletes them
@@ -1014,13 +1014,13 @@ if _has fzf; then
 fi
 
 alias fzf_regex_help="echo \"\
-sbtrkt 	    fuzzy-match                     Items that match sbtrkt
-'wild 	    exact-match (quoted)            Items that include wild
-^music 	    prefix-exact-match              Items that start with music
-.mp2$ 	    suffix-exact-match              Items that end with .mp3
-!fire 	    inverse-exact-match             Items that do not include fire
+sbtrkt      fuzzy-match                     Items that match sbtrkt
+'wild       exact-match (quoted)            Items that include wild
+^music      prefix-exact-match              Items that start with music
+.mp2$       suffix-exact-match              Items that end with .mp3
+!fire       inverse-exact-match             Items that do not include fire
 !^music     inverse-prefix-exact-match      Items that do not start with music
-!.mp2$ 	    inverse-suffix-exact-match      Items that do not end with .mp3\"
+!.mp2$      inverse-suffix-exact-match      Items that do not end with .mp3\"
 "
 # rust regex help (used by fzf, rg, fd)
 # see https://docs.rs/regex/1.10.3/regex/#syntax
@@ -1065,18 +1065,18 @@ done
 
 # Normalize `open` across Linux, macOS, and Windows
 if ! _is_osx; then
-	if [[ -n "$WSL_DISTRO_NAME" ]]; then
-		alias open='explorer.exe'
-	else
-		alias open='xdg-open'
-	fi
+    if [[ -n "$WSL_DISTRO_NAME" ]]; then
+        alias open='explorer.exe'
+    else
+        alias open='xdg-open'
+    fi
 fi
 function open() {
-	if [[ -z "$1" ]]; then
-		open .
-	else
-		open "$1"
-	fi
+    if [[ -z "$1" ]]; then
+        open .
+    else
+        open "$1"
+    fi
 }
 alias open='open'
 

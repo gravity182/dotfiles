@@ -27,7 +27,7 @@ All of them are already preconfigured.
 
 ## Quick start
 
-Execute the following:
+Oneline installation:
 ```shell
 curl -sSfLO https://raw.githubusercontent.com/blinky-z/dotfiles/refs/heads/main/install.sh \
     && chmod u+x install.sh \

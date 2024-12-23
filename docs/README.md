@@ -29,10 +29,7 @@ All of them are already preconfigured.
 
 Execute the following:
 ```shell
-cd ~
-git clone https://github.com/blinky-z/dotfiles.git dotfiles
-mv dotfiles/* dotfiles/.* .; rm -rf dotfiles
-./.config/yadm/bootstrap
+curl -sSfLO https://raw.githubusercontent.com/blinky-z/dotfiles/refs/heads/main/install.sh && chmod u+x install.sh && ./install.sh
 ```
 
 The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils.
@@ -42,6 +39,6 @@ After the bootstrap script finishes the job, please log out and log in again. No
 
 > [!WARNING]
 > Make sure to backup your home dir beforehard.
-> 
+>
 > This repo will overwrite everything upon installation.
 

@@ -49,6 +49,8 @@ for stage in ${STAGES[@]}; do
     declare -n arr="$stage"
     for bootstrap in "${arr[@]}"; do
         bootstrap="$BOOTSTRAP_D/$bootstrap"
+        echo ""
+        echo "======================"
         echo "Executing '$bootstrap'"
         if ! source "$bootstrap"; then
             echo -e "${BOLD_RED}Error: bootstrap '$bootstrap' failed${RESET}" >&2

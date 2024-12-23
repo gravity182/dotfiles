@@ -13,10 +13,14 @@ doIt() {
     ./.config/yadm/bootstrap
 }
 
-printf 'This may overwrite existing files in your home directory. Continue? (y/n) '
-read answer
-if [ "$answer" != "${answer#[Yy]}" ]; then
+if [ "$1" = "--force" ]; then
     doIt
+else
+    printf 'This may overwrite existing files in your home directory. Continue? (y/n) '
+    read answer
+    if [ "$answer" != "${answer#[Yy]}" ]; then
+        doIt
+    fi
 fi
 unset doIt
 

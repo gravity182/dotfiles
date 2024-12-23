@@ -30,8 +30,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-ZCONFIG_DIR="$HOME/.config/zsh.d"
-
 # --------------------------------------
 # oh-my-zsh settings
 # see https://github.com/ohmyzsh/ohmyzsh/wiki/Settings
@@ -351,15 +349,11 @@ export LESS="-igRFXM --tabs=4 --mouse"
 # should be respected by delta diff as well
 export BAT_THEME="Monokai Extended"
 
-# UPD: it works worse than the plugin actually, so I had to disable it
 # colorize man pages; no need to use the colored-man-pages plugin anymore
+# UPD: it works worse than the plugin actually, so I had to disable it
 # export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # # needed to fix colors
 # export MANROFFOPT="-c"
-
-# colorize help pages
-alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
-alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 
 # -------------------
 # Java exports
@@ -486,6 +480,10 @@ elif _is_osx; then
 fi
 
 alias bat='bat --style=auto'
+
+# colorize help pages
+alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 
 # use bat by default
 alias cat='bat'

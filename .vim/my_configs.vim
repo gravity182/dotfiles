@@ -27,10 +27,8 @@ if exists('+termguicolors')
 endif
 
 " colorscheme
-set background=dark
-" colorscheme spaceduck
-" colorscheme onedark
 colorscheme catppuccin_mocha
+set background=dark
 
 " yanked or deleted text will go to the system clipboard register
 " put command will also use this register
@@ -230,7 +228,6 @@ if has("gui_running")
     " Set extra options when running in GUI mode
     set guioptions-=T
     set guioptions-=e
-    set t_Co=256
     set guitablabel=%M\ %t
 
     if has("gui_macvim")
@@ -267,6 +264,10 @@ set mouse=
 
 " Disable highlight when <leader><cr> is pressed
 nmap <silent> <leader><cr> :noh<cr>
+
+" navigate through quickfix errors in the buffer
+map <C-j> :cn<CR>
+map <C-k> :cp<CR>
 
 " map redo to 'r'
 nnoremap <C-r> <Nop>
@@ -494,12 +495,11 @@ let g:mundo_preview_bottom = 1
 " --------------------
 
 let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_auto_colors = 1
-let g:indent_guides_color_change_percent = 10
+let g:indent_guides_auto_colors = 0
 let g:indent_guides_start_level = 2
 let g:indent_guides_guide_size = 1
-" autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=LightGray ctermbg=LightGray
-" autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=Gray      ctermbg=Gray
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=gray     ctermbg=gray
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgrey ctermbg=darkgrey
 
 
 " --------------------
@@ -543,9 +543,31 @@ let g:easy_align_ignore_groups = ['Comment']
 let g:lightline = {
     \ 'colorscheme': 'catppuccin_mocha',
     \ 'active': {
-    \   'left': [ ['mode', 'paste'],
-    \             ['fugitive', 'readonly', 'filename', 'modified'] ],
-    \   'right': [ [ 'lineinfo' ], ['percent'] ]
+    \   'left':  [
+    \              [ 'mode', 'paste' ],
+    \              [ 'readonly', 'filename', 'modified' ],
+    \            ],
+    \   'right': [
+    \              [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ],
+    \              [ 'lineinfo' ],
+    \              [ 'percent' ],
+    \              [ 'fileformat', 'fileencoding', 'filetype' ],
+    \              [ 'fugitive' ],
+    \            ],
+    \ },
+    \ 'component_expand': {
+    \   'linter_checking': 'lightline#ale#checking',
+    \   'linter_infos': 'lightline#ale#infos',
+    \   'linter_warnings': 'lightline#ale#warnings',
+    \   'linter_errors': 'lightline#ale#errors',
+    \   'linter_ok': 'lightline#ale#ok',
+    \ },
+    \ 'component_type': {
+    \   'linter_checking': 'right',
+    \   'linter_infos': 'right',
+    \   'linter_warnings': 'warning',
+    \   'linter_errors': 'error',
+    \   'linter_ok': 'right',
     \ },
     \ 'component': {
     \   'readonly': '%{&filetype=="help"?"":&readonly?"=":""}',
@@ -558,8 +580,15 @@ let g:lightline = {
     \   'fugitive': '(exists("*FugitiveHead") && ""!=FugitiveHead())'
     \ },
     \ 'separator': { 'left': ' ', 'right': ' ' },
-    \ 'subseparator': { 'left': ' ', 'right': ' ' }
+    \ 'subseparator': { 'left': ' ', 'right': '|' }
 \ }
+
+" let g:lightline#ale#indicator_checking = "\uf110"
+" let g:lightline#ale#indicator_infos = "\uf129"
+" let g:lightline#ale#indicator_warnings = "\uf071"
+" let g:lightline#ale#indicator_errors = "\uf05e"
+" let g:lightline#ale#indicator_ok = "\uf00c"
+
 " mode is already displayed by lightline
 set noshowmode
 

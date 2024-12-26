@@ -67,7 +67,8 @@ ZSH_THEME='powerlevel10k/powerlevel10k'
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    vi-mode
+    # vi-mode
+    zsh-vi-mode
     fzf-tab # load fzf-tab early
     colored-man-pages
     zsh-autosuggestions
@@ -219,17 +220,17 @@ bindkey -v
 
 # switch modes faster (time in milliseconds)
 # vi mode feels much more responsive after this
-export KEYTIMEOUT=1
+# export KEYTIMEOUT=1
 
 # defaults (vi-mode plugin)
-VI_MODE_CURSOR_NORMAL=2
-VI_MODE_CURSOR_VISUAL=6
-VI_MODE_CURSOR_INSERT=6
-VI_MODE_CURSOR_OPPEND=0
+# VI_MODE_CURSOR_NORMAL=2
+# VI_MODE_CURSOR_VISUAL=6
+# VI_MODE_CURSOR_INSERT=6
+# VI_MODE_CURSOR_OPPEND=0
 
 # this remaps `vv` to `E` (but overrides `visual-mode`)
 # unfortunately `vv` doesn't work due to low keytimeout
-bindkey -M vicmd 'E' edit-command-line
+# bindkey -M vicmd 'E' edit-command-line
 
 # -----------------------
 # Completions (zstyle)

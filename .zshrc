@@ -73,7 +73,7 @@ ZSH_THEME='powerlevel10k/powerlevel10k'
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    zsh-vi-mode
+    vi-mode
     fzf-tab # load fzf-tab early
     colored-man-pages
     zsh-autosuggestions
@@ -201,6 +201,21 @@ setopt HIST_FCNTL_LOCK
 # history size
 HISTSIZE=10000
 SAVEHIST=10000
+
+# -----------------------
+# vi mode
+# -----------------------
+
+# the vi-mode plugin already calls `bindkey -v`, but anyway
+bindkey -v
+
+# switch modes faster (time in milliseconds)
+# vi mode feels much more responsive after this
+KEYTIMEOUT=1
+
+# this remaps `vv` to `E` (but overrides `visual-mode`)
+# unfortunately `vv` doesn't work due to low keytimeout
+bindkey -M vicmd 'V' edit-command-line
 
 # -----------------------
 # Completions (zstyle)
@@ -808,17 +823,22 @@ alias monitor_keycode='sed -n l'
 SHOW_AWS_PROMPT=false
 
 # -------------------
-# zsh-vi-mode
+# vi-mode
 # -------------------
 
-# key timeout
-ZVM_KEYTIMEOUT=0.4
-ZVM_ESCAPE_KEYTIMEOUT=0.03
+VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=false
+VI_MODE_SET_CURSOR=true
+# unset VI_MODE_DISABLE_CLIPBOARD
 
-# use the new nex engine
-ZVM_READKEY_ENGINE=$ZVM_READKEY_ENGINE_NEX
+# cursor style
+VI_MODE_CURSOR_NORMAL=2
+VI_MODE_CURSOR_VISUAL=2
+VI_MODE_CURSOR_INSERT=6
+VI_MODE_CURSOR_OPPEND=0
 
-ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+# p10k supports mode display out of the box
+# MODE_INDICATOR="%F{105}<<<%f"
+# RPROMPT="\$(vi_mode_prompt_info)$RPROMPT"
 
 # -------------------
 # zsh-autosuggestions
@@ -855,13 +875,10 @@ fi
 # fzf
 # ---
 
-# fzf shell integration
-# to enable on macOS + brew, execute /opt/homebrew/opt/fzf/install;
-# to enable on Ubuntu (provided fzf has been installed directly from the git repo), execute ~/.fzf/install;
-# this will generate the ~/.fzf.zsh file which should be sourced here
+# shell integration
 source ~/.fzf.zsh
 
-# Specify the default command that fzf shall execute on empty stdin
+# specify the default command that fzf shall execute on empty stdin
 export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
 
 # see https://github.com/junegunn/fzf#key-bindings-for-command-line

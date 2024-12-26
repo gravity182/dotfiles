@@ -30,13 +30,13 @@ endif
 colorscheme catppuccin_mocha
 set background=dark
 
-" yanked or deleted text will go to the system clipboard register
-" put command will also use this register
+" yank, delete, and put commands will use the system clipboard
 " prefer the "+ register on X11 (clipboard selection)
+" WSL is supported too - just install vim-gtk with clipboard support
 if has('unnamedplus')
-    set clipboard+=unnamedplus
+    set clipboard=unnamedplus
 else
-    set clipboard+=unnamed
+    set clipboard=unnamed
 endif
 
 set encoding=UTF-8
@@ -791,15 +791,6 @@ noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
 " ====================
 " Miscellaneous
 " ====================
-
-" WSL yank support
-let s:win_clip = '/mnt/c/Windows/System32/clip.exe'
-if executable(s:win_clip)
-    augroup WSLYank
-        autocmd!
-        autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:win_clip, @0) | endif
-    augroup END
-endif
 
 function! CmdLine(str)
     call feedkeys(":" . a:str)

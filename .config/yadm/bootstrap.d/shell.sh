@@ -43,23 +43,24 @@ mkdir -pv "$ZSH_CUSTOM/"{completions,functions,plugins}
 [[ ! -d "$ZSH_CUSTOM"/plugins/fzf-tab ]] \
     && git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$ZSH_CUSTOM/plugins/fzf-tab" \
     && echo "Installed the fzf-tab plugin"
+
 [[ ! -d "$ZSH_CUSTOM"/plugins/zsh-autosuggestions ]] \
     && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions" \
     && echo "Installed the zsh-autosuggestions plugin"
+
 [[ ! -d "$ZSH_CUSTOM"/plugins/fast-syntax-highlighting ]] \
     && git clone --depth=1 https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_CUSTOM/plugins/fast-syntax-highlighting" \
     && echo "Installed the fast-syntax-highlighting plugin"
 
-
-# --------------------
-# zsh completions
-# --------------------
+[[ ! -d "$ZSH_CUSTOM"/plugins/zsh-vi-mode ]] \
+    && git clone --depth=1 https://github.com/jeffreytse/zsh-vi-mode.git "$ZSH_CUSTOM/plugins/zsh-vi-mode" \
+    && echo "Installed the zsh-vi-mode plugin"
 
 # by default zsh can already complete many popular CLIs like cd, cp, git, and so on
 # zsh-completions adds even more completions
 # see the full list https://github.com/zsh-users/zsh-completions/tree/master/src
 [[ ! -d "$ZSH_CUSTOM"/plugins/zsh-completions ]] \
-    && git clone --depth=1 https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM"/plugins/zsh-completions \
+    && git clone --depth=1 https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions" \
     && echo "Installed zsh-completions"
 
 

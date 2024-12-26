@@ -255,6 +255,12 @@ if ! _has kubens; then
     arkade get kubens
 fi
 
+if ! _has k9s; then
+    log_install_pre 'k9s'
+    arkade get k9s
+    k9s completion zsh > $ZSH_CUSTOM/completions/_k9s
+fi
+
 if ! _has helm; then
     log_install_pre 'helm'
     arkade get helm

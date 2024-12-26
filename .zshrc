@@ -90,34 +90,6 @@ zstyle ':omz:plugins:*' aliases no
 # you can allow specific plugins though
 # zstyle ':omz:plugins:gnu-utils' aliases yes
 
-# AWS
-# -------------------
-
-SHOW_AWS_PROMPT=false
-
-# zsh-vi-mode
-# -------------------
-
-# key timeout
-ZVM_KEYTIMEOUT=0.4
-ZVM_ESCAPE_KEYTIMEOUT=0.03
-
-# use the new nex engine
-ZVM_READKEY_ENGINE=$ZVM_READKEY_ENGINE_NEX
-
-# zsh-autosuggestions
-# -------------------
-
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-# tune this value to your liking
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-
-# ctrl + arrow key will accept a suggestion partially
-bindkey '^[[1;5C' vi-forward-word
-bindkey '^[[1;5D' vi-backward-word
-# ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
-# ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(forward-char end-of-line vi-forward-char vi-forward-word forward-word vi-end-of-line vi-add-eol)
-
 # --------------------
 # Completions (fpath)
 # --------------------
@@ -824,6 +796,48 @@ alias monitor_keycode='sed -n l'
 # ===============
 
 
+# =====================
+# PLUGINS CONFIG START
+# =====================
+
+# -------------------
+# AWS
+# -------------------
+
+SHOW_AWS_PROMPT=false
+
+# -------------------
+# zsh-vi-mode
+# -------------------
+
+# key timeout
+ZVM_KEYTIMEOUT=0.4
+ZVM_ESCAPE_KEYTIMEOUT=0.03
+
+# use the new nex engine
+ZVM_READKEY_ENGINE=$ZVM_READKEY_ENGINE_NEX
+
+ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+
+# -------------------
+# zsh-autosuggestions
+# -------------------
+
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# tune this value to your liking
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+# ctrl + arrow key will accept a suggestion partially
+bindkey '^[[1;5C' vi-forward-word
+bindkey '^[[1;5D' vi-backward-word
+# ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
+# ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(forward-char end-of-line vi-forward-char vi-forward-word forward-word vi-end-of-line vi-add-eol)
+
+# =====================
+# PLUGINS CONFIG END
+# =====================
+
+
 # ===============
 # MISCELLANEOUS
 # ===============
@@ -945,9 +959,9 @@ sbtrkt      fuzzy-match                     Items that match sbtrkt
 .mp2$       suffix-exact-match              Items that end with .mp3
 !fire       inverse-exact-match             Items that do not include fire
 !^music     inverse-prefix-exact-match      Items that do not start with music
-!.mp2$      inverse-suffix-exact-match      Items that do not end with .mp3\"
+!.mp3$      inverse-suffix-exact-match      Items that do not end with .mp3\"
 "
-# rust regex help (used by fzf, rg, fd)
+# rust regex help (used by rg, fd, and many other Rust-based CLI utils)
 # see https://docs.rs/regex/1.10.3/regex/#syntax
 alias rust_regex_help="echo \"\
 .          any character except new line
@@ -974,6 +988,7 @@ if _has aws; then
     complete -C '/usr/local/bin/aws_completer' aws
 fi
 
+
 # =====================
 # Source other configs
 # =====================
@@ -982,10 +997,11 @@ find $ZCONFIG_DIR/source -type f | sort | while read -r file; do
     source "$file"
 done
 
+
 # =============
 # Final config
-# ---
-# Dependent on the source files above or overwrites
+# ------------
+# Depends on the sourced files above or overwrites
 # =============
 
 # Normalize `open` across Linux, macOS, and Windows

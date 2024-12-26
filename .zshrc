@@ -67,7 +67,6 @@ ZSH_THEME='powerlevel10k/powerlevel10k'
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    # vi-mode
     zsh-vi-mode
     fzf-tab # load fzf-tab early
     colored-man-pages
@@ -210,27 +209,6 @@ setopt HIST_FCNTL_LOCK
 # history size
 HISTSIZE=10000
 SAVEHIST=10000
-
-# -----------------------
-# vi mode
-# -----------------------
-
-# the vi-mode plugin already calls `bindkey -v`, but anyway
-bindkey -v
-
-# switch modes faster (time in milliseconds)
-# vi mode feels much more responsive after this
-# export KEYTIMEOUT=1
-
-# defaults (vi-mode plugin)
-# VI_MODE_CURSOR_NORMAL=2
-# VI_MODE_CURSOR_VISUAL=6
-# VI_MODE_CURSOR_INSERT=6
-# VI_MODE_CURSOR_OPPEND=0
-
-# this remaps `vv` to `E` (but overrides `visual-mode`)
-# unfortunately `vv` doesn't work due to low keytimeout
-# bindkey -M vicmd 'E' edit-command-line
 
 # -----------------------
 # Completions (zstyle)
@@ -837,21 +815,15 @@ alias monitor_keycode='sed -n l'
 SHOW_AWS_PROMPT=false
 
 # -------------------
-# VI-MODE
+# zsh-vi-mode
 # -------------------
 
-VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
-VI_MODE_SET_CURSOR=true
+# key timeout
+ZVM_KEYTIMEOUT=0.4
+ZVM_ESCAPE_KEYTIMEOUT=0.03
 
-# cursor style
-VI_MODE_CURSOR_NORMAL=2
-VI_MODE_CURSOR_VISUAL=2
-VI_MODE_CURSOR_INSERT=6
-VI_MODE_CURSOR_OPPEND=0
-
-# p10k supports mode display out of the box
-# MODE_INDICATOR="%F{105}<<<%f"
-# RPROMPT="\$(vi_mode_prompt_info)$RPROMPT"
+# use the new nex engine
+ZVM_READKEY_ENGINE=$ZVM_READKEY_ENGINE_NEX
 
 # -------------------
 # zsh-autosuggestions

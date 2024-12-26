@@ -569,8 +569,11 @@ let g:lightline = {
     \   'linter_errors': 'error',
     \   'linter_ok': 'right',
     \ },
+    \ 'component_function': {
+    \   'filetype': 'AleFiletype',
+    \ },
     \ 'component': {
-    \   'readonly': '%{&filetype=="help"?"":&readonly?"=":""}',
+    \   'readonly': '%{&filetype=="help"?"":&readonly?"\ue672":""}',
     \   'modified': '%{&filetype=="help"?"":&modified?"+":&modifiable?"":"-"}',
     \   'fugitive': '%{exists("*FugitiveHead")?FugitiveHead():""}'
     \ },
@@ -582,6 +585,10 @@ let g:lightline = {
     \ 'separator': { 'left': ' ', 'right': ' ' },
     \ 'subseparator': { 'left': ' ', 'right': '|' }
 \ }
+
+function! AleFiletype()
+    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : '?') : ''
+endfunction
 
 " let g:lightline#ale#indicator_checking = "\uf110"
 " let g:lightline#ale#indicator_infos = "\uf129"

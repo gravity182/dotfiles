@@ -30,6 +30,12 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Helper functions
+# might want to convert it to the autoload style to reduce startup time
+# fpath+="$ZCONFIG_DIR/functions"
+# autoload ...
+source "$ZCONFIG_DIR/functions/helpers.zsh"
+
 # --------------------------------------
 # oh-my-zsh settings
 # see https://github.com/ohmyzsh/ohmyzsh/wiki/Settings
@@ -74,11 +80,6 @@ plugins=(
     fast-syntax-highlighting # much faster than zsh-syntax-highlighting
 )
 
-# add this to your /etc/wsl.conf, otherwise syntax highlighting will be very slow
-# see https://github.com/zsh-users/zsh-syntax-highlighting/issues/790#issuecomment-1385406603
-# [interop]
-# appendWindowsPath = false
-
 if [[ "$OSTYPE" == "darwin"* ]]; then
     plugins+=(gnu-utils)
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -89,14 +90,33 @@ zstyle ':omz:plugins:*' aliases no
 # you can allow specific plugins though
 # zstyle ':omz:plugins:gnu-utils' aliases yes
 
-# --------------------------------------
-# Helper functions
-# --------------------------------------
+# AWS
+# -------------------
 
-# might want to convert it to the autoload style to reduce startup time
-# fpath+="$ZCONFIG_DIR/functions"
-# autoload ...
-source "$ZCONFIG_DIR/functions/helpers.zsh"
+SHOW_AWS_PROMPT=false
+
+# zsh-vi-mode
+# -------------------
+
+# key timeout
+ZVM_KEYTIMEOUT=0.4
+ZVM_ESCAPE_KEYTIMEOUT=0.03
+
+# use the new nex engine
+ZVM_READKEY_ENGINE=$ZVM_READKEY_ENGINE_NEX
+
+# zsh-autosuggestions
+# -------------------
+
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# tune this value to your liking
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+# ctrl + arrow key will accept a suggestion partially
+bindkey '^[[1;5C' vi-forward-word
+bindkey '^[[1;5D' vi-backward-word
+# ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
+# ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(forward-char end-of-line vi-forward-char vi-forward-word forward-word vi-end-of-line vi-add-eol)
 
 # --------------------
 # Completions (fpath)
@@ -802,46 +822,6 @@ alias monitor_keycode='sed -n l'
 # ===============
 # ALIASES END
 # ===============
-
-
-# =====================
-# PLUGINS CONFIG START
-# =====================
-
-# -------------------
-# AWS
-# -------------------
-
-SHOW_AWS_PROMPT=false
-
-# -------------------
-# zsh-vi-mode
-# -------------------
-
-# key timeout
-ZVM_KEYTIMEOUT=0.4
-ZVM_ESCAPE_KEYTIMEOUT=0.03
-
-# use the new nex engine
-ZVM_READKEY_ENGINE=$ZVM_READKEY_ENGINE_NEX
-
-# -------------------
-# zsh-autosuggestions
-# -------------------
-
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-# tune this value to your liking
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-
-# ctrl + arrow key will accept a suggestion partially
-bindkey '^[[1;5C' vi-forward-word
-bindkey '^[[1;5D' vi-backward-word
-# ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
-# ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(forward-char end-of-line vi-forward-char vi-forward-word forward-word vi-end-of-line vi-add-eol)
-
-# =====================
-# PLUGINS CONFIG END
-# =====================
 
 
 # ===============

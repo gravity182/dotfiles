@@ -1,10 +1,10 @@
-#  _____ _____                           
-# |  ___|  ___| __ ___  _ __   ___  __ _ 
+#  _____ _____
+# |  ___|  ___| __ ___  _ __   ___  __ _
 # | |_  | |_ | '_ ` _ \| '_ \ / _ \/ _` |
 # |  _| |  _|| | | | | | |_) |  __/ (_| |
 # |_|   |_|  |_| |_| |_| .__/ \___|\__, |
-#                      |_|         |___/ 
-# 
+#                      |_|         |___/
+#
 
 if ! _has ffmpeg; then
     return 1
@@ -16,10 +16,13 @@ fi
 
 
 # ------------------
-# General
+# Info
 # ------------------
 
 alias ffmpeg_info="ffmpeg -i"
+
+alias ffmpeg_dimension="ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0"
+
 
 # ------------------
 # Video manipulation
@@ -115,6 +118,48 @@ function ffmpeg_vid_cut_from() {
     ffmpeg -v warning -ss $2 -i "$src" -c copy -y "$dest"
 }
 
+# Video cropping
+# --------------
+
+# Accepts:
+#   - $1 - input video
+#   - $2 - crop format in form of 'w:h:x:y'
+#
+# When the position x:y is specified, the video will be cropped from x:y
+# towards the right and the bottom of the video.
+# When the position x:y is not specified, FFmpeg will automatically crop the input video from the center.
+#
+# Use 'in_w'/'in_h' variables to represent input width/height.
+#
+# Examples for a 1280x720 video:
+#   - "640:480:0:0" - crop from the top left corner (0,0) of the video
+#   - "640:480" - crop from the center
+#   - "640:480:0:720"/"crop=640:480:0:in_h" - crop from the bottom left corner
+#   - "crop=640:480:1280:0"/"crop=640:480:in_w:0" - crops from the right top corner
+#   - "crop=640:480:1280:720"/"crop=640:480:in_w:in_h" - crops from the right bottom corner
+#
+function ffmpeg_vid_crop() {
+    local src="$1"
+    local src_ext="${1##*.}"
+    local dest="${src%.*}-cropped.${src_ext}"
+    local crop="$2"
+    if [[ -z "$crop" ]]; then
+        echo "Provide a crop in form of 'w:h:x:y'!"
+    fi
+    ffmpeg -v warning -i "$src" -vf "crop=$crop" -y "$dest"
+}
+
+# crop black borders automatically
+function ffmpeg_vid_crop_black_borders() {
+    local src="$1"
+    local src_ext="${1##*.}"
+    local dest="${src%.*}-cropped-black-borders.${src_ext}"
+
+    local crop=$(ffmpeg -i "$src" -vf cropdetect -f null - 2>&1 | awk '/crop/ { print $NF }' | tail -1)
+    echo "Removing black borders - video will be cropped to '$crop'"
+    ffmpeg -v warning -i "$src" -vf "crop=$crop" -y "$dest"
+}
+
 # Video to audio
 # --------------
 
@@ -123,7 +168,7 @@ function ffmpeg_vid2aud_uncompressed() {
     local src="$1"
     local dest_ext="wav"
     local dest="${src%.*}.${dest_ext}"
-    ffmpeg -v warning -i "$src" -vn -c:a pcm_s24le -ar 48000 -ac 2 "$dest"
+    ffmpeg -v warning -i "$src" -vn -c:a pcm_s24le -ar 48000 -ac 2 -y "$dest"
 }
 
 # flac is the best lossless codec
@@ -131,7 +176,7 @@ function ffmpeg_vid2aud_lossless() {
     local src="$1"
     local dest_ext="flac"
     local dest="${src%.*}.${dest_ext}"
-    ffmpeg -v warning -i "$src" -vn -c:a flac -ar 44100 -ac 2 "$dest"
+    ffmpeg -v warning -i "$src" -vn -c:a flac -ar 44100 -ac 2 -y "$dest"
 }
 
 # opus is the best lossy format
@@ -139,21 +184,21 @@ function ffmpeg_vid2aud_lossy_best() {
     local src="$1"
     local dest_ext="opus"
     local dest="${src%.*}.${dest_ext}"
-    ffmpeg -v warning -i "$src" -vn -c:a libopus -ar 44100 -ac 2 -ab 192k "$dest"
+    ffmpeg -v warning -i "$src" -vn -c:a libopus -ar 44100 -ac 2 -ab 192k -y "$dest"
 }
 # mp3 is the most compatible format
 function ffmpeg_vid2aud_lossy_compatible() {
     local src="$1"
     local dest_ext="mp3"
     local dest="${src%.*}.${dest_ext}"
-    ffmpeg -v warning -i "$src" -vn -c:a libmp3lame -ar 44100 -ac 2 -ab 192k "$dest"
+    ffmpeg -v warning -i "$src" -vn -c:a libmp3lame -ar 44100 -ac 2 -ab 192k -y "$dest"
 }
 # aac is a good trade-off between quality and compatibility
 function ffmpeg_vid2aud_lossy() {
     local src="$1"
     local dest_ext="m4a"
     local dest="${src%.*}.${dest_ext}"
-    ffmpeg -v warning -i "$src" -vn -c:a libfdk_aac -ar 44100 -ac 2 -ab 192k "$dest"
+    ffmpeg -v warning -i "$src" -vn -c:a libfdk_aac -ar 44100 -ac 2 -ab 192k -y "$dest"
 }
 
 # Video to gif
@@ -261,9 +306,13 @@ function ffmpeg_img2png() {
     ffmpeg -v warning -i "$src" -frames:v 1 -update true -y "$dest"
 }
 
-# Resize image
-# pass scale in form of "width:height"
-# read https://trac.ffmpeg.org/wiki/Scaling#SimpleRescaling
+# Resize image.
+# Accepts:
+#   - $1 - input image
+#   - $2 - scale in form of "width:height"
+#
+# Read https://trac.ffmpeg.org/wiki/Scaling#SimpleRescaling
+#
 # The scale filter can also automatically calculate a dimension while preserving the aspect ratio
 # scale=320:-1 / scale=-1:240
 function ffmpeg_img_resize() {
@@ -304,13 +353,13 @@ TELEGRAM_OUT_OPTS=(-pix_fmt yuva420p -crf 15 -b:v 0 -deadline best -cpu-used 0)
 # $1 - mp4 source file
 function ffmpeg_telegram_sticker() {
     local src="$1"
-    local dest="${src%.*}.webm"
+    local dest="${src%.*}-tg-sticker.webm"
     ffmpeg -i "$src" -r 24 -t 3 -an -c:v libvpx-vp9 -s 512x512 "${TELEGRAM_OUT_OPTS[@]}" -y "$dest"
 }
 
 function ffmpeg_telegram_sticker_speeded_up() {
     local src="$1"
-    local dest="${src%.*}.webm"
+    local dest="${src%.*}-tg-sticker-speed.webm"
     local speed="$2"
     if [[ -z "$speed" ]]; then
         speed="1.125"
@@ -325,14 +374,14 @@ function ffmpeg_telegram_sticker_speeded_up() {
 # $1 - jpg/png source file
 function ffmpeg_telegram_emoji_static() {
     local src="$1"
-    local dest="${src%.*}.webm"
+    local dest="${src%.*}-tg-emoji.webm"
     ffmpeg -f image2 -s 100x100 -framerate 25 -i "$src" -c:v libvpx-vp9 -s 100x100 "${TELEGRAM_OUT_OPTS[@]}" -y "$dest"
 }
 
 # $1 - mp4 source file
 function ffmpeg_telegram_emoji_animated() {
     local src="$1"
-    local dest="${src%.*}.webm"
+    local dest="${src%.*}-tg-emoji.webm"
     ffmpeg -i "$src" -r 24 -t 3 -an -c:v libvpx-vp9 -s 100x100 "${TELEGRAM_OUT_OPTS[@]}" -y "$dest"
 }
 

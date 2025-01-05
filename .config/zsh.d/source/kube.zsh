@@ -27,6 +27,19 @@ function kube_run_busybox() {
     kubectl run --rm -i --tty busybox --image=busybox --restart=Never -- sh
 }
 
+function kube_kubelet_conf() {
+    if ! curl -f http://127.0.0.1:8001/ &> /dev/null; then
+        echo "Please ensure the kube proxy is serving on port 8001" >&2
+        return 1
+    fi
+
+    node=$(fzf --header-lines=1 --header="Select a node to display its kubelet conf" --print0 <<< $(kubectl get nodes) | awk '{print $1}')
+    if [[ -z $node ]]; then
+        return 1
+    fi
+    curl -sSX GET http://127.0.0.1:8001/api/v1/nodes/$node/proxy/configz | jq .kubeletconfig
+}
+
 function kube_clean_evicted() {
     kubectl get pods -A -o json \
         | jq '.items[] | select((.status.reason == "Evicted") or (.status.phase == "Succeeded")) | "kubectl delete pods \(.metadata.name) -n \(.metadata.namespace)"' \

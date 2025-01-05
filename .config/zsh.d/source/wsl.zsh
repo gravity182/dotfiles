@@ -27,7 +27,8 @@ function mount_usb() {
         echo "Please provide a USB letter!"
         return 1
     fi
-    sudo mount -t drvfs $1: /mnt/$1 -o uid=$(id -u $USER),gid=$(id -g $USER),metadata
+    sudo mkdir -p /mnt/$1 && \
+        sudo mount -t drvfs $1: /mnt/$1 -o uid=$(id -u $USER),gid=$(id -g $USER),metadata
 }
 
 # directory shortcuts

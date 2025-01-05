@@ -56,12 +56,13 @@
 
     untrack = rm --cached
 
+    # Remove the file the Staging area, but leave its local modifications (the opposite of git add)
     unadd = restore --staged
 
-    # what would be merged
+    # What would be merged
     incoming = log HEAD..@{upstream}
 
-    # what would be pushed
+    # What would be pushed
     outgoing = log @{upstream}..HEAD
     outgoing = log @{u}..
 
@@ -78,10 +79,10 @@
     ft = "!f() { git describe --always --contains $1; }; f"
 
     # Find commits by source code
-    fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+    fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S '$1'; }; f"
 
     # Find commits by commit message
-    fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+    fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep='$1'; }; f"
 
     # Remove branches that have already been merged with main.
     # a.k.a. ‘delete merged’

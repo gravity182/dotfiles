@@ -308,7 +308,7 @@ fi
 # ===============
 
 # -------------------
-# Java exports
+# Java
 # -------------------
 
 # select the default java version via `sdk default java <ver>`
@@ -317,7 +317,15 @@ export GRAALVM_HOME="$HOME/.sdkman/candidates/java/17.0.10-graal"
 export GRADLE_USER_HOME="$HOME/.gradle"
 
 # -------------------
-# JavaScript exports
+# Golang
+# -------------------
+
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+# -------------------
+# JavaScript
 # -------------------
 
 export VOLTA_HOME="$HOME/.volta"

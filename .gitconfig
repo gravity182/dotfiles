@@ -34,8 +34,8 @@
     sa = stash apply
     sp = !git stash push --include-untracked --message="$1"
 
-    # Pull in remote changes for the current repository and all its submodules.
-    p = pull --recurse-submodules
+    p = push
+    pf = push --force
 
     # Clone a repository including all submodules.
     c = clone --recursive

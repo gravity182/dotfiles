@@ -42,7 +42,7 @@ function kube_kubelet_conf() {
 
 function kube_clean_evicted() {
     kubectl get pods -A -o json \
-        | jq '.items[] | select((.status.reason == "Evicted") or (.status.phase == "Succeeded")) | "kubectl delete pods \(.metadata.name) -n \(.metadata.namespace)"' \
+        | jq '.items[] | select((.status.reason == "Evicted") or (.status.phase == "Succeeded") or (.status.phase == "Failed")) | "kubectl delete pods \(.metadata.name) -n \(.metadata.namespace)"' \
         | xargs -n 1 $SHELL -c 2>/dev/null || echo "No evicted pods found"
 }
 

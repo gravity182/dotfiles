@@ -176,6 +176,8 @@ if ! _has ffmpeg; then
     tar -xf ffmpeg-latest.tar.xz --strip-components=1 -C ~/.ffmpeg
     rm ffmpeg-latest.tar.xz
     ln -sf "$HOME/.ffmpeg/bin/ffmpeg" "$HOME/.local/bin/ffmpeg"
+    ln -sf "$HOME/.ffmpeg/bin/ffprobe" "$HOME/.local/bin/ffprobe"
+    ln -sf "$HOME/.ffmpeg/bin/ffplay" "$HOME/.local/bin/ffplay"
 fi
 
 if ! _has gifsicle; then

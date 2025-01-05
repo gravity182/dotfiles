@@ -901,7 +901,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
 
 # these default options will be used everytime you call fzf
-FZF_MIN_HEIGHT="40%"
+FZF_MIN_HEIGHT="50%"
 export FZF_DEFAULT_OPTS="--height $FZF_MIN_HEIGHT
   --border horizontal
   --layout reverse
@@ -918,13 +918,12 @@ export FZF_DEFAULT_OPTS="--height $FZF_MIN_HEIGHT
   --bind 'ctrl-d:half-page-down,ctrl-u:half-page-up'
   "
 
-# these options overwrite the default ones above
+# these options *extend* and override the default ones above
 export FZF_BINDING_OPTS="--border rounded
   --layout default
   --info inline-right
   --color header:italic
-  --separator '─'
-  "
+  --separator '─'"
 export FZF_CTRL_T_OPTS="$FZF_BINDING_OPTS
   --preview 'bat --color=always --style=numbers --line-range=:500 {}'
   --bind 'ctrl-/:change-preview-window(hidden|)'
@@ -934,10 +933,54 @@ export FZF_ALT_C_OPTS="$FZF_BINDING_OPTS
   --bind 'ctrl-/:change-preview-window(hidden|)'
   "
 export FZF_CTRL_R_OPTS="$FZF_BINDING_OPTS
-  --preview 'echo {}'
+  --preview 'echo {3..}'
   --preview-window down:5:hidden:wrap
   --bind 'ctrl-/:toggle-preview'
   "
+
+# CTRL-R - Paste the selected command from history into the command line
+# better shell history search
+# big thanks to this amazing article https://tratt.net/laurie/blog/2025/better_shell_history_search.html
+# adapted for FZF
+fzf-history-widget() {
+  local selected num
+  setopt localoptions noglobsubst noposixbuiltins pipefail no_aliases noglob 2> /dev/null
+  local awk_filter='{ cmd=$0; sub(/^\s*[0-9]+\**\s+/, "", cmd); if (!seen[cmd]++) print $0 }'  # filter out duplicates
+  local n=1 fc_opts=''
+  if [[ -o extended_history ]]; then
+    awk_filter='
+{
+  ts = int($2)
+  delta = systime() - ts
+  delta_days = int(delta / 86400)
+  if (delta < 0) { $2="+" (-delta_days) "d" }
+  else if (delta_days < 1 && delta < 72000) { $2=strftime("%H:%M", ts) }
+  else if (delta_days == 0) { $2="1d" }
+  else { $2=delta_days "d" }
+  line=$0; $1=""; $2=""
+  if (!seen[$0]++) print line
+}'
+    fc_opts='-i'
+    n=2
+  fi
+  selected=( $(fc -rl $fc_opts -t '%s' 1 | sed -E "s/^ *//" | awk "$awk_filter" |
+    FZF_DEFAULT_OPTS=$(__fzf_defaults "" "--with-nth $n.. --scheme=history --bind=ctrl-r:toggle-sort --highlight-line ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} --no-multi") \
+    FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd)) )
+  local ret=$?
+  if [ -n "$selected" ]; then
+    if num=$(awk '{print $1; exit}' <<< "$selected" | grep -o '^[1-9][0-9]*'); then
+      zle vi-fetch-history -n $num
+    else # selected is a custom query, not from history
+      LBUFFER="$selected"
+    fi
+  fi
+  zle reset-prompt
+  return $ret
+}
+zle     -N            fzf-history-widget
+bindkey -M emacs '^R' fzf-history-widget
+bindkey -M vicmd '^R' fzf-history-widget
+bindkey -M viins '^R' fzf-history-widget
 
 # map Ctrl-E to the cd/dir search (the same as Alt-C)
 zle     -N              fzf-cd-widget

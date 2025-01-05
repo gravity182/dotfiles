@@ -184,6 +184,13 @@ LC_CTYPE=en_US.UTF-8
 # History
 # -----------------------
 
+# The EXTENDED_HISTORY changes the format of .zsh_history to record when (in seconds from the Unix epoch) a command was executed and (with INC_APPEND_HISTORY_TIME) how long it ran for
+# Save each command’s beginning timestamp (in seconds since the epoch) and the duration (in seconds)
+setopt EXTENDED_HISTORY
+# This option is a variant of INC_APPEND_HISTORY in which, where possible,
+# the history entry is written out to the file after the command is finished,
+# so that the time taken by the command is recorded correctly in the history file in EXTENDED_HISTORY format
+setopt INC_APPEND_HISTORY_TIME
 # When the history file is re-written, write out a copy of the file named $HISTFILE.new
 # and then rename it over the old one (atomic rename)
 setopt HIST_SAVE_BY_COPY

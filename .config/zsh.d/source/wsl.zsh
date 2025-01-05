@@ -37,7 +37,7 @@ function mount_usb() {
 # C drive
 hash -d c="/mnt/c/Users/$wuser"
 hash -d w="/mnt/c/Users/$wuser"
-hash -d idea="/mnt/c/Users/$wuser/Documents/IdeaProjects"
+hash -d idea="/mnt/d/Code/IdeaProjects"
 hash -d mods="/mnt/c/Users/$wuser/AppData/Local/ModOrganizer/Skyrim Special Edition/mods/SSEEdit Patch"
 
 # D drive

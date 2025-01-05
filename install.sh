@@ -13,12 +13,12 @@ function doIt() {
     ./.config/yadm/bootstrap
 }
 
-if [ "$1" == "--force" ]; then
+if [[ "${1:-}" == "--force" ]]; then
     doIt
 else
     printf 'This may overwrite existing files in your home directory. Continue? (y/n) '
     read answer
-    if [ "$answer" != "${answer#[Yy]}" ]; then
+    if [[ "$answer" != "${answer#[Yy]}" ]]; then
         doIt
     fi
 fi

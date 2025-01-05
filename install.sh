@@ -17,7 +17,7 @@ if [[ "${1:-}" == "--force" ]]; then
     doIt
 else
     printf 'This may overwrite existing files in your home directory. Continue? (y/n) '
-    read answer
+    read -r answer
     if [[ "$answer" != "${answer#[Yy]}" ]]; then
         doIt
     fi

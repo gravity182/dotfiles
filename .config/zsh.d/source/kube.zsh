@@ -22,7 +22,9 @@ export KUBECONFIG
 alias k='kubectl'
 
 function kube_run_busybox() {
-    kubectl run -it busybox --image=busybox --restart=Never
+    namespace=$(kubectl config view --minify -o jsonpath='{..namespace}')
+    echo "Running busybox in namespace '$namespace'"
+    kubectl run --rm -i --tty busybox --image=busybox --restart=Never -- sh
 }
 
 function kube_clean_evicted() {

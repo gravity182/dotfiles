@@ -19,7 +19,7 @@ fi
 # Info
 # ------------------
 
-alias ffmpeg_info="ffmpeg -i"
+alias ffmpeg_info="ffprobe"
 
 alias ffmpeg_dimension="ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0"
 

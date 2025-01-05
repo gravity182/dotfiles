@@ -5,6 +5,12 @@
 temp
 temporary
 
+# Ignore a file by renaming it with 'ignore' in its name
+# e.g. 'ignore.values.yaml'/'values.yaml.ignore'/'.values.ignore.yaml'
+*.ignore
+ignore.*
+*.ignore.*
+
 
 # ======================
 # MacOS specific

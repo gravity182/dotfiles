@@ -72,10 +72,10 @@
     # Remove the old tag with this name and tag the latest commit with it.
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
 
-    # Find branches containing commit
+    # Find branches containing commit (accepts a commit hash)
     fb = "!f() { git branch -a --contains $1; }; f"
 
-    # Find tags containing commit
+    # Find tags containing commit (accepts a commit hash)
     ft = "!f() { git describe --always --contains $1; }; f"
 
     # Find commits by source code

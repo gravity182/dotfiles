@@ -1,10 +1,10 @@
-#        _            _ _       
-#  _   _| |_       __| | |_ __  
-# | | | | __|____ / _` | | '_ \ 
+#        _            _ _
+#  _   _| |_       __| | |_ __
+# | | | | __|____ / _` | | '_ \
 # | |_| | ||_____| (_| | | |_) |
-#  \__, |\__|     \__,_|_| .__/ 
-#  |___/                 |_|    
-#                               
+#  \__, |\__|     \__,_|_| .__/
+#  |___/                 |_|
+#
 
 if ! _has yt-dlp; then
     return 1
@@ -56,7 +56,7 @@ alias yt_dl_all_user_playlists_indexed="yt-dlp "$video_default_opts" -o '$path_p
 # download audio only
 # selects the best possible quality by default
 alias yt_dl_audio_uncompressed="yt-dlp -x --audio-quality 0 --audio-format wav -o '$path_prefix/%(title)s.%(ext)s'"
-alias yt_dl_audio="yt-dlp -x --audio-quality 5 --audio-format best -o '$path_prefix/%(title)s.%(ext)s'"
+alias yt_dl_audio="yt-dlp -x --audio-quality 0 --audio-format 'm4a' -o '$path_prefix/%(title)s.%(ext)s'"
 
 alias yt_dl_update="yt-dlp -U"
 

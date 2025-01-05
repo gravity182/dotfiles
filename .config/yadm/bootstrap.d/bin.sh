@@ -180,6 +180,19 @@ if ! _has ffmpeg; then
     ln -sf "$HOME/.ffmpeg/bin/ffplay" "$HOME/.local/bin/ffplay"
 fi
 
+if ! _has yt-dlp; then
+    log_install_pre 'yt-dlp'
+    version="2025.03.27"
+    curl -fsSL "https://github.com/yt-dlp/yt-dlp/releases/download/$version/yt-dlp.tar.gz" -o yt-dlp.tar.gz
+
+    mkdir -p ~/.yt-dlp
+    tar -xf yt-dlp.tar.gz --strip-components=1 -C ~/.yt-dlp
+    rm yt-dlp.tar.gz
+    ln -sf "$HOME/.yt-dlp/yt-dlp" "$HOME/.local/bin/yt-dlp"
+    ln -sf "$HOME/.yt-dlp/yt-dlp.1" "$HOME/.local/share/man/man1/yt-dlp.1"
+    ln -sf "$HOME/.yt-dlp/completions/zsh/_yt-dlp" "$ZSH_CUSTOM/completions/_yt-dlp"
+fi
+
 if ! _has gifsicle; then
     log_install_pre 'gifsicle'
     sudo apt install -y gifsicle

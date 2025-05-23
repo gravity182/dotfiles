@@ -35,3 +35,4 @@ export BAT_THEME="Monokai Extended"
 # # needed to fix colors
 # export MANROFFOPT="-c"
 
+. "$HOME/.cargo/env"

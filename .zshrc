@@ -329,7 +329,13 @@ export GRADLE_USER_HOME="$HOME/.gradle"
 
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+export PATH="$GOPATH/bin:$GOROOT/bin:$PATH"
+
+# -------------------
+# Rust
+# -------------------
+
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # -------------------
 # JavaScript

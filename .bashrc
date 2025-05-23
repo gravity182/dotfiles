@@ -123,3 +123,4 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 
 set -o vi
 
+. "$HOME/.cargo/env"

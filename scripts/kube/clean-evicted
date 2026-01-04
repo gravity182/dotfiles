@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+# Kubernetes Pod Cleaner
+# Removes evicted and failed pods from all namespaces
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0"
+    echo ""
+    echo "Removes pods with status 'Evicted' or 'Failed' from all namespaces"
+    echo "Helps clean up cluster resources and reduce clutter in pod listings"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - kubectl must be installed and configured"
+    echo "  - jq must be installed for JSON processing"
+    echo "  - Appropriate permissions to delete pods across namespaces"
+    echo ""
+    echo "Examples:"
+    echo "  $0                # Clean evicted/failed pods from all namespaces"
+    echo ""
+    echo "Pod statuses cleaned:"
+    echo "  - Evicted: Pods evicted due to resource constraints"
+    echo "  - Failed: Pods that failed to run successfully"
+    echo ""
+    echo "Note: Succeeded pods are preserved as they represent successful completions"
+    echo ""
+    echo "The script will:"
+    echo "  1. Scan all namespaces for qualifying pods"
+    echo "  2. Generate delete commands for found pods"
+    echo "  3. Execute deletions or report if no pods found"
+    exit 0
+fi
+
+# Check dependencies
+if ! command -v kubectl &> /dev/null; then
+    echo "Error: kubectl is not installed or not in PATH" >&2
+    exit 1
+fi
+
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed or not in PATH" >&2
+    echo "Install with: brew install jq" >&2
+    exit 1
+fi
+
+# Check if we have a valid kubectl context
+if ! kubectl config current-context &> /dev/null; then
+    echo "Error: No valid kubectl context found" >&2
+    exit 1
+fi
+
+echo "Scanning for evicted and failed pods across all namespaces..."
+
+kubectl get pods -A -o json \
+    | jq '.items[] | select((.status.reason == "Evicted") or (.status.phase == "Failed")) | "kubectl delete pods \(.metadata.name) -n \(.metadata.namespace)"' \
+    | xargs -n 1 $SHELL -c 2>/dev/null || echo "No evicted or failed pods found"

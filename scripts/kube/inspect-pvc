@@ -1,0 +1,203 @@
+#!/usr/bin/env bash
+
+# PVC Inspector - Creates a utility pod to inspect Persistent Volume Claims
+# Usage: pvc-inspector.sh [-n namespace] [-u uid] [-g gid] [-h|--help]
+
+# Help message
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0 [-n namespace] [-u uid] [-g gid] [-h|--help]"
+    echo ""
+    echo "Creates a utility pod to inspect Kubernetes Persistent Volume Claims (PVCs)"
+    echo "Provides an interactive shell with the PVC mounted for inspection"
+    echo ""
+    echo "Options:"
+    echo "  -n, --namespace <namespace>  Target namespace (interactive selection if not specified)"
+    echo "  -u, --uid <uid>              User ID to run as (default: 0/root)"
+    echo "  -g, --gid <gid>              Group ID to run as (default: 0/root)"
+    echo "  -h, --help                   Show this help message"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - kubectl must be installed and configured"
+    echo "  - fzf must be installed for interactive selection"
+    echo "  - Appropriate permissions to create pods and access PVCs"
+    echo ""
+    echo "Examples:"
+    echo "  $0                           # Interactive selection, run as root"
+    echo "  $0 -n production             # Use production namespace, run as root"
+    echo "  $0 -u 1000 -g 1000          # Run as user 1000:1000"
+    echo "  $0 --uid 65534              # Run as nobody user"
+    echo "  $0 -n app -u 1001 -g 1001   # Specific namespace and user"
+    echo ""
+    echo "Common UIDs/GIDs:"
+    echo "  0:0        root:root (default)"
+    echo "  1000:1000  Default non-root user in many containers"
+    echo "  65534:65534 nobody:nogroup"
+    echo ""
+    echo "The script will:"
+    echo "  1. List available namespaces (or use specified one)"
+    echo "  2. Show PVCs in the selected namespace"
+    echo "  3. Create a temporary utility pod with the selected PVC mounted"
+    echo "  4. Open an interactive shell in the pod"
+    echo "  5. Auto-cleanup the pod when shell exits"
+    exit 0
+fi
+
+# --- Configuration ---
+UTILITY_POD_NAME="pvc-inspector-$(date +%s)" # Unique name for the utility pod
+CONTAINER_IMAGE="ubuntu:latest"             # Image for the utility pod container
+MOUNT_PATH="/mnt/pvc-data"                 # Mount path inside the utility pod
+
+# Default values
+NAMESPACE_FLAG=""
+UID_FLAG="0"
+GID_FLAG="0"
+
+# --- Script Logic ---
+
+# Check dependencies
+if ! command -v kubectl &> /dev/null; then
+    echo "Error: kubectl is not installed or not in PATH" >&2
+    exit 1
+fi
+
+if ! command -v fzf &> /dev/null; then
+    echo "Error: fzf is not installed or not in PATH" >&2
+    echo "Install with: brew install fzf" >&2
+    exit 1
+fi
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -n|--namespace)
+            NAMESPACE_FLAG="$2"
+            shift 2
+            ;;
+        -u|--uid)
+            UID_FLAG="$2"
+            shift 2
+            ;;
+        -g|--gid)
+            GID_FLAG="$2"
+            shift 2
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            echo "Use -h or --help for usage information" >&2
+            exit 1
+            ;;
+        *)
+            echo "Unexpected argument: $1" >&2
+            echo "Use -h or --help for usage information" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Validate numeric inputs
+if ! [[ "$UID_FLAG" =~ ^[0-9]+$ ]]; then
+    echo "Error: UID must be a numeric value, got: $UID_FLAG" >&2
+    exit 1
+fi
+
+if ! [[ "$GID_FLAG" =~ ^[0-9]+$ ]]; then
+    echo "Error: GID must be a numeric value, got: $GID_FLAG" >&2
+    exit 1
+fi
+
+# Determine the target namespace
+TARGET_NAMESPACE=""
+if [ -n "$NAMESPACE_FLAG" ]; then
+  TARGET_NAMESPACE="$NAMESPACE_FLAG"
+  echo "Using namespace specified by flag: $TARGET_NAMESPACE"
+else
+  echo "Fetching namespaces..."
+  # List namespaces and pipe to fzf for interactive selection
+  SELECTED_NAMESPACE=$(kubectl get namespaces --no-headers -o custom-columns=":metadata.name" | fzf --prompt="Select a namespace: " --height=10)
+
+  if [ -z "$SELECTED_NAMESPACE" ]; then
+    echo "No namespace selected. Exiting."
+    exit 1
+  fi
+  TARGET_NAMESPACE="$SELECTED_NAMESPACE"
+  echo "Selected namespace: $TARGET_NAMESPACE"
+fi
+
+# --- Fetch and Display PVC Information for Selection ---
+
+echo "Fetching PVCs in namespace '$TARGET_NAMESPACE'..."
+
+# Get PVCs in wide format, keeping the header
+PVC_INFO=$(kubectl get pvc -n "$TARGET_NAMESPACE" -o wide)
+
+# Check if any PVCs were found (besides the header)
+if [ "$(echo "$PVC_INFO" | wc -l)" -le 1 ]; then
+  echo "No PVCs found in namespace '$TARGET_NAMESPACE'. Exiting."
+  exit 1
+fi
+
+# Use fzf with --header-lines option to use the first line as header
+# We also need to capture the full selected line to extract the PVC name later
+SELECTED_PVC_LINE=$(echo "$PVC_INFO" | fzf --prompt="Select a PVC: " --header-lines=1 --height=20)
+
+if [ -z "$SELECTED_PVC_LINE" ]; then
+  echo "No PVC selected. Exiting."
+  exit 1
+fi
+
+# Extract the PVC name from the selected line (assuming name is the first column)
+# We use awk to get the first field of the selected line
+SELECTED_PVC=$(echo "$SELECTED_PVC_LINE" | awk '{print $1}')
+
+if [ -z "$SELECTED_PVC" ]; then
+    echo "Failed to extract PVC name from selection. Exiting."
+    exit 1
+fi
+
+echo "Selected PVC: $SELECTED_PVC"
+echo "Running as UID: $UID_FLAG, GID: $GID_FLAG"
+
+# --- Create and Run Utility Pod ---
+
+# Generate JSON overrides for kubectl run
+OVERRIDES=$(cat <<EOF
+{
+  "spec": {
+    "containers": [{
+      "name": "$UTILITY_POD_NAME",
+      "image": "$CONTAINER_IMAGE",
+      "stdin": true,
+      "tty": true,
+      "securityContext": {
+        "runAsUser": $UID_FLAG,
+        "runAsGroup": $GID_FLAG
+      },
+      "volumeMounts": [{
+        "name": "pvc-data",
+        "mountPath": "$MOUNT_PATH"
+      }]
+    }],
+    "volumes": [{
+      "name": "pvc-data",
+      "persistentVolumeClaim": {
+        "claimName": "$SELECTED_PVC"
+      }
+    }]
+  }
+}
+EOF
+)
+
+echo "Creating utility pod '$UTILITY_POD_NAME' in namespace '$TARGET_NAMESPACE'..."
+echo "PVC '$SELECTED_PVC' will be mounted at '$MOUNT_PATH'"
+
+# Use kubectl run with overrides - pod will auto-delete when shell exits
+kubectl run "$UTILITY_POD_NAME" \
+  --namespace="$TARGET_NAMESPACE" \
+  --image="$CONTAINER_IMAGE" \
+  --restart=Never \
+  --rm \
+  -it \
+  --overrides="$OVERRIDES" \
+  -- /bin/bash
+

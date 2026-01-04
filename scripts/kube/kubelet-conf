@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# Kubernetes Kubelet Configuration Viewer
+# Displays kubelet configuration from selected node via kube proxy
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0"
+    echo ""
+    echo "Displays kubelet configuration from a Kubernetes node"
+    echo "Uses kubectl proxy to access node's kubelet configuration endpoint"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - kubectl must be installed and configured"
+    echo "  - fzf must be installed for interactive node selection"
+    echo "  - jq must be installed for JSON formatting"
+    echo "  - kubectl proxy must be running on port 8001"
+    echo ""
+    echo "Examples:"
+    echo "  $0                # Interactive node selection and config display"
+    echo ""
+    echo "Setup:"
+    echo "  kubectl proxy --port=8001 &    # Start proxy in background"
+    echo "  $0                             # Run this script"
+    echo ""
+    echo "The script will:"
+    echo "  1. Check if kubectl proxy is available on port 8001"
+    echo "  2. List all nodes for interactive selection"
+    echo "  3. Fetch and display kubelet configuration as formatted JSON"
+    exit 0
+fi
+
+# Check dependencies
+if ! command -v kubectl &> /dev/null; then
+    echo "Error: kubectl is not installed or not in PATH" >&2
+    exit 1
+fi
+
+if ! command -v fzf &> /dev/null; then
+    echo "Error: fzf is not installed or not in PATH" >&2
+    echo "Install with: brew install fzf" >&2
+    exit 1
+fi
+
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed or not in PATH" >&2
+    echo "Install with: brew install jq" >&2
+    exit 1
+fi
+
+# Check if kubectl proxy is running
+if ! curl -f http://127.0.0.1:8001/ &> /dev/null; then
+    echo "Error: kubectl proxy is not serving on port 8001" >&2
+    echo "Please start the proxy with: kubectl proxy --port=8001" >&2
+    exit 1
+fi
+
+# Check if we have a valid kubectl context
+if ! kubectl config current-context &> /dev/null; then
+    echo "Error: No valid kubectl context found" >&2
+    exit 1
+fi
+
+# Get nodes and let user select one
+node=$(kubectl get nodes | fzf --header-lines=1 --header="Select a node to display its kubelet conf" --print0 | awk '{print $1}')
+
+if [[ -z "$node" ]]; then
+    echo "No node selected"
+    exit 1
+fi
+
+echo "Fetching kubelet configuration for node: $node"
+curl -sSX GET "http://127.0.0.1:8001/api/v1/nodes/$node/proxy/configz" | jq .kubeletconfig

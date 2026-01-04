@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# Kubernetes Debug Shell
+# Creates a temporary Ubuntu pod for debugging and troubleshooting
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0"
+    echo ""
+    echo "Creates a temporary Ubuntu pod in the current Kubernetes namespace"
+    echo "Provides an interactive bash shell with common utilities for debugging"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - kubectl must be installed and configured"
+    echo "  - Valid Kubernetes context and namespace access"
+    echo ""
+    echo "Examples:"
+    echo "  $0                # Create Ubuntu pod in current namespace"
+    echo ""
+    echo "The script will:"
+    echo "  1. Display the current namespace"
+    echo "  2. Create a temporary Ubuntu pod"
+    echo "  3. Open an interactive bash shell with utilities (curl, wget, etc.)"
+    echo "  4. Automatically clean up the pod after exit"
+    exit 0
+fi
+
+# Check if kubectl is available
+if ! command -v kubectl &> /dev/null; then
+    echo "Error: kubectl is not installed or not in PATH" >&2
+    exit 1
+fi
+
+# Check if we have a valid kubectl context
+if ! kubectl config current-context &> /dev/null; then
+    echo "Error: No valid kubectl context found" >&2
+    exit 1
+fi
+
+namespace=$(kubectl config view --minify -o jsonpath='{..namespace}')
+if [[ -z "$namespace" ]]; then
+    namespace="default"
+fi
+
+echo "Running ubuntu in namespace '$namespace'"
+kubectl run --rm -i --tty ubuntu-debug --image=ubuntu:latest --restart=Never -- bash

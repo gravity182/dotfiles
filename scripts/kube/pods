@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+# Interactive Kubernetes Pod Browser
+# Browse, execute into, and view logs of pods using fzf
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0"
+    echo ""
+    echo "Interactive Kubernetes pod browser with real-time log preview"
+    echo "Provides fuzzy search and multiple actions for pod management"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - kubectl must be installed and configured"
+    echo "  - fzf must be installed for interactive browsing"
+    echo "  - Valid Kubernetes context and namespace access"
+    echo ""
+    echo "Examples:"
+    echo "  $0                # Launch interactive pod browser"
+    echo ""
+    echo "Key Bindings:"
+    echo "  Enter             Execute into pod (kubectl exec -it {pod} -- bash)"
+    echo "  Ctrl-O            Open pod logs in editor"
+    echo "  Ctrl-R            Reload pod list"
+    echo "  Ctrl-/            Toggle preview window visibility"
+    echo ""
+    echo "Features:"
+    echo "  - Real-time log preview with follow mode"
+    echo "  - Shows current kubectl context in prompt"
+    echo "  - Auto-refresh pod listings"
+    echo "  - Multi-container support"
+    echo ""
+    echo "The interface will:"
+    echo "  1. List all pods in the current namespace"
+    echo "  2. Show live logs in preview pane"
+    echo "  3. Allow exec into selected pod or log viewing"
+    exit 0
+fi
+
+# Check dependencies
+if ! command -v kubectl &> /dev/null; then
+    echo "Error: kubectl is not installed or not in PATH" >&2
+    exit 1
+fi
+
+if ! command -v fzf &> /dev/null; then
+    echo "Error: fzf is not installed or not in PATH" >&2
+    echo "Install with: brew install fzf" >&2
+    exit 1
+fi
+
+# Check if we have a valid kubectl context
+if ! kubectl config current-context &> /dev/null; then
+    echo "Error: No valid kubectl context found" >&2
+    exit 1
+fi
+
+command='kubectl get pods'
+fzf \
+  --info=inline --layout=reverse --header-lines=1 \
+  --height=80% \
+  --prompt "$(kubectl config current-context | sed 's/-context$//')> " \
+  --header $'╱ Enter (kubectl exec) ╱ CTRL-O (open log in editor) ╱ CTRL-R (reload) ╱\n\n' \
+  --bind "start:reload:$command" \
+  --bind "ctrl-r:reload:$command" \
+  --bind 'ctrl-/:change-preview-window(80%,border-bottom|hidden|)' \
+  --bind 'enter:execute:kubectl exec -it {1} -- bash' \
+  --bind 'ctrl-o:execute:${EDITOR:-vim} <(kubectl logs --all-containers {1})' \
+  --preview-window up:follow \
+  --preview 'kubectl logs --follow --all-containers --tail=10000 {1}' "$@"

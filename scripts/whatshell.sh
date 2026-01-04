@@ -4,6 +4,46 @@
 : '$Id: whatshell.sh,v 1.27 2020/04/30 00:53:25 xmascheck Exp xmascheck $'
 : 'fixes are tracked on www.in-ulm.de/~mascheck/various/whatshell/'
 
+# Shell Detection Utility
+# Comprehensive shell type and version identification tool
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0 [debug]"
+    echo ""
+    echo "Comprehensive shell detection utility that identifies shell type and version"
+    echo "Recognizes all major Bourne-compatible shells including variants and versions"
+    echo ""
+    echo "Arguments:"
+    echo "  debug             Enable debug output showing detection logic"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo ""
+    echo "Detected shells include:"
+    echo "  - bash (all versions)"
+    echo "  - zsh (all versions)" 
+    echo "  - ksh (ksh86, ksh88, ksh93 variants)"
+    echo "  - ash/dash (all versions and distributions)"
+    echo "  - Traditional Bourne shells (7th edition through SVR4)"
+    echo "  - posh, yash, and other POSIX shells"
+    echo "  - Busybox ash variants"
+    echo "  - Historical shell variants (BSD, System III/V, etc.)"
+    echo ""
+    echo "Examples:"
+    echo "  $0                # Detect current shell"
+    echo "  $0 debug          # Show detection process details"
+    echo ""
+    echo "Technical details:"
+    echo "  - Uses shell-specific features and behaviors for identification"
+    echo "  - Handles shells without version variables"
+    echo "  - Provides detailed version information when available"
+    echo "  - Includes historical and embedded shell variants"
+    echo ""
+    echo "Author: Sven Mascheck <mascheck@in-ulm.de>"
+    echo "Updates: www.in-ulm.de/~mascheck/various/whatshell/"
+    exit 0
+fi
+
 LC_ALL=C; export LC_ALL
 : 'trivial cases first, yet parseable for historic shells'
 case $BASH_VERSION in *.*) { echo "bash $BASH_VERSION";exit;};;esac

@@ -103,16 +103,16 @@
 [merge]
     conflictstyle = zdiff3
 [include]
-    # these configs should contain only work or personal-related config
-    # they're excluded from the dotfiles repo
-    path = ~/.gitconfig_personal
-    path = ~/.gitconfig_work
+    # this config contains the personal creds; do not commit to git
+    path = ~/.gitconfig.local
 [apply]
     # Detect whitespace errors when applying a patch
     whitespace = fix
 [branch]
     # Show most recently changed branches first.
     sort = -committerdate
+[pull]
+    ff = only
 [push]
     # https://git-scm.com/docs/git-config#git-config-pushdefault
     default = simple

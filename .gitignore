@@ -5,11 +5,15 @@
 temp
 temporary
 
-# Ignore a file by renaming it with 'ignore' in its name
-# e.g. 'ignore.values.yaml'/'values.yaml.ignore'/'.values.ignore.yaml'
+# Ignore a file by renaming it with 'ignore' or 'local' in its name
+# 'ignore.values.yaml'/'values.yaml.ignore'/'.values.ignore.yaml'
+# 'local.values.yaml'/'values.yaml.local'/'.values.local.yaml'
 *.ignore
+*.local
 ignore.*
+local.*
 *.ignore.*
+*.local.*
 
 
 # ======================
@@ -228,4 +232,11 @@ fabric.properties
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+
+# ======================
+# Claude
+# ======================
+
+CLAUDE*.md
 

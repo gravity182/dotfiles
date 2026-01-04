@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# Closes SSH tunnels - interactive selection or by host name
+# Usage: close [host]
+
+# Source helper functions
+source "$(dirname "$0")/_helpers.sh"
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0 [host]"
+    echo ""
+    echo "Closes SSH tunnels for the specified host or interactively select"
+    echo ""
+    echo "Arguments:"
+    echo "  host              Host name to close tunnels for (optional)"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo ""
+    echo "Interactive mode (no arguments):"
+    echo "  - Lists active SSH tunnels"
+    echo "  - Allows selection using fzf"
+    echo "  - Closes selected tunnel(s)"
+    echo ""
+    echo "Direct mode (with host):"
+    echo "  - Closes all tunnels for specified host"
+    echo ""
+    echo "Examples:"
+    echo "  $0                # Interactive tunnel selection"
+    echo "  $0 myserver       # Close all tunnels to myserver"
+    echo "  $0 dev-server     # Close all tunnels to dev-server"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - fzf must be installed for interactive mode"
+    exit 0
+fi
+
+# Interactive mode when no host specified
+if [[ -z "$1" ]]; then
+    # Check if fzf is available
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for interactive mode but not found" >&2
+        echo "Install fzf or provide a host name as argument" >&2
+        exit 1
+    fi
+    
+    # Get active tunnels using helper function
+    tunnel_data=$(get_active_tunnels)
+    tunnel_processes=$(echo "$tunnel_data" | while IFS='|' read -r pid port host cmd; do
+        echo "PID: $pid | Port: $port | Host: $host | Command: $cmd"
+    done)
+    
+    if [[ -z "$tunnel_processes" ]]; then
+        echo "No active SSH tunnels found"
+        exit 0
+    fi
+    
+    # Select tunnel to close
+    selected_line=$(echo "$tunnel_processes" | fzf --prompt="Select tunnel to close: " \
+        --header="Use Tab for multi-select, Ctrl+/ for details" \
+        --multi --bind 'tab:toggle' \
+        --preview='echo "Details: {}"' \
+        --preview-window=hidden \
+        --bind 'ctrl-/:toggle-preview')
+    
+    if [[ -z "$selected_line" ]]; then
+        echo "No tunnel selected"
+        exit 0
+    fi
+    
+    # Extract PIDs and kill processes
+    echo "$selected_line" | while read -r line; do
+        pid=$(echo "$line" | grep -o 'PID: [0-9]*' | cut -d' ' -f2)
+        port=$(echo "$line" | grep -o 'Port: [0-9]*' | cut -d' ' -f2)
+        echo "Closing tunnel: PID $pid (local port: $port)"
+        kill "$pid" 2>/dev/null && echo "  ✓ Closed" || echo "  ✗ Failed to close"
+    done
+else
+    # Direct mode with specified host
+    host="$1"
+    echo "Closing SSH tunnels for host: $host"
+    
+    # Check if any tunnels exist for this host
+    if ! pgrep -f "autossh.*localhost.*$host" >/dev/null; then
+        echo "No tunnels found for host: $host"
+        exit 1
+    fi
+    
+    pkill -f "autossh.*localhost.*$host"
+    echo "Closed tunnels for host: $host"
+fi

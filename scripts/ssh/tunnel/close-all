@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Closes all opened SSH tunnels
+# Usage: close-all
+
+# Source helper functions
+source "$(dirname "$0")/_helpers.sh"
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0"
+    echo ""
+    echo "Closes all SSH tunnels (kills all autossh processes)"
+    echo ""
+    echo "Examples:"
+    echo "  $0               # Close all SSH tunnels"
+    echo "  $0 --help        # Show this help message"
+    exit 0
+fi
+
+# Check if autossh processes exist and close them
+if pgrep -q "autossh"; then
+    echo "Closing all SSH tunnels..."
+    pkill "autossh"
+    echo "All SSH tunnels closed."
+else
+    echo "No active SSH tunnels found."
+fi

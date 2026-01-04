@@ -126,18 +126,21 @@ fi
 if ! volta -v &>/dev/null; then
     log_install_pre 'volta'
     curl https://get.volta.sh | bash -s -- --skip-setup
+    ~/.volta/bin/volta completions zsh > "$ZSH_CUSTOM/completions/_volta"
+
 fi
+export PATH="$HOME/.volta/bin:$PATH"
 
 
 if ! node -v &>/dev/null; then
     log_install_pre 'node'
-    ~/.volta/bin/volta install node
+    volta install node
 fi
 
 
 if ! _has tldr; then
     log_install_pre 'tldr'
-    ~/.volta/bin/volta install tldr
+    volta install tldr
     mkdir -pv "$ZSH_CUSTOM/plugins/tldr"
     ln -sf "$HOME/.volta/tools/shared/tldr/bin/completion/zsh/_tldr" "$ZSH_CUSTOM/completions/_tldr"
     echo 'Tldr cache will be downloaded on the first run'
@@ -198,16 +201,9 @@ if ! _has gifsicle; then
     sudo apt install -y gifsicle
 fi
 
-if ! _has pipx; then
-    log_install_pre 'pipx'
-    sudo apt install -y pipx
-    register-python-argcomplete --shell zsh pipx > $ZSH_CUSTOM/completions/_pipx
-fi
-
-if ! _has yt-dlp; then
-    log_install_pre 'yt-dlp'
-    # use the nightly version
-    pipx install --pip-args '\--pre' yt-dlp
+if ! _has uv; then
+    log_install_pre 'uv'
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
 if ! _has figlet; then

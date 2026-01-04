@@ -6,11 +6,12 @@
 #
 
 # Start tmux on every shell login
-# 1. if we are not already inside a tmux session,
+# 1. if not already inside a tmux session,
 # 2. and if a terminal is interactive (not automation),
 # 3. and if a graphical session is running;
 #    remove this condition if you want tmux to start in any login shell, but it might interfere
-#    with autostarting X at login,
+#    with autostarting X at login;
+#    on MacOS this check is not needed,
 # 4. then try to attach, if the attachment fails, start a new session.
 #
 # remember: if server is not running yet,
@@ -18,10 +19,60 @@
 #   will become server-wide
 # in order to pass session-wide vars, use the '-e' option
 # i.e. compare `showenv` vs `showenv -g`
-if [[ -z "${TMUX}" ]] && [[ -n "$TTY" ]] && [[ -n "$DISPLAY" ]]; then
-    exec tmux new-session -A -s $USER >/dev/null 2>&1
+#
+# Notes on the iTerm2 tmux integration:
+# `tmux -CC` initiates a 'control client' session
+# It makes tmux the backend, sending raw data to iTerm2
+# iTerm2 acts as the frontend, enabling native window/session handling and rendering
+# Moreover, the tmux keybindings (including the prefix) won't work anymore,
+# since everything is handled natively by iTerm2 in this regard.
+# See https://gitlab.com/gnachman/iterm2/-/issues/9970#note_717936845
+#
+# Set to 1 to disable auto-launching tmux
+TMUX_DISABLE=1
+# Set to `1` to enable iTerm2 tmux integration
+ITERM_ENABLE_TMUX_INTEGRATION=0
+if [[ ${TMUX_DISABLE} != 1 ]] && [[ -z "${TMUX}" ]] && [[ -n "$TTY" ]] && ([[ "$OSTYPE" == "darwin"* ]] || [[ -n "$DISPLAY" ]]); then
+    if [[ $ITERM_ENABLE_TMUX_INTEGRATION -eq 1 ]]; then
+        exec tmux -CC new-session -A -s $USER >/dev/null 2>&1
+    else
+        exec tmux new-session -A -s $USER >/dev/null 2>&1
+    fi
 fi
 
+# Set to 1 to disable auto-launching zellij
+ZELLIJ_DISABLE=1
+# Checks:
+# 1. If auto-launching is not disabled.
+# 2. If NOT already inside a zellij session ($ZELLIJ is not set).
+# 3. If running in an interactive terminal (TTY is set).
+# 4. If on macOS or in a graphical environment (DISPLAY is set).
+if [[ ${ZELLIJ_DISABLE} != 1 ]] && [[ -z "$ZELLIJ" ]] && [[ -n "$TTY" ]] && ([[ "$OSTYPE" == "darwin"* ]] || [[ -n "$DISPLAY" ]]); then
+    exec zellij attach --create $USER
+fi
+
+# https://www.reddit.com/r/zellij/comments/10skez0/does_zellij_support_changing_tabs_name_according/
+zellij_tab_name_update() {
+  if [[ -n $ZELLIJ ]]; then
+    tab_name=''
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        tab_name+=$(basename "$(git rev-parse --show-toplevel)")/
+        tab_name+=$(git rev-parse --show-prefix)
+        tab_name=${tab_name%/}
+    else
+        tab_name=$PWD
+            if [[ $tab_name == $HOME ]]; then
+            tab_name="~"
+             else
+            tab_name=${tab_name##*/}
+             fi
+    fi
+    command nohup zellij action rename-tab $tab_name >/dev/null 2>&1
+  fi
+}
+
+zellij_tab_name_update
+chpwd_functions+=(zellij_tab_name_update)
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -32,8 +83,6 @@ fi
 
 # Helper functions
 # might want to convert it to the autoload style to reduce startup time
-# fpath+="$ZCONFIG_DIR/functions"
-# autoload ...
 source "$ZCONFIG_DIR/functions/helpers.zsh"
 
 # --------------------------------------
@@ -95,12 +144,9 @@ zstyle ':omz:plugins:*' aliases no
 # --------------------
 
 # brew shell completion
-# https://docs.brew.sh/Shell-Completion#configuring-completions-in-zsh
-if _is_osx; then
-    _has brew && [[ -d $(brew --prefix)/share/zsh/site-functions ]] && fpath+="$(brew --prefix)/share/zsh/site-functions"
-fi
 
 # this must be added to fpath before loading omz
+#
 # adding it as a plugin is correct, but not very optimal
 # see https://github.com/zsh-users/zsh-completions/issues/603
 fpath+="$ZSH_CUSTOM/plugins/zsh-completions/src"
@@ -119,7 +165,7 @@ fpath+="$ZSH_CUSTOM/plugins/zsh-completions/src"
 # Load oh-my-zsh (boot stage)
 # ======================================
 
-# all completions must be added to the fpath before loading oh-my-zsh, which calls compinit
+# all completions must be added to the fpath before loading oh-my-zsh, which invokes compinit
 
 source $ZSH/oh-my-zsh.sh
 
@@ -137,12 +183,17 @@ timezsh() {
     for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
 
-# this is the best method to measure the startup time
+# this is the best method to measure the startup time (by romkatv)
 # see https://www.reddit.com/r/zsh/comments/1bqtb7m/comment/kx5x33l
 tracezsh() {
     ( exec -l zsh --sourcetrace 2>&1 ) | ts -i '%.s'
 }
+# you MUST hit Ctrl-D to exit the subshell for sort to work
+tracezsh_sorted() {
+    ( exec -l zsh --sourcetrace 2>&1 ) | ts -i '%.s' | sort -nr -k1,1
+}
 
+# another method to measure startip time
 # uncomment the next lines to measure startup time of each plugin
 # for plugin ($plugins); do
 #   timer=$(($(date +%s%N)/1000000))
@@ -170,15 +221,6 @@ unsetopt autocd
 # only correct commands but not its arguments
 setopt correct
 unsetopt correct_all
-
-# you may also need to run:
-#  $ sudo locale-gen "en_US.UTF-8"
-#  $ sudo dpkg-reconfigure locales
-# to see the defined locales, run `locale`
-# to see all the available locales, run `locale -a`
-LANG=en_US.UTF-8
-LC_ALL=en_US.UTF-8
-LC_CTYPE=en_US.UTF-8
 
 # -----------------------
 # History
@@ -234,78 +276,238 @@ bindkey -M vicmd 'V' edit-command-line
 # include dotfiles in completion
 _comp_options+=(globdots)
 
+# enable caching
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path "$HOME/.cache/zsh/.zcompcache"
+
 # don't expand aliases before completion has finished
-# this option might prevent completions from working with aliases
+# when on, this option might prevent completions from working with aliases
 # see https://unix.stackexchange.com/a/583743/346664
 # e.g. try the following with this option on:
 #   $ alias g='git'
-#   $ g<Tab>
-# the result is alias won't show completions
+#   $ g<Tab>  # no completions
 unsetopt complete_aliases
 
-# bindkey '^i' expand-or-complete-prefix
-
+# force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
+zstyle ':completion:*' menu no
+# group ordering configuration
+# display different types of matches separately
+zstyle ':completion:*' group-name ''
 # set descriptions format to enable group support
 # fzf-tab will group the results by group description
 zstyle ':completion:*:descriptions' format '[%d]'
 # set list-colors to enable filename colorizing
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# matches case insensitive for lowercase search (smart-case)
+# enhanced matcher list with fuzzy matching (smart case)
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 # pasting with tabs doesn't perform completion
 zstyle ':completion:*' insert-tab pending
-# sort files alphabetically (dummy value)
-# zstyle ':completion:*' file-sort dummyvalue
-# TODO sorting doesn't work for some reason
-zstyle ':completion:*' file-sort modification
+# normally, the completion will not produce the directory names ‘.’ and ‘..’ as possible completions
+# this sets special-dirs to ‘..’ when the current prefix is empty, is a single ‘.’, or consists only of a path beginning with ‘../’
+zstyle -e ':completion:*' special-dirs \
+   '[[ $PREFIX = (../)#(|.|..) ]] && reply=(..)'
+
+# tag order
+# all tags enabled by default
+zstyle ':completion:*:complete:-command-:*:*' tag-order \
+    'commands builtins aliases functions reserved-words parameters'
+
+# Global tag-order:
+# - keep custom option groups (long/short/single-letter) when completing options
+# - include `-` to fall back to zsh’s default tag-order for everything else
+zstyle ':completion:*' tag-order \
+    'options:-long:long\ options
+     options:-short:short\ options
+     options:-single-letter:single\ letter\ options
+     -'
+
+# Helper for option completion gating across inconsistent tag names (`options-*` vs `options`/`option`).
+_da__completion_option_ignored_patterns() {
+  emulate -L zsh
+  local mode="$1"
+
+  if (( CURRENT > 1 )) && [[ ${words[CURRENT-1]} == -- ]]; then
+    reply=( "*" )
+    return 0
+  fi
+
+  case "$mode" in
+    long)
+      case $PREFIX in
+        --*) reply=( "[-+](|-|[^-]*)" ) ;;
+        *) reply=( "*" ) ;;
+      esac
+      ;;
+    short)
+      case $PREFIX in
+        --*) reply=( "*" ) ;;
+        -*) reply=( "--*" "[-+]?" ) ;;
+        *) reply=( "*" ) ;;
+      esac
+      ;;
+    single-letter)
+      case $PREFIX in
+        --*) reply=( "*" ) ;;
+        -*) reply=( "???*" ) ;;
+        *) reply=( "*" ) ;;
+      esac
+      ;;
+    generic)
+      case $PREFIX in
+        --*) reply=( "+*" "-[^-]*" ) ;;
+        -*) reply=( "+*" "--*" ) ;;
+        *) reply=( "*" ) ;;
+      esac
+      ;;
+    *)
+      reply=( "*" )
+      ;;
+  esac
+}
+
+# Only show options when it makes sense:
+# - `--<TAB>` => only long options
+# - `-<TAB>`  => only short options
+# - after an explicit `--` (end-of-options), never offer options
+zstyle -e ':completion:*:*:*:*:options-long' ignored-patterns '
+  _da__completion_option_ignored_patterns long
+'
+
+zstyle -e ':completion:*:*:*:*:options-short' ignored-patterns '
+  _da__completion_option_ignored_patterns short
+'
+
+zstyle -e ':completion:*:*:*:*:options-single-letter' ignored-patterns '
+  _da__completion_option_ignored_patterns single-letter
+'
+
+# Some completions (notably GNU tools like `ls`) use the generic `options`/`option` tag
+# rather than `options-long`/`options-short`. Apply the same "only after a dash"
+# gating here too.
+zstyle -e ':completion:*:*:*:*:options' ignored-patterns '
+  _da__completion_option_ignored_patterns generic
+'
+zstyle -e ':completion:*:*:*:*:option' ignored-patterns '
+  _da__completion_option_ignored_patterns generic
+'
+
+# Command-position (`-command-`) completion gating:
+# - when the command word is empty, keep the default tag-order (allows listing commands)
+# - once you start typing a command name, suppress tag-order in this context (reduces noise)
+zstyle -e '*:-command-:*' tag-order '
+        if [[ -n $PREFIX$SUFFIX ]]; then
+          reply=( )
+        else
+      reply=( - )
+    fi'
+
+# treat sequences of slashes in filename paths as a single slash (for example in ‘foo//bar’)
+zstyle ':completion:*' squeeze-slashes true
+# don't complete options unless the current word starts with '-' (matches "flags only on -/--")
+zstyle ':completion:*' complete-options no
+zstyle ':completion:*' keep-prefix true
+
+# configure completer (disable corrections / approximate matches)
+# Note: Keep comments outside the `zstyle -e` body; it is `eval`'d and some setups
+# can treat `# ... (e.g. ...)` as glob patterns under `nomatch`.
+zstyle -e ':completion:*' completer '
+  reply=(_complete _match)
+'
+zstyle ':completion:*:approximate:*' max-errors 0
+
+# file sorting configuration
+zstyle ':completion:*' file-sort change reverse
+zstyle ':completion:*:*:ls:*:*' file-patterns '%p:globbed-files' '*(-/):directories' '*:all-files'
+zstyle ':completion:*:*:(cd|pushd):*:*' file-patterns '*(-/):directories'
+# enhanced git completions
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
-zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(|.|..) ]] && reply=(..)'
-# force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
-zstyle ':completion:*' menu no
-# zstyle ':completion:*:*:-command-:*:*' group-order alias builtins functions commands
-zstyle ':completion:*' squeeze-slashes true
-# autocomplete options for cd instead of dirstack
-zstyle ':completion:*' complete-options true
-zstyle ':completion:*' keep-prefix true
+zstyle ':completion:*:git-checkout:*' tag-order 'heads:-branch:branch' 'tags:-tag:tag'
+
+# enhanced process/kill completions
+# show process details
+zstyle ':completion:*:*:kill:*:*' verbose yes
+# colorize process list
+zstyle ':completion:*:*:kill:*:*' colorize yes
+# show only processes (no process groups)
+zstyle ':completion:*:*:kill:*' tag-order 'processes'
+# custom ps command with full arguments
+zstyle ':completion:*:*:kill:*:processes' command 'ps -u $USER -o pid,args -w -w'
+# killall process command
+zstyle ':completion:*:killall:*' command 'ps -u $USER -o comm'
 
 # respect FZF_DEFAULT_OPTS
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:*' fzf-min-height 18
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' continuous-trigger '/'
+#
+# fzf-tab adds a leading "·" prefix by default when `:completion:*:descriptions` is set.
+# Disable it to avoid dots showing up in the completion list.
+zstyle ':fzf-tab:*' prefix ''
 
 # for some reason this ctrl-space binding from the default opts isn't honored
 # add it one more time
-zstyle ':fzf-tab:*' fzf-bindings 'ctrl-space:toggle+down'
-
-zstyle ':fzf-tab:complete:cd:*'                       fzf-preview 'tree -L 2 -C $realpath'
-zstyle ':fzf-tab:complete:(ssh|scp|sftp|rsh|rsync):*' fzf-preview 'dig $word'
-zstyle ':fzf-tab:complete:systemctl-*:*'              fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
-
+# fzf-tab uses fzf `--multi`; if nothing is selected (`(0)`), Enter may accept nothing.
+# Make Enter/Ctrl-Y always accept the current item.
+zstyle ':fzf-tab:*' fzf-bindings \
+  'ctrl-space:toggle+down' \
+  'enter:select+accept' \
+  'ctrl-y:select+accept'
 # allow multi-selection by default
 zstyle ':fzf-tab:complete:*' fzf-flags '--multi'
 
-zstyle ':completion:*:ssh:argument-1:'                  tag-order  hosts users
-zstyle ':completion:*:scp:argument-rest:'               tag-order  hosts files users
+# fzf-tab preview commands
+# Preview context variables provided by fzf-tab:
+# - `$group`: current completion group/label (derived from `:completion:*:descriptions`)
+# - `$word`: currently selected candidate (unquoted)
+# - `$realpath`: absolute/real path when the candidate is a file/dir (may be empty)
+# directory tree preview
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -T -L 2 --color=always $realpath'
+
+# ssh/scp/sftp/etc:
+# - for host groups: show ssh config + DNS
+# - for file/path groups: preview the path
+zstyle ':fzf-tab:complete:(ssh|scp|sftp|rsh|rsync):*' fzf-preview '
+  if [[ $group == *host* ]]; then
+    ssh -G $word 2>/dev/null | sed -n "1,120p"
+    echo
+    dig $word
+  elif [[ -n $realpath ]]; then
+    eza -la --color=always $realpath 2>/dev/null || ls -la $realpath
+  fi
+'
+
+# rm:
+# preview the selected path (type + basic listing + head for regular files)
+zstyle ':fzf-tab:complete:rm:*' fzf-preview '
+  [[ -n $realpath ]] || exit 0
+  (command -v eza >/dev/null 2>&1 && eza -la --color=always "$realpath") || ls -la "$realpath"
+  echo
+  file -b "$realpath" 2>/dev/null || true
+  echo
+  if [[ -f $realpath ]]; then
+    (command -v bat >/dev/null 2>&1 && bat --color=always --line-range=:120 "$realpath") \
+      || sed -n "1,120p" "$realpath"
+  fi
+'
+# systemd status
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
+# man page preview
+zstyle ':fzf-tab:complete:man:*' fzf-preview 'man $word | head -50'
+# bat file preview
+zstyle ':fzf-tab:complete:bat:*' fzf-preview 'bat --color=always --line-range=:50 $realpath'
+# eza dir preview
+zstyle ':fzf-tab:complete:eza:*' fzf-preview 'eza -la --color=always $realpath'
+
+# ssh completion order
+zstyle ':completion:*:ssh:argument-1:' tag-order hosts users
+# scp completion order
+# Avoid forcing `tag-order` here: `scp` completion (`_ssh`) can offer local files,
+# remote hosts, and users as alternatives; a restrictive `tag-order` often results
+# in only the first group being shown (e.g. hosts only).
+# ssh hosts completion
 zstyle ':completion:*:(ssh|scp|sftp|rsh|rsync):*:hosts' hosts
-
-# -----------------------
-# zoxide
-# -----------------------
-
-# --cmd cd will replace the `cd` command
-# that is, cd=z, cdi=zi
-eval "$(zoxide init zsh --cmd cd)"
-
-# -----------------
-# SSH keys
-# -----------------
-
-# run ssh-agent if not already running
-if [[ -z "$SSH_AGENT_PID" ]]; then
-    eval "$(ssh-agent -s)" &>/dev/null
-fi
 
 
 # ===============
@@ -314,38 +516,6 @@ fi
 # To search, run `exf`
 # ===============
 
-# -------------------
-# Java
-# -------------------
-
-# select the default java version via `sdk default java <ver>`
-export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
-export GRAALVM_HOME="$HOME/.sdkman/candidates/java/17.0.10-graal"
-export GRADLE_USER_HOME="$HOME/.gradle"
-
-# -------------------
-# Golang
-# -------------------
-
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH="$GOPATH/bin:$GOROOT/bin:$PATH"
-
-# -------------------
-# Rust
-# -------------------
-
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# -------------------
-# JavaScript
-# -------------------
-
-export VOLTA_HOME="$HOME/.volta"
-
-if [[ -d "$VOLTA_HOME/bin" ]]; then
-    path+="$VOLTA_HOME/bin"
-fi
 
 # -------------------
 # Unset exports
@@ -363,9 +533,6 @@ fi
 # ---
 # To see the full list of active aliases, run `alias`
 # To search for a specific alias, run `alf`
-#
-# Remember that aliases are expanded when the function definition is parsed,
-# so usually you want to define aliases before functions
 # ===============
 
 # -------------------
@@ -379,8 +546,6 @@ alias zshrld='zshreload'
 
 alias tmuxconfig="$EDITOR ~/.tmux.conf; tmux source ~/.tmux.conf"
 alias tmuxcfg="tmuxconfig"
-alias tconfig="tmuxconfig"
-alias tcfg='tmuxconfig'
 
 alias sshconfig="$EDITOR ~/.ssh/config"
 alias sshcfg='sshconfig'
@@ -427,11 +592,11 @@ function .dotsync-sys() {
 alias hs='history'
 
 if _has fd; then
-    alias fd='fd --hidden --no-ignore-vcs --follow'
+    alias fd='fd --hidden --follow'
 
-    alias fdf='fd -t f --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
-    alias fdd='fd -t d --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
-    alias fdd1='fd -t d -d 1 --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
+    alias fdf='fd -t f --strip-cwd-prefix --hidden --follow 2>/dev/null'
+    alias fdd='fd -t d --strip-cwd-prefix --hidden --follow 2>/dev/null'
+    alias fdd1='fd -t d -d 1 --strip-cwd-prefix --hidden --follow 2>/dev/null'
 else
     alias fdf='find . -type f -iname'
     alias fdd='find . -type d -iname'
@@ -461,15 +626,12 @@ alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 # use bat by default
 alias cat='bat'
 
-# -r, -R, --recursive
-#   remove directories and their contents recursively
-alias rm='rm -rf'
-# -i
-#   prompt before every removal
+# remove directories and their contents recursively
+alias rmd='rm -r'
+# interactive; prompt before every removal
 alias rmi='rm -i'
 
-# -R, -r, --recursive
-#   copy directories recursively
+# copy directories recursively
 alias cp='nocorrect cp -R'
 
 # -p, --parents
@@ -477,6 +639,7 @@ alias cp='nocorrect cp -R'
 # -v, --verbose
 #   print a message for each created directory
 alias mkdir='nocorrect mkdir -pv'
+
 function mkcd() {
     mkdir "$1"
     builtin cd "$1"
@@ -488,7 +651,6 @@ alias eza='eza --color=auto --classify=auto --icons=never'
 
 # use eza instead of ls
 alias ls='eza'
-alias l='eza --git-ignore'
 alias ll='eza --all --header --long'
 alias llm='eza --all --header --long --sort=modified'
 alias li='eza --all --header --long --inode'
@@ -501,7 +663,7 @@ alias tree1='tree --level 1'
 alias tree2='tree --level 2'
 
 if _has rg; then
-    alias rg='rg --smart-case --hidden --no-ignore-vcs'
+    alias rg='rg --smart-case --hidden --follow'
 fi
 
 alias tarc='tar -czvf'
@@ -555,56 +717,22 @@ alias htop='htop --tree'
 
 alias killall='command killall -v'
 
-alias pgrep='command pgrep -a'
-alias pkill='command pkill -e'
+alias pgrep='command pgrep'
+alias pkill='command pkill'
 
 # VIM FTW
 alias :q='exit'
 alias :wq='exit'
 
-# -------------------
-# SSH
-# -------------------
-
-# Opens an SSH tunnel
-# $1 - local port
-# $2 - remote port
-# $3 - host or host alias
-function ssh_tun_open() {
-    if [[ -z $1 || -z $2 || -z $3 ]]; then
-        echo 'Please provide a local port, a remote port, and a host'
-        return 1
-    fi
-    autossh -M 0 -f -T -N -L '127.0.0.1:'"$1"':localhost:'"$2" "$3"
-    sleep 1
-    echo "SSH tunnel opened for '$3': local:$1->remote:$2"
-    if _has firefox; then
-        scheme=$(curl -X GET --silent --output /dev/null --write-out "%{scheme}" 'localhost:'"$1")
-        if [[ "$scheme" =~ "HTTP*" ]]; then
-            eval $(firefox 'localhost:'"$1") &
-        fi
-    fi
-}
-
-# Closes all opened SSH tunnels for the specified host
-# $1 - host or host alias
-function ssh_tun_close() {
-    if [[ -z $1 ]]; then
-        echo 'Please provide a host'
-        return 1
-    fi
-    pkill -e -f "autossh.*localhost.*$1"
-}
-
-# Closes all opened SSH tunnels
-function ssh_tun_close_all() {
-    pkill -e "autossh"
-}
 
 # ------------------------
 # Observability
 # ------------------------
 
+function lsof_port() {
+    local port="$1"
+    lsof -i ":${port}"
+}
 alias lsof_inet="lsof -i -P -n"
 alias lsof_inet_listen="lsof -i -P -n | grep LISTEN"
 
@@ -617,7 +745,7 @@ alias curl="curl -L"
 
 # by default curl writes to stdout
 # download file with the same name as a remote (only filename part is used, the path is cut off)
-alias curl_dl="curl -O"
+alias curl_download="curl -O"
 
 # -I - show document info only
 alias curl_info="curl -LI"
@@ -672,6 +800,7 @@ whatismyip() {
     dig +short txt ch whoami.cloudflare @1.0.0.1 | tr -d '"'
 }
 alias whatsmyip='whatismyip'
+
 whatip() {
     if [[ -z "$1" ]]; then
         echo 'Please provide an IP address to look up!'
@@ -704,7 +833,7 @@ alias envf='env | fzf'
 #  CTRL-/ to toggle preview
 #  ENTER to edit | CTRL-R to interactively delete
 function ff() {
-    local selection=$(fd -t f -d 1 --hidden --no-ignore-vcs --follow --color never 2>/dev/null | fzf --multi \
+    local selection=$(fd -t f -d 1 --hidden --follow --color never 2>/dev/null | fzf --multi \
     --height=80% \
     --color header:italic \
     --header 'Press CTRL-F to display files | CTRL-D to display dirs
@@ -716,11 +845,11 @@ Press CTRL-/ to toggle the preview window' \
     --bind='ctrl-r:execute(rm -ri {+})' \
     --bind='ctrl-/:toggle-preview' \
     --bind='ctrl-d:change-prompt(Dirs ∷ )' \
-    --bind='ctrl-d:+reload(fd -t d -d 1 --hidden --no-ignore-vcs --follow --color never 2>/dev/null)' \
-    --bind='ctrl-d:+change-preview(tree -L 1 -C {})' \
+    --bind='ctrl-d:+reload(fd -t d -d 1 --hidden --follow --color never 2>/dev/null)' \
+    --bind='ctrl-d:+change-preview(eza -T -L 1 --color=always {})' \
     --bind='ctrl-d:+refresh-preview' \
     --bind='ctrl-f:change-prompt(Files ∷ )' \
-    --bind='ctrl-f:+reload(fd -t f -d 1 --hidden --no-ignore-vcs --follow --color never 2>/dev/null)' \
+    --bind='ctrl-f:+reload(fd -t f -d 1 --hidden --follow --color never 2>/dev/null)' \
     --bind='ctrl-f:+change-preview(bat --style numbers --color=always --line-range=:500 {})' \
     --bind='ctrl-f:+refresh-preview' \
     --bind='ctrl-a:select-all' \
@@ -782,10 +911,18 @@ alias gitcfg_ignore="$EDITOR ~/.gitignore; git config --global core.excludesfile
 # Misc aliases
 # -------------------
 
-alias ai='aichat'
-
 # apply the provided functions ($2...) to all files or dirs found by the provided glob ($1)
 # all functions must accept exactly one argument, which would be the path of a found file/dir
+#
+# or simply use:
+#   `fd -t f -g "*.mohidden" -x mv {} ../`
+# where {} is a file found by fd search
+# the command above moves all files one dir level up
+#
+# another example: file conversion with successive deletion:
+#   `fd -t f -g ".webp" -x ffmpeg_img2jpg {} && rm {}`
+# the command above converts all .webp files to .jpg format and then deletes them
+#
 # usage:
 #   run_on_files '*.webp' 'ffmpeg_img2jpg' 'rm'
 function run_on_dirs() {
@@ -809,14 +946,6 @@ function run_on_files() {
 alias execute_on_dirs='run_on_dirs'
 alias execute_on_files='run_on_files'
 
-# or just:
-#   `fd -t f -g "*.mohidden" -x mv {} ../`
-# where {} is a file found by fd search
-# the command above moves all files one dir level up
-#
-# another example: file conversion with successive deletion:
-#   `fd -t f -g ".webp" -x ffmpeg_img2jpg {} && rm {}`
-# the command above converts all .webp files to .jpg format and then deletes them
 
 # view raw keycodes that terminal sends
 alias monitor_keycode='sed -n l'
@@ -900,11 +1029,12 @@ bindkey '^[[1;5D' vi-backward-word
 source ~/.fzf.zsh
 
 # specify the default command that fzf shall execute on empty stdin
-export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
+export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden --follow 2>/dev/null'
 
 # see https://github.com/junegunn/fzf#key-bindings-for-command-line
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden --no-ignore-vcs --follow 2>/dev/null'
+# also mapped as CTRL-E
+export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden --follow 2>/dev/null'
 
 # these default options will be used everytime you call fzf
 FZF_MIN_HEIGHT="50%"
@@ -935,7 +1065,7 @@ export FZF_CTRL_T_OPTS="$FZF_BINDING_OPTS
   --bind 'ctrl-/:change-preview-window(hidden|)'
   "
 export FZF_ALT_C_OPTS="$FZF_BINDING_OPTS
-  --preview 'tree -L 2 -C {}'
+  --preview 'eza -T -L 2 --color=always {}'
   --bind 'ctrl-/:change-preview-window(hidden|)'
   "
 export FZF_CTRL_R_OPTS="$FZF_BINDING_OPTS
@@ -1003,12 +1133,12 @@ export FZF_COMPLETION_OPTS="--bind 'ctrl-/:change-preview-window(hidden|)'"
 # - The first argument to the function ($1) is the base path to start traversal
 # - See the source code (completion.{bash,zsh}) for the details.
 function _fzf_compgen_path() {
-    fd --hidden --no-ignore-vcs --follow . "$1" 2>/dev/null
+    fd --hidden --follow . "$1" 2>/dev/null
 }
 
 # Use fd to generate an input for dir completion
 function _fzf_compgen_dir() {
-    fd -t d --hidden --no-ignore-vcs --follow . "$1" 2>/dev/null
+    fd -t d --hidden --follow . "$1" 2>/dev/null
 }
 
 # Advanced customization of fzf options via _fzf_comprun function
@@ -1021,13 +1151,11 @@ function _fzf_compgen_dir() {
 function _fzf_comprun() {
     local command=$1
     shift
-
     # add custom commands to leverage from autocompletion here
     # note that some commands already use autocompletion (like cd) and don't require an input
     # on the other hand, tree is a custom command which requires input
     case "$command" in
-        cd)           fzf --preview 'tree -L 2 -C {} | head -200' "$@" ;;
-        tree)         fzf --preview 'tree -L 2 -C {} | head -200' "$@" ;;
+        cd)           fzf --preview 'eza -T -L 2 --color=always {} | head -200' "$@" ;;
         export|unset) fzf --preview "eval 'echo \$'{}"            "$@" ;;
         ssh)          fzf --preview 'dig {}'                      "$@" ;;
         *)            fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}' "$@" ;;
@@ -1072,10 +1200,10 @@ fi
 
 
 # =====================
-# Source other configs
+# Source modular configs
 # =====================
 
-find $ZCONFIG_DIR/source -type f | sort | while read -r file; do
+for file in "$ZCONFIG_DIR"/source/**/*(.N); do
     source "$file"
 done
 
@@ -1083,27 +1211,41 @@ done
 # =============
 # Final config
 # ------------
-# Depends on the sourced files above or overwrites
+# Depends on the sourced files above or overrides
 # =============
 
 # Normalize `open` across Linux, macOS, and Windows
+OPEN_CMD='open'
 if ! _is_osx; then
     if _is_wsl; then
-        alias open='explorer.exe'
+        OPEN_CMD='explorer.exe'
     else
-        alias open='xdg-open'
+        OPEN_CMD='xdg-open'
     fi
 fi
 function open() {
     if [[ -z "$1" ]]; then
-        open .
+        command "$OPEN_CMD"  .
     else
-        open "$1"
+        command "$OPEN_CMD" "$1"
     fi
 }
-alias open='open'
 
+# -----------------------
+# Prompt
+# -----------------------
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh directly
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# -----------------------
+# zoxide
+# -----------------------
+
+# --cmd cd will replace the `cd` command
+# that is, cd=z, cdi=zi
+#
+# loaded only on interactive env to be safe
+if [[ -o interactive ]]; then
+    eval "$(zoxide init zsh --cmd cd)"
+fi

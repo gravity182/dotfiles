@@ -70,19 +70,19 @@
 
 -- Administration queries
 
-\set conninfo 'SELECT usename, count(*) FROM pg_stat_activity group by usename;'
+\set conninfo 'SELECT datname, usename, application_name, state, count(*) FROM pg_stat_activity GROUP BY datname, usename, application_name, state ORDER BY datname, usename, state;'
 
-\set activity 'SELECT datname, pid, usename, client_addr, client_hostname, state, query FROM pg_stat_activity;'
+\set activity 'SELECT datname, pid, usename, application_name, client_addr, state, state_change, query_start, query FROM pg_stat_activity WHERE pid != pg_backend_pid() ORDER BY query_start DESC NULLS LAST;'
 
-\set transactions 'SELECT datname, pid, usename, client_addr, client_hostname, state, query FROM pg_stat_activity WHERE state like ''%transaction%'';'
+\set transactions 'SELECT datname, pid, usename, application_name, client_addr, state, xact_start, now() - xact_start AS duration, query FROM pg_stat_activity WHERE state LIKE ''%transaction%'' ORDER BY xact_start;'
 
-\set waits 'SELECT pg_stat_activity.pid, pg_stat_activity.query, pg_stat_activity.waiting, now() - pg_stat_activity.query_start AS \"totaltime\", pg_stat_activity.backend_start FROM pg_stat_activity WHERE pg_stat_activity.query !~ \'%IDLE%\'::text AND pg_stat_activity.waiting = true;'
+\set waits 'SELECT pid, usename, wait_event_type, wait_event, state, now() - query_start AS duration, query FROM pg_stat_activity WHERE state != \'idle\' AND wait_event IS NOT NULL ORDER BY query_start;'
 
-\set locks  'SELECT bl.pid AS blocked_pid, a.usename AS blocked_user, kl.pid AS blocking_pid, ka.usename AS blocking_user, a.query AS blocked_statement FROM pg_catalog.pg_locks bl JOIN pg_catalog.pg_stat_activity a ON bl.pid = a.pid JOIN pg_catalog.pg_locks kl JOIN pg_catalog.pg_stat_activity ka ON kl.pid = ka.pid ON bl.transactionid = kl.transactionid AND bl.pid != kl.pid WHERE NOT bl.granted;'
+\set locks  'SELECT bl.pid AS blocked_pid, a.usename AS blocked_user, a.query AS blocked_query, kl.pid AS blocking_pid, ka.usename AS blocking_user, ka.query AS blocking_query, now() - a.query_start AS blocked_duration FROM pg_locks bl JOIN pg_stat_activity a ON bl.pid = a.pid JOIN pg_locks kl ON bl.transactionid = kl.transactionid AND bl.pid != kl.pid JOIN pg_stat_activity ka ON kl.pid = ka.pid WHERE NOT bl.granted ORDER BY a.query_start;'
 
-\set dbsize 'SELECT datname, pg_size_pretty(pg_database_size(datname)) db_size FROM pg_database ORDER BY db_size;'
+\set dbsize 'SELECT datname, pg_size_pretty(pg_database_size(datname)) AS db_size FROM pg_database ORDER BY pg_database_size(datname) DESC;'
 
-\set tablesize 'SELECT nspname || \'.\' || relname AS \"relation\", pg_size_pretty(pg_relation_size(C.oid)) AS "size" FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace) WHERE nspname NOT IN (\'pg_catalog\', \'information_schema\') ORDER BY pg_relation_size(C.oid) DESC LIMIT 40;'
+\set tablesize 'SELECT nspname || \'.\' || relname AS \"relation\", pg_size_pretty(pg_total_relation_size(C.oid)) AS "size" FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace) WHERE nspname NOT IN (\'pg_catalog\', \'information_schema\') AND C.relkind = \'r\' ORDER BY pg_total_relation_size(C.oid) DESC LIMIT 40;'
 
 \set settings 'SELECT name, setting, unit, context FROM pg_settings;'
 

@@ -9,13 +9,24 @@ call plug#begin('~/.vim/plugged')
 
 " Make sure you use single quotes
 
+" Syntax check & LSP
 Plug 'dense-analysis/ale'
+
+" editorconfig files support
 Plug 'editorconfig/editorconfig-vim'
+
+" status line
 Plug 'itchyny/lightline.vim'
+
+" provides ALE indicator for the lightline
 Plug 'maximbaz/lightline-ale'
-Plug 'preservim/vim-indent-guides'
+
+" Plug 'preservim/vim-indent-guides'
 Plug 'sheerun/vim-polyglot'
+
+" navigate between tmux and vim panes seamlessly
 Plug 'christoomey/vim-tmux-navigator'
+
 Plug 'terryma/vim-smooth-scroll'
 
 " Motions and text objects
@@ -67,7 +78,7 @@ Plug 'mattn/vim-gist'
 
 " Auto-completion & Snippets
 " -------------------------
-Plug 'sirver/ultisnips'
+"Plug 'sirver/ultisnips'
 Plug 'honza/vim-snippets'
 
 

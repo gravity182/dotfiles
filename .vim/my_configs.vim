@@ -27,7 +27,8 @@ if exists('+termguicolors')
 endif
 
 " colorscheme
-colorscheme catppuccin_mocha
+" colorscheme catppuccin_mocha
+colorscheme onedark
 set background=dark
 
 " yank, delete, and put commands will use the system clipboard

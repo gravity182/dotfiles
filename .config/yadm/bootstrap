@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 # files to be executed during each bootstrap stage
@@ -36,9 +36,31 @@ for stage in ${STAGES[@]}; do
     done
 done
 
+# Ask for the administrator password upfront
+echo "Presaving sudo credentials..."
+sudo -v
+
+# Keep-alive: update existing `sudo` timestamp until bootstrap script has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+_error_trap() {
+    local error_code=$?
+    local last_command="${BASH_COMMAND}"
+
+    local i=1
+    local error_file="${BASH_SOURCE[${i}]}"
+    local error_line="${BASH_LINENO[${i}-1]}"
+
+    echo ""
+    echo "======================"
+    echo -e "${BOLD_RED}BOOTSTRAP ERROR: Command \`$last_command\` failed with exit code $error_code.${RESET}" >&2
+    echo -e "${BOLD_RED}  Occurred in: '${error_file}' at line ${error_line}${RESET}" >&2
+
+    exit 1
+}
+trap _error_trap ERR
 
 # boostrap
-set +e
 for stage in ${STAGES[@]}; do
     echo "----------------------"
     echo -e "${BOLD_YELLOW}Current stage: ${stage##BS_}${RESET}"
@@ -47,14 +69,10 @@ for stage in ${STAGES[@]}; do
         bootstrap="$BOOTSTRAP_D/$bootstrap"
         echo ""
         echo "======================"
-        echo "Executing '$bootstrap'"
-        if ! source "$bootstrap"; then
-            echo -e "${BOLD_RED}Error: bootstrap '$bootstrap' failed${RESET}" >&2
-            exit 1
-        fi
+        echo -e "Executing ${BOLD_YELLOW}'$bootstrap'${RESET}"
+        source "$bootstrap"
     done
 done
-set -e
 
 echo "-------------------"
 echo -e "${BOLD_GREEN}Bootstrap finished!${RESET}"

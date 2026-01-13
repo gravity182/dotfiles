@@ -107,7 +107,7 @@ export BAT_THEME="Monokai Extended"
 # Docker
 # ------
 
-export DOCKER_HOST="unix://$HOME/.colima/work/docker.sock"
+export DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
 
 # Testcontainers
 # --------------

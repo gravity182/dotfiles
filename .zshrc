@@ -572,18 +572,6 @@ function .dotsync() {
     yadm push
 }
 
-alias sysyadm="sudo yadm --yadm-dir /etc/yadm --yadm-data /etc/yadm/data"
-
-function .dotsync-sys() {
-    sysyadm pull
-    if [[ -z "$(sysyadm status --porcelain)" ]]; then
-        echo "Everything up-to-date (sys)"
-        return 0
-    fi
-    sysyadm add -u
-    sysyadm commit --reedit-message=HEAD
-    sysyadm push
-}
 
 # -------------------
 # Core utils

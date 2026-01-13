@@ -895,6 +895,8 @@ function manf2() {
 alias gitcfg="$EDITOR ~/.gitconfig"
 alias gitcfg_ignore="$EDITOR ~/.gitignore; git config --global core.excludesfile ~/.gitignore"
 
+alias lazygit="lazygit --use-config-dir ~/.config/lazygit"
+
 # -------------------
 # Misc aliases
 # -------------------

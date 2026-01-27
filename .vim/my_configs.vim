@@ -375,32 +375,14 @@ endif
 " Switch CWD with the directory of the open buffer preselected
 nmap <leader>cd :cd <C-r>=escape(expand("%:p:h"), " ")<cr>/
 
-" Strip trailing whitespace (,ss)
-function! StripTrailingWhitespaces()
-    let save_cursor = getpos(".")
-    let old_query = getreg('/')
-    :%s/\s\+$//e
-    call setpos('.', save_cursor)
-    call setreg('/', old_query)
-endfunction
-
-function! FormatFile()
-    retab
-    call StripTrailingWhitespaces()
-endfunction
-
-" format the file
-" replaces tabs with spaces and strips trailing whitespaces
-noremap <leader>ss :call FormatFile()<cr>
-
 " save/exit mappings
 
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
 command! W execute 'w !sudo tee % > /dev/null' <bar> edit!
 
-" formats and saves the current buffer
-nmap <leader>w  :call FormatFile()<cr>:w<cr>
+" save the current buffer
+nmap <leader>w  :w<cr>
 nmap <leader>q  :q<cr>
 
 " unmap Ex mode

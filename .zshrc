@@ -1239,3 +1239,10 @@ function open() {
 if [[ -o interactive ]]; then
     eval "$(zoxide init zsh --cmd cd)"
 fi
+
+# -----------------------
+# mise
+# -----------------------
+
+eval "$(mise activate zsh)"
+

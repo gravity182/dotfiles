@@ -43,9 +43,8 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
 fi
 
 # --- Configuration ---
-UTILITY_POD_NAME="pvc-inspector-$(date +%s)" # Unique name for the utility pod
 CONTAINER_IMAGE="ubuntu:latest"             # Image for the utility pod container
-MOUNT_PATH="/mnt/pvc-data"                 # Mount path inside the utility pod
+MOUNT_BASE="/mnt"                           # Base mount path inside the utility pod
 
 # Default values
 NAMESPACE_FLAG=""
@@ -53,6 +52,21 @@ UID_FLAG="0"
 GID_FLAG="0"
 
 # --- Script Logic ---
+
+sanitize_dns_label() {
+    local input="$1"
+    local max_len="${2:-63}"
+    local sanitized
+
+    sanitized=$(echo "$input" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g; s/^-+//; s/-+$//')
+    sanitized="${sanitized:0:$max_len}"
+
+    while [[ "$sanitized" == *- ]]; do
+        sanitized="${sanitized%-}"
+    done
+
+    printf '%s' "$sanitized"
+}
 
 # Check dependencies
 if ! command -v kubectl &> /dev/null; then
@@ -155,6 +169,20 @@ if [ -z "$SELECTED_PVC" ]; then
 fi
 
 echo "Selected PVC: $SELECTED_PVC"
+
+SANITIZED_PVC_NAME=$(echo "$SELECTED_PVC" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9.-]+/-/g; s/^-+//; s/-+$//')
+if [ -z "$SANITIZED_PVC_NAME" ]; then
+    echo "Failed to create a safe mount path from PVC name: $SELECTED_PVC" >&2
+    exit 1
+fi
+
+MOUNT_PATH="$MOUNT_BASE/$SANITIZED_PVC_NAME"
+
+UTILITY_POD_NAME=$(sanitize_dns_label "pvc-inspector-$SELECTED_PVC" 63)
+if [ -z "$UTILITY_POD_NAME" ]; then
+    echo "Failed to create a valid pod name from PVC name: $SELECTED_PVC" >&2
+    exit 1
+fi
 echo "Running as UID: $UID_FLAG, GID: $GID_FLAG"
 
 # --- Create and Run Utility Pod ---
@@ -164,10 +192,11 @@ OVERRIDES=$(cat <<EOF
 {
   "spec": {
     "containers": [{
-      "name": "$UTILITY_POD_NAME",
+      "name": "inspector",
       "image": "$CONTAINER_IMAGE",
       "stdin": true,
       "tty": true,
+      "workingDir": "$MOUNT_PATH",
       "securityContext": {
         "runAsUser": $UID_FLAG,
         "runAsGroup": $GID_FLAG
@@ -200,4 +229,3 @@ kubectl run "$UTILITY_POD_NAME" \
   -it \
   --overrides="$OVERRIDES" \
   -- /bin/bash
-

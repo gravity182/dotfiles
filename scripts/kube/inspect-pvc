@@ -178,7 +178,8 @@ fi
 
 MOUNT_PATH="$MOUNT_BASE/$SANITIZED_PVC_NAME"
 
-UTILITY_POD_NAME=$(sanitize_dns_label "pvc-inspector-$SELECTED_PVC" 63)
+TIMESTAMP_SUFFIX="$(date +%Y%m%d-%H%M%S)"
+UTILITY_POD_NAME=$(sanitize_dns_label "pvc-inspector-$SELECTED_PVC-$TIMESTAMP_SUFFIX" 63)
 if [ -z "$UTILITY_POD_NAME" ]; then
     echo "Failed to create a valid pod name from PVC name: $SELECTED_PVC" >&2
     exit 1

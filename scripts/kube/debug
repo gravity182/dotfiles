@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+
+# Kubernetes Pod Debugger
+# Launches a netshoot debug container in a selected pod
+
+show_help() {
+    echo "Usage: $0 [--copy-to]"
+    echo ""
+    echo "Interactively select a namespace and pod to run kubectl debug"
+    echo "Optionally select a target container when the pod has multiple containers"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help               Show this help message"
+    echo "  --copy-to                Use copy mode (kubectl debug --copy-to with auto name)"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - kubectl must be installed and configured"
+    echo "  - fzf must be installed for interactive selection"
+    echo "  - Kubernetes cluster must support kubectl debug"
+    echo ""
+    echo "Examples:"
+    echo "  $0                       # Select namespace/pod and open netshoot debug shell"
+    echo "  $0 --copy-to             # Use copy mode with an auto-generated pod name"
+    echo ""
+    echo "The script will:"
+    echo "  1. List namespaces for selection"
+    echo "  2. List running pods in the selected namespace"
+    echo "  3. Prompt for a target container if multiple are present"
+    echo "  4. Run: kubectl debug -it pod/<pod> --image=nicolaka/netshoot --target=<container>"
+    echo "  5. If --copy-to is set, include it in the kubectl debug command"
+    exit 0
+}
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_help
+fi
+
+# Check dependencies
+if ! command -v kubectl &> /dev/null; then
+    echo "Error: kubectl is not installed or not in PATH" >&2
+    exit 1
+fi
+
+if ! command -v fzf &> /dev/null; then
+    echo "Error: fzf is not installed or not in PATH" >&2
+    echo "Install with: brew install fzf" >&2
+    exit 1
+fi
+
+# Check if we have a valid kubectl context
+if ! kubectl config current-context &> /dev/null; then
+    echo "Error: No valid kubectl context found" >&2
+    exit 1
+fi
+
+# Parse command line arguments
+COPY_TO_ENABLED="false"
+COPY_TO_NAME=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            ;;
+        --copy-to)
+            COPY_TO_ENABLED="true"
+            shift 1
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            echo "Use -h or --help for usage information" >&2
+            exit 1
+            ;;
+        *)
+            echo "Unexpected argument: $1" >&2
+            echo "Use -h or --help for usage information" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Select namespace
+echo "Fetching namespaces..."
+SELECTED_NAMESPACE=$(kubectl get namespaces --no-headers -o custom-columns=":metadata.name" | fzf --prompt="Select a namespace: " --height=10)
+
+if [ -z "$SELECTED_NAMESPACE" ]; then
+    echo "No namespace selected. Exiting."
+    exit 1
+fi
+
+TARGET_NAMESPACE="$SELECTED_NAMESPACE"
+echo "Selected namespace: $TARGET_NAMESPACE"
+
+# Select pod
+echo "Fetching running pods in namespace '$TARGET_NAMESPACE'..."
+POD_INFO=$(kubectl get pods -n "$TARGET_NAMESPACE" --field-selector=status.phase=Running -o wide)
+
+if [ "$(echo "$POD_INFO" | wc -l)" -le 1 ]; then
+    echo "No pods found in namespace '$TARGET_NAMESPACE'. Exiting."
+    exit 1
+fi
+
+SELECTED_POD_LINE=$(echo "$POD_INFO" | fzf --prompt="Select a pod: " --header-lines=1 --height=20)
+
+if [ -z "$SELECTED_POD_LINE" ]; then
+    echo "No pod selected. Exiting."
+    exit 1
+fi
+
+POD_NAME=$(echo "$SELECTED_POD_LINE" | awk '{print $1}')
+
+if [ -z "$POD_NAME" ]; then
+    echo "Failed to extract pod name from selection. Exiting."
+    exit 1
+fi
+
+echo "Selected pod: $POD_NAME"
+
+# Select container if multiple
+CONTAINERS=$(kubectl get pod -n "$TARGET_NAMESPACE" "$POD_NAME" -o jsonpath='{.spec.containers[*].name}')
+
+if [ -z "$CONTAINERS" ]; then
+    echo "No containers found for pod '$POD_NAME'. Exiting."
+    exit 1
+fi
+
+IFS=' ' read -r -a container_array <<< "$CONTAINERS"
+
+TARGET_CONTAINER=""
+if [ "${#container_array[@]}" -eq 1 ]; then
+    TARGET_CONTAINER="${container_array[0]}"
+    echo "Single container detected. Using target: $TARGET_CONTAINER"
+else
+    SELECTED_CONTAINER=$(printf "%s\n" "${container_array[@]}" | fzf --prompt="Select a target container: " --height=10)
+    if [ -z "$SELECTED_CONTAINER" ]; then
+        echo "No container selected. Exiting."
+        exit 1
+    fi
+    TARGET_CONTAINER="$SELECTED_CONTAINER"
+    echo "Selected container: $TARGET_CONTAINER"
+fi
+
+echo "Starting debug session..."
+
+DEBUG_CMD=(kubectl debug -it -n "$TARGET_NAMESPACE" "pod/$POD_NAME" --image=nicolaka/netshoot)
+if [ "$COPY_TO_ENABLED" = "true" ]; then
+    COPY_TO_SUFFIX="debug-$(date +%s)-$RANDOM"
+    COPY_TO_MAX_LEN=253
+    COPY_TO_POD_MAX=$((COPY_TO_MAX_LEN - 1 - ${#COPY_TO_SUFFIX}))
+    if [ "$COPY_TO_POD_MAX" -lt 1 ]; then
+        COPY_TO_POD_MAX=1
+    fi
+    COPY_TO_PREFIX="${POD_NAME:0:$COPY_TO_POD_MAX}"
+    COPY_TO_NAME="${COPY_TO_PREFIX}-${COPY_TO_SUFFIX}"
+    DEBUG_CMD+=(--copy-to "$COPY_TO_NAME")
+else
+    DEBUG_CMD+=(--target "$TARGET_CONTAINER")
+fi
+
+"${DEBUG_CMD[@]}"

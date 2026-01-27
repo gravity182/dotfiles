@@ -20,6 +20,13 @@ fi
 # Check if autossh processes exist and close them
 if pgrep -q "autossh"; then
     echo "Closing all SSH tunnels..."
+    tunnel_data=$(get_active_tunnels)
+    if [[ -n "$tunnel_data" ]]; then
+        echo "Tunnels closed:"
+        echo "$tunnel_data" | while IFS='|' read -r pid port host cmd; do
+            echo "PID: $pid | Port: $port | Host: $host | Command: $cmd"
+        done
+    fi
     pkill "autossh"
     echo "All SSH tunnels closed."
 else

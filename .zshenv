@@ -23,13 +23,6 @@ export ZCONFIG_DIR="$HOME/.config/zsh.d"
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CUSTOM="$ZSH/custom"
 
-# PATH
-# -------------------
-
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.claude/local:$PATH"
-export PATH="$HOME/.arkade/bin:$PATH"
-
 # Secrets
 # -------
 
@@ -42,6 +35,17 @@ export PATH="$HOME/.arkade/bin:$PATH"
 # Configures PATH and FPATH variables
 # This enables completions as well; see https://docs.brew.sh/Shell-Completion#configuring-completions-in-zsh
 eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+
+# macOS path_helper workaround
+# ---
+# Zsh load order: ~/.zshenv -> /etc/zprofile -> ~/.zprofile -> /etc/zshrc -> ~/.zshrc
+# path_helper (called in /etc/zprofile AND by brew shellenv) reorders PATH,
+# pushing user paths behind system paths.
+# NO_GLOBAL_RCS prevents /etc/zprofile from running path_helper again after .zshenv.
+# User PATH prepends are at the bottom of this file so they come AFTER all tools
+# that may call path_helper (notably brew shellenv).
+# See https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
+setopt NO_GLOBAL_RCS
 
 # -------------------
 # Java
@@ -115,3 +119,12 @@ export DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
 # https://github.com/testcontainers/testcontainers-java/issues/5034
 export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
 
+# PATH
+# -------------------
+
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.claude/local:$PATH"
+export PATH="$HOME/.arkade/bin:$PATH"
+
+# Deduplicate PATH (keeps first occurrence)
+typeset -U path

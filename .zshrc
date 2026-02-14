@@ -216,6 +216,11 @@ tracezsh_sorted() {
 # Options
 # -----------------
 
+# Replicated from /etc/zshrc (skipped due to NO_GLOBAL_RCS in .zshenv)
+setopt COMBINING_CHARS
+setopt BEEP
+disable log  # prevent zsh builtin from shadowing /usr/bin/log
+
 unsetopt autocd
 
 # only correct commands but not its arguments
@@ -1244,5 +1249,8 @@ fi
 # mise
 # -----------------------
 
+# Reset so mise captures the current (correct) PATH, not a stale value
+# from a previous session (e.g. iTerm2 session restore, exec zsh).
+unset __MISE_ORIG_PATH
 eval "$(mise activate zsh)"
 

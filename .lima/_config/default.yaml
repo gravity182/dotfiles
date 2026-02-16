@@ -1,0 +1,11 @@
+mounts:
+  - location: "~/VM-Shared"
+    mountPoint: "{{.Home}}/Shared"
+    writable: true
+
+portForwards:
+  - guestPortRange: [8000, 9000]
+    hostPortRange: [8000, 9000]
+
+cpus: 4
+memory: 8GiB

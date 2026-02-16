@@ -28,7 +28,7 @@ endif
 
 " colorscheme
 " colorscheme catppuccin_mocha
-colorscheme onedark
+colorscheme spaceduck
 set background=dark
 
 " yank, delete, and put commands will use the system clipboard
@@ -524,7 +524,7 @@ let g:easy_align_ignore_groups = ['Comment']
 " --------------------
 
 let g:lightline = {
-    \ 'colorscheme': 'catppuccin_mocha',
+            \ 'colorscheme': 'spaceduck',
     \ 'active': {
     \   'left':  [
     \              [ 'mode', 'paste' ],

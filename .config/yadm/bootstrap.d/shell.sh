@@ -1,18 +1,24 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 
 echo "Your shell: '$SHELL'"
 
 if ! _has zsh; then
     echo "Installing zsh"
-    sudo apt update && sudo apt install -y zsh
+    if _is_linux; then
+        sudo apt update && sudo apt install -y zsh
+    else
+        brew install zsh
+    fi
 fi
 
 # --------------------
 # home set up
 # --------------------
 
-mkdir -pv ~/.local/{,bin,share{,/man/man1}}
+: "${ZSH_CUSTOM:=${ZSH:-$HOME/.oh-my-zsh}/custom}"
+
+mkdir -pv ~/.local/{,bin,share{,/man/{man1,man5}}}
 
 
 # --------------------
@@ -71,6 +77,6 @@ mkdir -pv "$ZSH_CUSTOM/"{completions,functions,plugins}
 # set zsh as a default shell
 if [[ ! "$SHELL" =~ "zsh" ]]; then
     echo "Setting zsh as a default shell"
-    chsh -s $(which zsh)
+    chsh -s "$(which zsh)"
 fi
 

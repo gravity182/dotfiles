@@ -27,14 +27,18 @@ export ZSH_CUSTOM="$ZSH/custom"
 # -------
 
 # put your secrets in this file; do not commit to git
-[[ -s "~/.config/secrets/env.zsh" ]] && source ~/.config/secrets/env.zsh
+[[ -s "$HOME/.config/secrets/env.zsh" ]] && source "$HOME/.config/secrets/env.zsh"
 
 # Homebrew
 # --------
 
 # Configures PATH and FPATH variables
 # This enables completions as well; see https://docs.brew.sh/Shell-Completion#configuring-completions-in-zsh
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv zsh)"
+fi
 
 # macOS path_helper workaround
 # ---

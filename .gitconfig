@@ -100,6 +100,7 @@
 
     # List aliases.
     aliases = config --get-regexp alias
+    treehash = "!f() { git rev-parse \"${1:-HEAD}^{tree}\"; }; f"
 [merge]
     conflictstyle = zdiff3
 [include]
@@ -131,7 +132,7 @@
     # suggest correct commands
     autocorrect = 0
 [delta]
-    navigate = true  # use n and N to move between diff sections
+    navigate = true
     side-by-side = false
     line-numbers = true
     hyperlinks = true

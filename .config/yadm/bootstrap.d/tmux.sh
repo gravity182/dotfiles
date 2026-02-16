@@ -3,7 +3,7 @@ set -euo pipefail
 
 if ! _has tmux; then
     log_install_pre 'tmux'
-    sudo apt install -y tmux
+    _pkg_install tmux
 fi
 
 log_install_pre 'tmux plugins'
@@ -13,4 +13,4 @@ tmux new-session -d
 tmux source ~/.tmux.conf
 ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 tmux source ~/.tmux.conf
-
+tmux kill-server

@@ -1,15 +1,9 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
+if ! _is_macos; then
     return 0
 fi
-
-if ! _has brew; then
-    log_install_pre 'brew'
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # ===============
 # GNU Utils
@@ -52,27 +46,21 @@ defaults write com.apple.HIToolbox AppleFnUsageType -int "0"
 defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
 # Show language indicator underneath the cursor
 defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled -bool "true"
+# Fast key repeat (for vim-style navigation)
+defaults write -g InitialKeyRepeat -int 15
+defaults write -g KeyRepeat -int 2
+# Disable press-and-hold accent menu (enables key repeat in all apps)
+defaults write -g ApplePressAndHoldEnabled -bool false
 
 # ===============
 # Finder
 # ===============
 
-defaults write com.apple.finder "AppleShowAllFiles" -bool "true"
-defaults write NSGlobalDomain "AppleShowAllExtensions" -bool "false"
-defaults write com.apple.finder "AppleShowAllFiles" -bool "true"
-defaults write com.apple.finder "ShowPathbar" -bool "true"
-defaults write com.apple.finder "FXPreferredViewStyle" -string "clmv"
-defaults write com.apple.finder "_FXSortFoldersFirst" -bool "true"
+# Open new tabs instead of windows
 defaults write com.apple.finder "FinderSpawnTab" -bool "true"
-# search this Mac
-defaults write com.apple.finder "FXDefaultSearchScope" -string "SCev"
-defaults write com.apple.finder "FXEnableExtensionChangeWarning" -bool "false"
-# save to local disk by default instead of iCloud
+# Save to local disk by default instead of iCloud
 defaults write NSGlobalDomain "NSDocumentSaveNewDocumentsToCloud" -bool "false"
 defaults write NSGlobalDomain "NSToolbarTitleViewRolloverDelay" -float "0.2"
-# keep folders on top, then go files
-defaults write com.apple.finder "_FXSortFoldersFirst" -bool "true"
-
 
 # Set Desktop as the default location for new Finder windows
 # For other paths, use `PfLo` and `file:///full/path/here/`
@@ -216,3 +204,10 @@ defaults write com.apple.screencapture "type" -string "png"
 # Drag a file over an icon in the Dock, hover, and the application will open
 defaults write com.apple.dock "enable-spring-load-actions-on-all-items" -bool "true"
 
+# ===============
+# Restart affected applications
+# ===============
+
+killall Finder >/dev/null 2>&1 || true
+killall Dock >/dev/null 2>&1 || true
+killall SystemUIServer >/dev/null 2>&1 || true

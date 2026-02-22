@@ -1,0 +1,8 @@
+--embed-metadata
+-o "%(title)s [%(id)s].%(ext)s"
+--no-mtime
+--abort-on-unavailable-fragments
+--no-playlist
+--embed-thumbnail
+--retries 3
+--concurrent-fragments 1

@@ -1,0 +1,59 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "sticky_scroll": {
+    "enabled": true
+  },
+  "autosave": "off",
+  "outline_panel": {
+    "dock": "left",
+  },
+  "disable_ai": true,
+  "format_on_save": "on",
+  "git": {
+    "inline_blame": {
+      "enabled": false,
+    },
+  },
+  "enable_language_server": true,
+  "agent_ui_font_size": 16.0,
+  "buffer_font_family": ".ZedMono",
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false,
+  },
+  "base_keymap": "JetBrains",
+  "agent": {
+    "model_parameters": [],
+    "play_sound_when_agent_done": true,
+  },
+  "ui_font_size": 16,
+  "buffer_font_size": 15.0,
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Gruvbox Dark",
+  },
+  // Whether to enable vim modes and key bindings.
+  "vim_mode": true,
+  // Vim settings
+  "vim": {
+    "default_mode": "normal",
+    "toggle_relative_line_numbers": false,
+    "use_system_clipboard": "always",
+    "use_smartcase_find": true,
+    "highlight_on_yank_duration": 300,
+    "custom_digraphs": {},
+    // Cursor shape for the each mode.
+    // Specify the mode as the key and the shape as the value.
+    // The mode can be one of the following: "normal", "replace", "insert", "visual".
+    // The shape can be one of the following: "block", "bar", "underline", "hollow".
+    "cursor_shape": {},
+  },
+}

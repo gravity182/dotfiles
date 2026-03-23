@@ -1,0 +1,52 @@
+[
+  {
+    "label": "gitu",
+    "command": "gitu",
+    "env": {
+      "VISUAL": "zed --wait",
+      "EDITOR": "zed --wait",
+      "GIT_EDITOR": "zed --wait",
+    },
+    "use_new_terminal": true,
+    "allow_concurrent_runs": true,
+    "show_summary": false,
+    "show_command": false,
+  },
+  {
+    "label": "lazygit",
+    "command": "lazygit",
+    "env": {
+      "VISUAL": "zed --wait",
+      "EDITOR": "zed --wait",
+      "GIT_EDITOR": "zed --wait",
+    },
+    "use_new_terminal": true,
+    "allow_concurrent_runs": true,
+    "show_summary": false,
+    "show_command": false,
+  },
+  {
+    "label": "television-file-finder",
+    "command": "zed \"$(tv files)\"",
+    "shell": {
+      "program": "sh",
+    },
+    "hide": "always",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": true,
+    "show_summary": false,
+    "show_command": false,
+  },
+  {
+    "label": "codex",
+    "command": "codex",
+    "env": {
+      "VISUAL": "zed --wait",
+      "EDITOR": "zed --wait",
+    },
+    "use_new_terminal": true,
+    "allow_concurrent_runs": true,
+    "show_summary": false,
+    "show_command": false,
+  },
+]

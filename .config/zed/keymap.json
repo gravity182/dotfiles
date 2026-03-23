@@ -1,0 +1,81 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-left": "pane::ActivatePreviousItem",
+      "cmd-shift-right": "pane::ActivateNextItem",
+      "cmd-alt-c": [
+        "task::Spawn",
+        { "task_name": "codex", "reveal_target": "center" },
+      ],
+      "alt-x": "pane::CloseActiveItem",
+      "space f a": "command_palette::Toggle",
+      "space f e": "project_panel::ToggleFocus",
+      "space g g": [
+        "task::Spawn",
+        { "task_name": "lazygit", "reveal_target": "center" },
+      ],
+      "space g u": [
+        "task::Spawn",
+        { "task_name": "gitu", "reveal_target": "center" },
+      ],
+      "space /": "workspace::NewSearch",
+      "space e": "workspace::ToggleLeftDock",
+      // "space t": "workspace::NewCenterTerminal",
+      // "shift shift": "file_finder::Toggle",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-enter": "editor::ToggleCodeActions",
+      "cmd-shift-left": "pane::ActivatePreviousItem",
+      "cmd-shift-right": "pane::ActivateNextItem",
+      "cmd-alt-left": "pane::GoBack",
+      "cmd-alt-right": "pane::GoForward",
+      "cmd-w": "editor::SelectLargerSyntaxNode",
+      "cmd-shift-w": "editor::SelectSmallerSyntaxNode",
+      // "j k": ["workspace::SendKeystrokes", "escape"]
+    },
+  },
+  {
+    "context": "Editor && VimControl && !VimWaiting && !menu",
+    "bindings": {
+      "space a": "editor::ToggleCodeActions",
+      "shift-k": "editor::Hover",
+      "space g b": "git::Blame",
+      "space g d": "git::Diff",
+      "space g h": "git::FileHistory",
+      "space g l": "git_graph::Open",
+      "space d": "diagnostics::Deploy",
+      "space c c": ["workspace::SendKeystrokes", "g c c"],
+      "space f f": "file_finder::Toggle",
+      "space f t": ["task::Spawn", { "task_name": "television-file-finder" }],
+      "space r": "editor::ToggleCodeActions",
+      "n": "search::SelectNextMatch",
+      "+ +": "workspace::Save",
+    },
+  },
+  {
+    "context": "Editor && vim_mode == normal && vim_operator == none && !VimWaiting && !VimCount && !menu",
+    "bindings": {
+      "0": "vim::FirstNonWhitespace",
+      "shift-y": ["workspace::SendKeystrokes", "y $"],
+    },
+  },
+  {
+    "context": "Editor && vim_mode == visual && !VimWaiting && !VimObject",
+    "bindings": {
+      "space c": ["workspace::SendKeystrokes", "g c"],
+      "shift-j": "editor::MoveLineDown",
+      "shift-k": "editor::MoveLineUp",
+    },
+  },
+]

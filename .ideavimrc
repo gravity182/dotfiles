@@ -224,6 +224,7 @@ map <leader>a <Action>(ShowIntentionActions)
 " insert/generate
 nmap <leader>i <Action>(Generate)
 " show docs
+nmap K <Action>(QuickJavaDoc)
 nmap <leader>k <Action>(QuickJavaDoc)
 " copy reference
 nmap <leader>C <Action>(CopyReferencePopupGroup)
@@ -257,16 +258,12 @@ nmap gS <Action>(GotoSymbol)
 nmap g/ <Action>(FindInPath)
 
 " Navigation
-nmap [[ <Action>(MethodUp)
-nmap ]] <Action>(MethodDown)
-nmap [f <Action>(MethodUp)
-nmap ]f <Action>(MethodDown)
-nmap [g <action>(VcsShowPrevChangeMarker)
-nmap ]g <action>(VcsShowNextChangeMarker)
-"nmap [g <action>(PreviousDiff)
-"nmap ]g <action>(NextDiff)
-nmap [e <Action>(GotoPreviousError)
-nmap ]e <Action>(GotoNextError)
+nmap [m <Action>(MethodUp)
+nmap ]m <Action>(MethodDown)
+nmap [c <action>(VcsShowPrevChangeMarker)
+nmap ]c <action>(VcsShowNextChangeMarker)
+nmap [d <Action>(GotoPreviousError)
+nmap ]d <Action>(GotoNextError)
 
 
 " --------------------------------

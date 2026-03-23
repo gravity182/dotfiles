@@ -1,0 +1,350 @@
+" .ideavimrc is a configuration file for IdeaVim plugin. It uses
+"   the same commands as the original .vimrc configuration.
+" You can find a list of commands here: https://jb.gg/h38q75
+" Find more examples here: https://jb.gg/share-ideavimrc
+
+" --------------------------------
+" Core config
+" --------------------------------
+
+" yanked or deleted text will go to the system clipboard register
+" put command will also take content from the clipboard register
+" prefer the "+ register on X11 (clipboard selection)
+if has('unnamedplus')
+    set clipboard+=unnamedplus
+else
+    set clipboard+=unnamed
+endif
+
+" native idea insertion
+set clipboard+=ideaput
+
+" Configure backspace so it acts as it should act
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+" Ignore case when searching
+set ignorecase
+
+" When searching try to be smart about cases
+set smartcase
+
+" Highlight search results
+set hlsearch
+
+" Makes search act like search in modern browsers
+set incsearch
+
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
+
+" For regular expressions turn magic on
+set magic
+
+" Show matching brackets when text indicator is over them
+set showmatch
+
+" How many tenths of a second to blink when matching brackets
+set mat=2
+
+" No annoying sound on errors
+set noerrorbells
+set novisualbell
+set t_vb=
+set tm=500
+
+" Add a bit extra margin to the left
+set foldcolumn=1
+
+" Set utf8 as standard encoding and en_US as the standard language
+set encoding=utf8
+
+" Use Unix as the standard file type
+set ffs=unix,dos,mac
+
+set timeoutlen=1000
+
+set nocompatible
+
+
+" --------------------------------
+" Text, tab and indent related
+" --------------------------------
+
+" Use spaces instead of tabs
+set expandtab
+
+" Be smart when using tabs ;)
+set smarttab
+
+" 1 tab == 4 spaces
+set shiftwidth=4
+set tabstop=4
+
+" Disable linebreak
+set nolinebreak
+set tw=0
+
+set ai "Auto indent
+set si "Smart indent
+set wrap "Wrap lines
+
+
+" --------------------------------
+" IDEA set commands
+" https://github.com/JetBrains/ideavim/wiki/set-commands
+" --------------------------------
+
+" Show a few lines of context around the cursor. Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=5
+
+" https://github.com/JetBrains/ideavim/wiki/ideajoin-examples
+set ideajoin
+set ideamarks
+set idearefactormode=select
+
+" set selectmode=mouse
+set showmode
+set showcmd
+
+set ideastatusicon=gray
+
+
+" ====================
+" Key maps
+" ====================
+
+" Leader key
+let mapleader = "\<Space>"
+
+" remove <space> mappings
+nnoremap <SPACE> <Nop>
+
+" Disable highlight when <leader><cr> is pressed
+nmap <silent> <leader><cr> :noh<cr>
+
+" map redo to 'r'
+nnoremap <C-r> <Nop>
+nnoremap r <C-r>
+
+" Specify the behavior when switching between buffers
+try
+  set switchbuf=useopen,usetab,newtab
+  set stal=2
+catch
+endtry
+
+" Return to last edit position when opening files (You want this!)
+" au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+" Useful mappings for managing tabs
+nmap <leader>tn :tabnew<cr>
+nmap <leader>to :tabonly<cr>
+nmap <leader>tc :tabclose<cr>
+nmap <leader>tm :tabmove<space>
+nmap <leader>tp <Action>(PinActiveEditorTab)
+
+" Go to tab by number
+nnoremap <leader>1 1gt
+nnoremap <leader>2 2gt
+nnoremap <leader>3 3gt
+nnoremap <leader>4 4gt
+nnoremap <leader>5 5gt
+nnoremap <leader>6 6gt
+nnoremap <leader>7 7gt
+nnoremap <leader>8 8gt
+nnoremap <leader>9 9gt
+nnoremap <leader>0 :tablast<cr>
+
+" Remap VIM 0 to first non-blank character
+nmap 0 ^
+
+" I like Y to work from the cursor to the end of line, which is more logical, but not Vi-compatible
+nmap Y y$
+
+
+" --------------------------------
+" Plugins
+" https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins
+" --------------------------------
+
+Plug 'machakann/vim-highlightedyank'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+" https://github.com/JetBrains/ideavim/blob/master/doc/NERDTree-support.md
+Plug 'preservim/nerdtree'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'tommcdo/vim-exchange'
+
+" --------------------
+" https://github.com/tpope/vim-commentary
+" :help commentary
+" --------------------
+
+nmap <leader>cc gcc
+xmap <leader>c gc
+
+" --------------------
+" https://github.com/machakann/vim-highlightedyank
+" --------------------
+
+let g:highlightedyank_highlight_in_visual = 0
+
+
+" --------------------------------
+" Map IDE actions
+" https://jb.gg/abva4t
+" --------------------------------
+
+" If you want to check an action's name, enable the 'Track Action Ids' toggle in IDEA
+" it will print an action ID which can be used for mapping
+" or just execute :set trackactionids
+
+nmap <C-o> <Action>(Back)
+nmap <C-i> <Action>(Forward)
+
+map <C-k> <Action>(Editor.Up)
+map <C-j> <Action>(Editor.Down)
+
+" Space
+" file finder
+map <leader>ff <Action>(GotoFile)
+" project panel / explorer
+nmap <leader>fe <Action>(SelectInProjectView)
+" global finder / action search
+map <leader>fa <Action>(GotoAction)
+" class picker
+map <leader>fc <Action>(GotoClass)
+
+" refactor popup
+nmap <leader>r <Action>(Refactorings.QuickListPopupAction)
+" show code actions
+map <leader>a <Action>(ShowIntentionActions)
+" show diagnostics / problems
+nmap <leader>d <Action>(ActivateProblemsViewToolWindow)
+" insert/generate
+nmap <leader>i <Action>(Generate)
+" show docs
+nmap K <Action>(QuickJavaDoc)
+nmap <leader>k <Action>(QuickJavaDoc)
+" copy reference
+nmap <leader>C <Action>(CopyReferencePopupGroup)
+" Zen Mode
+nmap <leader>z <Action>(ToggleZenMode)
+
+" Git
+" action popup
+map <leader>gg <Action>(Vcs.QuickListPopupAction)
+" log
+map <leader>gl <Action>(Vcs.Show.Log)
+" current file history
+map <leader>gh <Action>(Vcs.ShowTabbedFileHistory)
+" annotate/blame
+map <leader>gb <Action>(Annotate)
+" diff
+map <leader>gd <Action>(Compare.SameVersion)
+
+" Goto
+" current word
+nmap gd <Action>(QuickImplementations)
+nmap gD <Action>(GotoDeclaration)
+nmap gy <Action>(GotoTypeDeclaration)
+nmap gI <Action>(GotoImplementation)
+nmap gu <Action>(ShowUsages)
+nmap gA <Action>(FindUsages)
+nmap gh <Action>(QuickJavaDoc)
+nmap g. <Action>(ShowIntentionActions)
+nmap gs <Action>(FileStructurePopup)
+nmap gS <Action>(GotoSymbol)
+nmap g/ <Action>(FindInPath)
+
+" Navigation
+nmap [m <Action>(MethodUp)
+nmap ]m <Action>(MethodDown)
+nmap [c <action>(VcsShowPrevChangeMarker)
+nmap ]c <action>(VcsShowNextChangeMarker)
+nmap [d <Action>(GotoPreviousError)
+nmap ]d <Action>(GotoNextError)
+
+
+" --------------------------------
+" Miscellaneous
+" --------------------------------
+
+if executable('rg')
+    set grepprg=rg\ --vimgrep\ --smart-case
+    " see https://www.reddit.com/r/vim/comments/gmbc03/comment/fr2qne5
+    set grepformat^=%f:%l:%c:%m
+endif
+
+" --------------------------------
+" Russian layout support
+" --------------------------------
+
+map й q
+map ц w
+map у e
+map к r
+map е t
+map н y
+map г u
+map ш i
+map щ o
+map з p
+map х [
+map ъ ]
+map ф a
+map ы s
+map в d
+map а f
+map п g
+map р h
+map о j
+map л k
+map д l
+map ж ;
+map э '
+map ё \
+map я z
+map ч x
+map с c
+map м v
+map и b
+map т n
+map ь m
+map б ,
+map ю .
+map Й Q
+map Ц W
+map У E
+map К R
+map Е T
+map Н Y
+map Г U
+map Ш I
+map Щ O
+map З P
+map Х {
+map Ъ }
+map Ф A
+map Ы S
+map В D
+map А F
+map П G
+map Р H
+map О J
+map Л K
+map Д L
+map Ж :
+map Э "
+map Я Z
+map Ч X
+map С C
+map М V
+map И B
+map Т N
+map Ь M
+map Б <
+map Ю >
+map Ё /|

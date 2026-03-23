@@ -1,0 +1,108 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-left": "pane::ActivatePreviousItem",
+      "cmd-shift-right": "pane::ActivateNextItem",
+      "cmd-alt-c": [
+        "task::Spawn",
+        { "task_name": "codex", "reveal_target": "center" },
+      ],
+      "cmd-shift-x": "pane::CloseActiveItem",
+      // "shift shift": "file_finder::Toggle",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-enter": "editor::ToggleCodeActions",
+      "cmd-shift-left": "pane::ActivatePreviousItem",
+      "cmd-shift-right": "pane::ActivateNextItem",
+      "cmd-alt-left": "pane::GoBack",
+      "cmd-alt-right": "pane::GoForward",
+      "cmd-w": "editor::SelectLargerSyntaxNode",
+      "cmd-shift-w": "editor::SelectSmallerSyntaxNode",
+      // "j k": ["workspace::SendKeystrokes", "escape"]
+    },
+  },
+  {
+    "context": "Editor && VimControl && !VimWaiting && !menu",
+    "bindings": {
+      "space a": "editor::ToggleCodeActions",
+      "shift-k": "editor::Hover",
+      "space e": "workspace::ToggleLeftDock",
+      "space g b": "git::Blame",
+      "space g d": "git::Diff",
+      "space g g": [
+        "task::Spawn",
+        { "task_name": "lazygit", "reveal_target": "center" },
+      ],
+      "space g h": "git::FileHistory",
+      "space g l": "git_graph::Open",
+      "space g u": [
+        "task::Spawn",
+        { "task_name": "gitu", "reveal_target": "center" },
+      ],
+      "space d": "diagnostics::Deploy",
+      "space c c": ["workspace::SendKeystrokes", "g c c"],
+      "space f a": "command_palette::Toggle",
+      "space f e": "project_panel::ToggleFocus",
+      "space f f": "file_finder::Toggle",
+      "space f t": ["task::Spawn", { "task_name": "television-file-finder" }],
+      "space /": "workspace::NewSearch",
+      "space r": "editor::ToggleCodeActions",
+      "n": "search::SelectNextMatch",
+      "space t": "workspace::NewCenterTerminal",
+      "+ +": "workspace::Save",
+    },
+  },
+  {
+    "context": "EmptyPane || SharedScreen",
+    // Put key bindings here if you want them to work when no editor exists
+    "bindings": {
+      "space f f": "file_finder::Toggle",
+    },
+  },
+  {
+    // move between all the editor docks
+    "context": "Dock",
+    "bindings": {
+      "ctrl-w h": "workspace::ActivatePaneLeft",
+      "ctrl-w l": "workspace::ActivatePaneRight",
+      "ctrl-w k": "workspace::ActivatePaneUp",
+      "ctrl-w j": "workspace::ActivatePaneDown",
+    },
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-[": "terminal::ToggleViMode",
+    },
+  },
+  {
+    "context": "Editor && vim_mode == normal && vim_operator == none && !VimWaiting && !VimCount && !menu",
+    "bindings": {
+      "0": "vim::FirstNonWhitespace",
+      "shift-y": ["workspace::SendKeystrokes", "y $"],
+    },
+  },
+  {
+    "context": "Editor && vim_mode == visual && !VimWaiting && !VimObject",
+    "bindings": {
+      // comment out selection
+      "space c": ["workspace::SendKeystrokes", "g c"],
+      // add surrounds in visual mode
+      "shift-s": "vim::PushAddSurrounds",
+      // move selected lines
+      "shift-j": "editor::MoveLineDown",
+      "shift-k": "editor::MoveLineUp",
+    },
+  },
+]

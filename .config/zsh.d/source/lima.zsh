@@ -2,6 +2,31 @@
 
 VM_TEMPLATE="$HOME/scripts/lima/vm-template.yaml"
 VM_DEFAULT_NAME="dev"
+VM_SHARED_ROOTS=(
+    "$HOME/IdeaProjects"
+)
+
+vm-shared-root-for() {
+    local path="${1:?Usage: vm-shared-root-for <path>}"
+    local root
+
+    for root in "${VM_SHARED_ROOTS[@]}"; do
+        if [[ "$path" == "$root" || "$path" == "$root"/* ]]; then
+            echo "$root"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+vm-print-shared-roots() {
+    local root
+
+    for root in "${VM_SHARED_ROOTS[@]}"; do
+        echo "  - $root"
+    done
+}
 
 # Sync Claude Code and Codex configs into a running VM
 vm-sync-configs() {
@@ -59,6 +84,8 @@ vm-create() {
 
     echo ""
     echo "Done! VM '$name' is ready."
+    echo "  Shared roots:"
+    vm-print-shared-roots
     echo "  Use 'vm-dev' from a project directory to start working."
 }
 
@@ -66,32 +93,33 @@ vm-create() {
 vm-dev() {
     local name="${1:-$VM_DEFAULT_NAME}"
     local project_dir="$PWD"
+    local shared_root
 
-    # Check if VM exists
+    if ! shared_root=$(vm-shared-root-for "$project_dir"); then
+        echo "Error: '$project_dir' is outside the shared VM roots."
+        echo "Run 'vm-dev' from one of:"
+        vm-print-shared-roots
+        return 1
+    fi
+
     if ! limactl list --json 2>/dev/null | grep -q "\"name\":\"$name\""; then
         echo "VM '$name' does not exist. Creating it..."
         vm-create "$name" || return 1
     fi
 
-    # Ensure VM is running
     local vm_status=$(limactl list --json 2>/dev/null | jq -r "select(.name==\"$name\") | .status")
     if [[ "$vm_status" != "Running" ]]; then
         echo "Starting VM '$name'..."
-        limactl start "$name"
+        limactl start "$name" || return 1
     fi
 
-    # Check if CWD is already mounted
     local lima_yaml="$HOME/.lima/$name/lima.yaml"
-    if ! grep -q "location: .*$project_dir" "$lima_yaml" 2>/dev/null; then
-        echo "New mount required: $project_dir"
-        echo "This will restart the VM. Continue? [y/N] "
-        read -r confirm
-        [[ "$confirm" =~ ^[Yy]$ ]] || return 1
-        limactl stop "$name"
-        limactl edit "$name" --mount "${project_dir}:w" --start
+    if ! grep -Fq "location: $shared_root" "$lima_yaml" 2>/dev/null; then
+        echo "Error: VM '$name' is missing required mount:"
+        echo "  $shared_root"
+        return 1
     fi
 
-    # Detect and set per-repo git identity
     local git_name git_email
     git_name=$(git config user.name 2>/dev/null || true)
     git_email=$(git config user.email 2>/dev/null || true)

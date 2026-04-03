@@ -7,5 +7,5 @@ portForwards:
   - guestPortRange: [8000, 9000]
     hostPortRange: [8000, 9000]
 
-cpus: 4
-memory: 8GiB
+cpus: 6
+memory: 10GiB

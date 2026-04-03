@@ -6,6 +6,11 @@ images:
     arch: aarch64
     digest: sha256:ec93c8acae3e7630daf723e31716703639417d86b87eb6962f3a0003d1045c15
 
+mounts:
+  - location: /Users/dmitryalexandrov/IdeaProjects
+    mountPoint: /Users/dmitryalexandrov/IdeaProjects
+    writable: true
+
 provision:
   - mode: user
     file: vm-provision.sh

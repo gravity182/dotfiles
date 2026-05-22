@@ -8,4 +8,4 @@ portForwards:
     hostPortRange: [8000, 9000]
 
 cpus: 6
-memory: 10GiB
+memory: 6GiB

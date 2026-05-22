@@ -68,9 +68,8 @@ export GRADLE_USER_HOME="$HOME/.gradle"
 # Golang
 # -------------------
 
-export GOROOT="/usr/local/go"
 export GOPATH="$HOME/go"
-export PATH="$GOPATH/bin:$GOROOT/bin:$PATH"
+export PATH="$GOPATH/bin:$PATH"
 
 # -------------------
 # Rust
@@ -115,7 +114,7 @@ export BAT_THEME="Monokai Extended"
 # Docker
 # ------
 
-export DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
+export DOCKER_HOST="unix://$HOME/.lima/dev/sock/docker.sock"
 
 # Testcontainers
 # --------------
@@ -125,6 +124,10 @@ export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
 
 # PATH
 # -------------------
+
+# macOS /usr/local tools, including official installers
+# Normally added by /etc/zprofile via path_helper, but global rc files are disabled above
+export PATH="/usr/local/bin:$PATH"
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.claude/local:$PATH"

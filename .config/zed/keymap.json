@@ -59,15 +59,16 @@
       "space /": "workspace::NewSearch",
       "space r": "editor::ToggleCodeActions",
       "n": "search::SelectNextMatch",
-      "space t": "workspace::NewCenterTerminal",
+      "cmd-t": "workspace::NewCenterTerminal",
       "+ +": "workspace::Save",
     },
   },
   {
+    // bindings when no editor exists
     "context": "EmptyPane || SharedScreen",
-    // Put key bindings here if you want them to work when no editor exists
     "bindings": {
       "space f f": "file_finder::Toggle",
+      "cmd-t": "workspace::NewCenterTerminal",
     },
   },
   {

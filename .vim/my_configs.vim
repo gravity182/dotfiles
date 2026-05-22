@@ -22,14 +22,10 @@ set nocompatible
 " also read :h xterm-true-color
 if exists('+termguicolors')
     set termguicolors
-    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 
-" colorscheme
-" colorscheme catppuccin_mocha
-colorscheme spaceduck
 set background=dark
+colorscheme gruvbox8
 
 " yank, delete, and put commands will use the system clipboard
 " prefer the "+ register on X11 (clipboard selection)
@@ -524,7 +520,7 @@ let g:easy_align_ignore_groups = ['Comment']
 " --------------------
 
 let g:lightline = {
-            \ 'colorscheme': 'spaceduck',
+            \ 'colorscheme': 'gruvbox8',
     \ 'active': {
     \   'left':  [
     \              [ 'mode', 'paste' ],

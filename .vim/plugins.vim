@@ -86,8 +86,7 @@ Plug 'honza/vim-snippets'
 " -------------------------
 Plug 'joshdick/onedark.vim'
 Plug 'liuchengxu/space-vim-theme'
-Plug 'pineapplegiant/spaceduck'
+Plug 'lifepillar/vim-gruvbox8'
 Plug 'catppuccin/vim', { 'as': 'catppuccin' }
 
 call plug#end()
-

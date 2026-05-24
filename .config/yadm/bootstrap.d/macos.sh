@@ -5,6 +5,26 @@ if ! _is_macos; then
     return 0
 fi
 
+function _plist_ensure_dict() {
+    local plist="$1"
+    local key="$2"
+
+    if ! /usr/libexec/PlistBuddy -c "Print $key" "$plist" >/dev/null 2>&1; then
+        /usr/libexec/PlistBuddy -c "Add $key dict" "$plist"
+    fi
+}
+
+function _plist_set() {
+    local plist="$1"
+    local key="$2"
+    local type="$3"
+    local value="$4"
+
+    if ! /usr/libexec/PlistBuddy -c "Set $key $value" "$plist" >/dev/null 2>&1; then
+        /usr/libexec/PlistBuddy -c "Add $key $type $value" "$plist"
+    fi
+}
+
 # ===============
 # GNU Utils
 # ===============
@@ -113,27 +133,38 @@ defaults write com.apple.frameworks.diskimages auto-open-rw-root -bool true
 defaults write com.apple.finder OpenWindowForNewRemovableDisk -bool true
 
 # Show item info near icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+finder_plist="$HOME/Library/Preferences/com.apple.finder.plist"
+if [[ -f "$finder_plist" && ! -s "$finder_plist" ]]; then
+    rm -f "$finder_plist"
+fi
+_plist_ensure_dict "$finder_plist" ":DesktopViewSettings"
+_plist_ensure_dict "$finder_plist" ":DesktopViewSettings:IconViewSettings"
+_plist_ensure_dict "$finder_plist" ":FK_StandardViewSettings"
+_plist_ensure_dict "$finder_plist" ":FK_StandardViewSettings:IconViewSettings"
+_plist_ensure_dict "$finder_plist" ":StandardViewSettings"
+_plist_ensure_dict "$finder_plist" ":StandardViewSettings:IconViewSettings"
+
+_plist_set "$finder_plist" ":DesktopViewSettings:IconViewSettings:showItemInfo" bool true
+_plist_set "$finder_plist" ":FK_StandardViewSettings:IconViewSettings:showItemInfo" bool true
+_plist_set "$finder_plist" ":StandardViewSettings:IconViewSettings:showItemInfo" bool true
 
 # Show item info to the right of the icons on the desktop
-/usr/libexec/PlistBuddy -c "Set DesktopViewSettings:IconViewSettings:labelOnBottom false" ~/Library/Preferences/com.apple.finder.plist
+_plist_set "$finder_plist" ":DesktopViewSettings:IconViewSettings:labelOnBottom" bool false
 
 # Enable snap-to-grid for icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+_plist_set "$finder_plist" ":DesktopViewSettings:IconViewSettings:arrangeBy" string grid
+_plist_set "$finder_plist" ":FK_StandardViewSettings:IconViewSettings:arrangeBy" string grid
+_plist_set "$finder_plist" ":StandardViewSettings:IconViewSettings:arrangeBy" string grid
 
 # Increase grid spacing for icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
+_plist_set "$finder_plist" ":DesktopViewSettings:IconViewSettings:gridSpacing" integer 100
+_plist_set "$finder_plist" ":FK_StandardViewSettings:IconViewSettings:gridSpacing" integer 100
+_plist_set "$finder_plist" ":StandardViewSettings:IconViewSettings:gridSpacing" integer 100
 
 # Increase the size of icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
+_plist_set "$finder_plist" ":DesktopViewSettings:IconViewSettings:iconSize" integer 80
+_plist_set "$finder_plist" ":FK_StandardViewSettings:IconViewSettings:iconSize" integer 80
+_plist_set "$finder_plist" ":StandardViewSettings:IconViewSettings:iconSize" integer 80
 
 # Use list view in all Finder windows by default
 # Four-letter codes for the other view modes: `icnv`, `clmv`, `glyv`

@@ -33,7 +33,7 @@ fi
 
 # files to be executed during each bootstrap stage
 # change the order of files if necessary
-BS_PRE=("helpers.sh" "platform.sh")
+BS_PRE=("helpers.sh" "platform.sh" "preflight.sh")
 BS_SHELL=("shell.sh")
 BS_POST=("bin.sh" "vim.sh" "tmux.sh" "macos.sh")
 STAGES=("BS_PRE" "BS_SHELL" "BS_POST")

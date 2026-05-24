@@ -66,6 +66,33 @@ function _pkg_install() {
     fi
 }
 
+function require_cmd() {
+    local cmd="$1"
+
+    if ! _has "$cmd"; then
+        echo "Error: required command '$cmd' was not found." >&2
+        return 1
+    fi
+}
+
+function require_executable() {
+    local path="$1"
+
+    if [[ ! -x "$path" ]]; then
+        echo "Error: required executable '$path' was not found or is not executable." >&2
+        return 1
+    fi
+}
+
+function require_file() {
+    local path="$1"
+
+    if [[ ! -f "$path" ]]; then
+        echo "Error: required file '$path' was not found." >&2
+        return 1
+    fi
+}
+
 # Download and extract a GitHub release archive.
 # Handles arch detection, download, extraction, and cleanup.
 # Symlinks are tool-specific, so the caller handles those.

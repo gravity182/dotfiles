@@ -6,6 +6,14 @@ echo -e "${BOLD_GREEN}Detected system arch: ${BOLD_YELLOW}$(_arch)${RESET}"
 # change path temporarily
 export PATH=$PATH:$HOME/.local/bin
 
+MISE_TOOLS=(
+    "node@26.2.0"
+    "go@1.26.3"
+    "rust@1.95.0"
+    "java@corretto-25.0.3.9.1"
+    "uv@0.11.16"
+)
+
 
 # ===============
 # Basic utilities (Linux-only, macOS has these by default)
@@ -110,15 +118,18 @@ if ! _has rg; then
     fi
 fi
 
-if ! _has fzf; then
-    log_install_pre 'fzf'
-    if _is_macos; then
+if _is_macos; then
+    if ! brew list --versions fzf >/dev/null 2>&1; then
+        log_install_pre 'fzf'
         brew install fzf
-    else
-        rm -rf ~/.fzf
-        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        ~/.fzf/install --all
     fi
+    require_cmd fzf
+elif ! _has fzf; then
+    log_install_pre 'fzf'
+    rm -rf ~/.fzf
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    ~/.fzf/install --all
+    require_cmd fzf
 fi
 
 if ! _has bat; then
@@ -143,25 +154,37 @@ if ! _has tree; then
 fi
 
 # ===============
-# Node.js (volta)
+# Dev runtimes (mise)
 # ===============
 
-if ! volta -v &>/dev/null; then
-    log_install_pre 'volta'
-    curl https://get.volta.sh | bash -s -- --skip-setup
-    ~/.volta/bin/volta completions zsh > "$ZSH_CUSTOM/completions/_volta"
+if ! _has mise; then
+    log_install_pre 'mise'
+    if _is_macos; then
+        brew install mise
+    else
+        curl https://mise.run | sh
+    fi
 fi
-export PATH="$HOME/.volta/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+require_cmd mise
 
-if ! node -v &>/dev/null; then
-    log_install_pre 'node'
-    volta install node
-fi
+log_install_pre 'mise runtimes'
+mise install -y --locked "${MISE_TOOLS[@]}"
+eval "$(mise activate bash)"
+require_cmd node
+require_cmd go
+require_cmd rustc
+require_cmd cargo
+require_cmd java
+require_cmd javac
+require_cmd uv
 
 if ! _has tldr; then
     log_install_pre 'tldr'
-    volta install tldr
-    ln -sf "$HOME/.volta/tools/shared/tldr/bin/completion/zsh/_tldr" "$ZSH_CUSTOM/completions/_tldr"
+    npm install -g tldr
+    tldr_completion="$(npm root -g)/tldr/bin/completion/zsh/_tldr"
+    require_file "$tldr_completion"
+    ln -sf "$tldr_completion" "$ZSH_CUSTOM/completions/_tldr"
     echo 'Tldr cache will be downloaded on the first run'
 fi
 
@@ -231,11 +254,6 @@ if ! _has gifsicle; then
     _pkg_install gifsicle
 fi
 
-if ! _has uv; then
-    log_install_pre 'uv'
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-fi
-
 if ! _has figlet; then
     log_install_pre 'figlet'
     _pkg_install figlet
@@ -259,19 +277,25 @@ if ! _has zip; then
     # macOS has zip preinstalled
 fi
 
-if ! _has aws; then
+if { _is_macos && { [[ ! -x /usr/local/bin/aws ]] || [[ ! -x /usr/local/bin/aws_completer ]]; }; } || { ! _is_macos && { ! _has aws || ! _has aws_completer; }; }; then
     log_install_pre 'AWS CLI'
     if _is_macos; then
-        brew install awscli
+        curl -fsSL "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "/tmp/AWSCLIV2.pkg"
+        sudo installer -pkg "/tmp/AWSCLIV2.pkg" -target /
+        rm -f "/tmp/AWSCLIV2.pkg"
+        require_executable /usr/local/bin/aws
+        require_executable /usr/local/bin/aws_completer
     else
         if [[ $(_arch) == 'arm64' ]]; then
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "/tmp/awscliv2.zip"
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "/tmp/awscliv2.zip"
         else
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
         fi
-        unzip "/tmp/awscliv2.zip" -d /tmp
-        sudo /tmp/aws/install
+        unzip -q "/tmp/awscliv2.zip" -d /tmp
+        sudo /tmp/aws/install --update
         rm -rf "/tmp/awscliv2.zip" /tmp/aws
+        require_cmd aws
+        require_cmd aws_completer
     fi
 fi
 
@@ -288,6 +312,65 @@ if ! _has delta; then
         ln -sf "$HOME/.delta/delta" "$HOME/.local/bin/delta"
     fi
 fi
+
+if ! _has gh; then
+    log_install_pre 'GitHub CLI'
+    if _is_macos; then
+        brew install gh
+    else
+        (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+            && sudo mkdir -p -m 755 /etc/apt/keyrings \
+            && out=$(mktemp) && wget -nv -O"$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+            && cat "$out" | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+            && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+            && sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+            && sudo apt update \
+            && sudo apt install gh -y
+    fi
+    require_cmd gh
+fi
+
+if ! _has lazygit; then
+    log_install_pre 'lazygit'
+    if _is_macos; then
+        brew install lazygit
+    else
+        _pkg_install lazygit
+    fi
+    require_cmd lazygit
+fi
+
+if _is_macos && ! _has limactl; then
+    log_install_pre 'lima'
+    brew install lima
+    require_cmd limactl
+fi
+
+if ! _has docker; then
+    log_install_pre 'Docker CLI'
+    if _is_macos; then
+        brew install docker
+    else
+        curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+        sudo sh /tmp/get-docker.sh
+        rm -f /tmp/get-docker.sh
+    fi
+    require_cmd docker
+fi
+
+if ! docker compose version &>/dev/null; then
+    log_install_pre 'Docker Compose'
+    if _is_macos; then
+        brew install docker-compose
+    else
+        _pkg_install docker-compose-plugin
+    fi
+    docker compose version >/dev/null
+fi
+
+log_install_pre 'Docker completions'
+docker completion zsh > "$ZSH_CUSTOM/completions/_docker"
 
 # ===============
 # Kubernetes tools

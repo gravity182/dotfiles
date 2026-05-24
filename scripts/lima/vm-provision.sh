@@ -30,28 +30,28 @@ fi
 # --- Dev tools via mise ---
 if ! mise x -- node --version &>/dev/null; then
   echo "==> Installing Node.js via mise..."
-  mise use -g node@lts
+  mise use -g node@26.2.0
 else
   echo "==> Node.js already installed, skipping."
 fi
 
 if ! mise x -- go version &>/dev/null; then
   echo "==> Installing Go via mise..."
-  mise use -g go@latest
+  mise use -g go@1.26.3
 else
   echo "==> Go already installed, skipping."
 fi
 
 if ! mise x -- rustc --version &>/dev/null; then
   echo "==> Installing Rust via mise..."
-  mise use -g rust@latest
+  mise use -g rust@1.95.0
 else
   echo "==> Rust already installed, skipping."
 fi
 
 if ! mise x -- uv --version &>/dev/null; then
   echo "==> Installing uv via mise..."
-  mise use -g uv@latest
+  mise use -g uv@0.11.16
 else
   echo "==> uv already installed, skipping."
 fi
@@ -99,17 +99,6 @@ if ! command -v codex &>/dev/null; then
 else
   echo "==> Codex already installed, skipping."
 fi
-
-# --- Kubernetes tools ---
-for k8s_tool in kubectl helm k9s kubectx kubens stern kustomize; do
-  if ! command -v "$k8s_tool" &>/dev/null; then
-    echo "==> Installing ${k8s_tool} via mise..."
-    mise use -g "${k8s_tool}@latest"
-  else
-    echo "==> ${k8s_tool} already installed, skipping."
-  fi
-done
-
 
 # --- Shell config (separate file, sourced from .bashrc) ---
 cat > ~/.bashrc.vm <<'BASHRC'

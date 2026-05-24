@@ -29,7 +29,7 @@ Default VM name: `dev`.
 
 ## What gets provisioned
 
-Via [mise](https://mise.jdx.dev/): Node.js (LTS), Go, Rust.
+Via [mise](https://mise.jdx.dev/): pinned Node.js, Go, Rust, and uv versions.
 Directly: Docker, GitHub CLI, Claude Code, Codex.
 
 ## Manual login required per VM

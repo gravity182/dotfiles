@@ -11,6 +11,10 @@ mounts:
     mountPoint: /Users/dmitryalexandrov/IdeaProjects
     writable: true
 
+portForwards:
+  - guestSocket: "/var/run/docker.sock"
+    hostSocket: "{{.Dir}}/sock/docker.sock"
+
 provision:
   - mode: user
     file: vm-provision.sh

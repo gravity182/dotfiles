@@ -238,6 +238,7 @@ replay_pid*
 # Coding Agents
 # ======================
 
+CLAUDE*.md
 *_plan.md
 
 

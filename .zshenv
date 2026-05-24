@@ -51,17 +51,6 @@ fi
 # See https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
 setopt NO_GLOBAL_RCS
 
-# -------------------
-# Java
-# -------------------
-
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
-
-export JAVA_HOME="$SDKMAN_DIR/candidates/java/17.0.15-amzn"
-
-export GRAALVM_HOME="$SDKMAN_DIR/candidates/java/17.0.10-graal"
-
 export GRADLE_USER_HOME="$HOME/.gradle"
 
 # -------------------
@@ -70,25 +59,6 @@ export GRADLE_USER_HOME="$HOME/.gradle"
 
 export GOPATH="$HOME/go"
 export PATH="$GOPATH/bin:$PATH"
-
-# -------------------
-# Rust
-# -------------------
-
-if [[ -d "$HOMEBREW_PREFIX/opt/rustup/bin" ]]; then
-    export PATH="$HOMEBREW_PREFIX/opt/rustup/bin:$PATH"
-fi
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# -------------------
-# JavaScript
-# -------------------
-
-export VOLTA_HOME="$HOME/.volta"
-
-if [[ -d "$VOLTA_HOME/bin" ]]; then
-    export PATH="$VOLTA_HOME/bin:$PATH"
-fi
 
 # Core utils
 # ----------
@@ -114,7 +84,9 @@ export BAT_THEME="Monokai Extended"
 # Docker
 # ------
 
-export DOCKER_HOST="unix://$HOME/.lima/dev/sock/docker.sock"
+if [[ "$OSTYPE" == darwin* ]]; then
+    export DOCKER_HOST="unix://$HOME/.lima/dev/sock/docker.sock"
+fi
 
 # Testcontainers
 # --------------

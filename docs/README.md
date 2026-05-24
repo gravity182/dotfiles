@@ -29,11 +29,18 @@ All of them are already preconfigured.
 
 Oneline installation:
 ```shell
-/bin/bash -c "$(curl -sSfL https://raw.githubusercontent.com/blinky-z/dotfiles/refs/heads/main/install.sh)"
+/bin/bash -c "$(curl -sSfL https://raw.githubusercontent.com/gravity182/dotfiles/refs/heads/main/install.sh)"
 ```
 
 The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), will configure your shell and install all the required utils.
 I recommend you to look at the scripts yourself and adjust the setup to your liking before running. High chances are you don't need everything I use.
 
-After the bootstrap script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.
+Prerequisites:
+- macOS: Xcode Command Line Tools, Git, curl, and rsync
+- Linux: apt-based distribution with sudo, Git, curl, and rsync
 
+Pinned runtimes are managed by [mise](https://mise.jdx.dev/) from `~/.config/mise/config.toml`.
+The Lima `dev` VM template is committed, including Docker socket forwarding, but the bootstrap does not create or start the VM.
+Run `vm-create dev` or `vm-dev` after bootstrap when you want to provision it.
+
+After the bootstrap script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.

@@ -1008,20 +1008,8 @@ bindkey '^[[1;5D' vi-backward-word
 # MISCELLANEOUS
 # ===============
 
-# sdkman
-# ------
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-# if [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]]; then
-#     export SDKMAN_DIR="$HOME/.sdkman"
-#     source "$HOME/.sdkman/bin/sdkman-init.sh"
-# fi
-
 # fzf
 # ---
-
-# shell integration
-source ~/.fzf.zsh
 
 # specify the default command that fzf shall execute on empty stdin
 export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden --follow 2>/dev/null'
@@ -1068,6 +1056,14 @@ export FZF_CTRL_R_OPTS="$FZF_BINDING_OPTS
   --preview-window down:5:hidden:wrap
   --bind 'ctrl-/:toggle-preview'
   "
+
+# type **<tab> to complete the sentence
+# see https://github.com/junegunn/fzf?tab=readme-ov-file#fuzzy-completion-for-bash-and-zsh
+export FZF_COMPLETION_TRIGGER='**'
+export FZF_COMPLETION_OPTS="--bind 'ctrl-/:change-preview-window(hidden|)'"
+
+# shell integration
+source <(fzf --zsh)
 
 # CTRL-R - Paste the selected command from history into the command line
 # better shell history search
@@ -1118,11 +1114,6 @@ zle     -N              fzf-cd-widget
 bindkey -M emacs '\C-e' fzf-cd-widget
 bindkey -M vicmd '\C-e' fzf-cd-widget
 bindkey -M viins '\C-e' fzf-cd-widget
-
-# type **<tab> to complete the sentence
-# see https://github.com/junegunn/fzf?tab=readme-ov-file#fuzzy-completion-for-bash-and-zsh
-export FZF_COMPLETION_TRIGGER='**'
-export FZF_COMPLETION_OPTS="--bind 'ctrl-/:change-preview-window(hidden|)'"
 
 # Use fd to generate an input for path completion
 # - The first argument to the function ($1) is the base path to start traversal
@@ -1187,9 +1178,8 @@ alias rg_regex_help=rust_regex_help
 # AWS CLI
 # -------
 
-if _has aws; then
+if [[ -x /usr/local/bin/aws_completer ]]; then
     # prefill the path to aws_completer for faster startup
-    # check the path via `which aws_completer`
     complete -C '/usr/local/bin/aws_completer' aws
 fi
 
@@ -1253,4 +1243,3 @@ fi
 # from a previous session (e.g. iTerm2 session restore, exec zsh).
 unset __MISE_ORIG_PATH
 eval "$(mise activate zsh)"
-

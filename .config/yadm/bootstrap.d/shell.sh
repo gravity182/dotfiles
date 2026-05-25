@@ -77,6 +77,10 @@ mkdir -pv "$ZSH_CUSTOM/"{completions,functions,plugins}
 # set zsh as a default shell
 if [[ ! "$SHELL" =~ "zsh" ]]; then
     echo "Setting zsh as a default shell"
-    chsh -s "$(which zsh)"
+    zsh_path="$(command -v zsh)"
+    if _is_linux; then
+        sudo chsh -s "$zsh_path" "$USER"
+    else
+        chsh -s "$zsh_path"
+    fi
 fi
-

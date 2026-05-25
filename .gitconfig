@@ -137,5 +137,3 @@
     line-numbers = true
     hyperlinks = true
     hyperlinks-file-link-format = "code://file/{path}:{line}"
-    theme = Monokai Extended
-

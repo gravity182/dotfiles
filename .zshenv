@@ -73,7 +73,7 @@ export PAGER="less"
 export LESS="-igRFXM --tabs=4 --mouse"
 
 # should be respected by delta as well
-export BAT_THEME="Monokai Extended"
+export BAT_THEME="gruvbox-dark"
 
 # # colorize man pages; no need to use the colored-man-pages plugin anymore
 # # UPD: it works worse than the plugin actually, so I had to disable it

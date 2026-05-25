@@ -5,11 +5,12 @@ Sandboxed Linux VMs for running Claude Code and Codex agents via [Lima](https://
 ## Quick start
 
 ```bash
-cd ~/your-project
+cd ~/IdeaProjects/your-project
 vm-dev
 ```
 
-This creates a VM (if needed), mounts the project directory, sets git identity, and drops you into the VM.
+This creates a VM (if needed), verifies the project is inside a configured shared root, sets git identity, and drops you into the same project path inside the VM.
+By default, projects must live under `~/IdeaProjects`, which is mounted at the same path in the guest.
 
 ## Functions
 
@@ -29,7 +30,7 @@ Default VM name: `dev`.
 
 ## What gets provisioned
 
-Via [mise](https://mise.jdx.dev/): pinned Node.js, Go, Rust, and uv versions.
+Via [mise](https://mise.jdx.dev/): pinned Node.js, Go, Rust, Java Corretto, and uv versions.
 Directly: Docker, GitHub CLI, Claude Code, Codex.
 
 ## Manual login required per VM

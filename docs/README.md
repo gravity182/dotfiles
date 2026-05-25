@@ -36,11 +36,13 @@ The bootstrap scripts, which you can find in [.config/yadm](../.config/yadm), wi
 I recommend you to look at the scripts yourself and adjust the setup to your liking before running. High chances are you don't need everything I use.
 
 Prerequisites:
-- macOS: Xcode Command Line Tools, Git, curl, and rsync
+- macOS: Xcode Command Line Tools, Homebrew, Git, curl, and rsync
 - Linux: apt-based distribution with sudo, Git, curl, and rsync
 
-Pinned runtimes are managed by [mise](https://mise.jdx.dev/) from `~/.config/mise/config.toml`.
-The Lima `dev` VM template is committed, including Docker socket forwarding, but the bootstrap does not create or start the VM.
+Pinned runtimes are managed by [mise](https://mise.jdx.dev/) from `~/.config/mise/config.toml` and locked by `~/.config/mise/mise.lock`.
+The current host toolchain includes Node.js, Go, Rust, Java Corretto, and uv.
+
+The Lima `dev` VM template is committed, including Docker socket forwarding, but the bootstrap only installs Lima tooling; it does not create or start the VM.
 Run `vm-create dev` or `vm-dev` after bootstrap when you want to provision it.
 
 After the bootstrap script finishes the job, please log out and log in again. Now, when opening a terminal, you should see Zsh inside a Tmux window.

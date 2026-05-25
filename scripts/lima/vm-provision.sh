@@ -49,6 +49,13 @@ else
   echo "==> Rust already installed, skipping."
 fi
 
+if ! mise x -- java -version &>/dev/null; then
+  echo "==> Installing Java via mise..."
+  mise use -g java@corretto-25.0.3.9.1
+else
+  echo "==> Java already installed, skipping."
+fi
+
 if ! mise x -- uv --version &>/dev/null; then
   echo "==> Installing uv via mise..."
   mise use -g uv@0.11.16
@@ -138,4 +145,5 @@ echo "==> Provisioning complete!"
 echo "    Node: $(mise x -- node --version)"
 echo "    Go:   $(mise x -- go version)"
 echo "    Rust: $(mise x -- rustc --version)"
+echo "    Java: $(mise x -- java -version 2>&1 | head -1)"
 echo "    gh:   $(gh --version | head -1)"

@@ -47,6 +47,14 @@ brew install gawk
 
 brew install --cask font-jetbrains-mono-nerd-font
 
+# ===============
+# iTerm2
+# ===============
+
+mkdir -p "$HOME/Library/Application Support/iTerm2/DynamicProfiles"
+ln -sf "$HOME/.config/iterm2/DynamicProfiles/Main.json" \
+    "$HOME/Library/Application Support/iTerm2/DynamicProfiles/Main.json"
+
 # Restore sudo cache,
 # since brew resets cache on each invokation
 echo -e "${BOLD_YELLOW}Checking sudo credentials...${RESET}"

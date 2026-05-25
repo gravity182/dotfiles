@@ -616,8 +616,11 @@ alias bat='bat --style=auto'
 alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 
-# use bat by default
-alias cat='bat'
+# Cat-compatible output: no decorations, no pager.
+alias cat='bat --style=plain --paging=never'
+
+# Pretty paged file viewer.
+alias page='bat --style=auto --paging=always'
 
 # remove directories and their contents recursively
 alias rmd='rm -r'

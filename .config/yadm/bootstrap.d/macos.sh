@@ -40,9 +40,6 @@ brew install findutils
 brew install gnu-sed
 # Install GNU `awk`
 brew install gawk
-# Install a modern version of Bash
-brew install bash
-brew install bash-completion2
 
 # Restore sudo cache,
 # since brew resets cache on each invokation

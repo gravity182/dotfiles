@@ -3,13 +3,9 @@ set -euo pipefail
 
 echo "Your shell: '$SHELL'"
 
-if ! _has zsh; then
+if _is_linux && ! _has zsh; then
     echo "Installing zsh"
-    if _is_linux; then
-        sudo apt update && sudo apt install -y zsh
-    else
-        brew install zsh
-    fi
+    sudo apt update && sudo apt install -y zsh
 fi
 
 # --------------------
@@ -77,7 +73,12 @@ mkdir -pv "$ZSH_CUSTOM/"{completions,functions,plugins}
 # set zsh as a default shell
 if [[ ! "$SHELL" =~ "zsh" ]]; then
     echo "Setting zsh as a default shell"
-    zsh_path="$(command -v zsh)"
+    if _is_macos; then
+        zsh_path="/bin/zsh"
+    else
+        zsh_path="$(command -v zsh)"
+    fi
+
     if _is_linux; then
         sudo chsh -s "$zsh_path" "$USER"
     else

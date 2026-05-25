@@ -1,42 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# macOS ships an old /bin/bash (3.2) which doesn't support `declare -n` used below.
-# Ensure we run under Bash 4+.
-if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
-    if [[ "${OSTYPE:-}" == darwin* ]]; then
-        echo "Bootstrap requires Bash 4+ on macOS. Installing Homebrew + Bash..."
-
-        if [[ ! -x /opt/homebrew/bin/brew && ! -x /usr/local/bin/brew ]]; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        fi
-
-        if [[ -x /opt/homebrew/bin/brew ]]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-            /opt/homebrew/bin/brew install bash
-            exec /opt/homebrew/bin/bash "$0" "$@"
-        fi
-
-        if [[ -x /usr/local/bin/brew ]]; then
-            eval "$(/usr/local/bin/brew shellenv)"
-            /usr/local/bin/brew install bash
-            exec /usr/local/bin/bash "$0" "$@"
-        fi
-
-        echo "Error: Homebrew was not found after installation." >&2
-        exit 1
-    fi
-
-    echo "Error: Bootstrap requires Bash 4+." >&2
-    exit 1
-fi
-
 # files to be executed during each bootstrap stage
 # change the order of files if necessary
 BS_PRE=("helpers.sh" "platform.sh" "preflight.sh")
 BS_SHELL=("shell.sh")
 BS_POST=("bin.sh" "vim.sh" "tmux.sh" "macos.sh")
-STAGES=("BS_PRE" "BS_SHELL" "BS_POST")
 # Directory to look for bootstrap executables in
 BOOTSTRAP_D="${BASH_SOURCE[0]}.d"
 
@@ -52,17 +21,37 @@ if [[ ! -d "$BOOTSTRAP_D" ]]; then
     exit 1
 fi
 
-# check if all files are present and executable
-for stage in "${STAGES[@]}"; do
-    declare -n arr="$stage"
-    for bootstrap in "${arr[@]}"; do
+check_files() {
+    local bootstrap
+
+    for bootstrap in "$@"; do
         bootstrap="$BOOTSTRAP_D/$bootstrap"
         if [[ ! -r "$bootstrap" || ! -x "$bootstrap" ]]; then
             echo -e "${BOLD_RED}Error: bootstrap '$bootstrap' is not executable or missing${RESET}" >&2
             exit 1
         fi
     done
-done
+}
+
+run_stage() {
+    local stage="$1"
+    local bootstrap
+    shift
+
+    echo "----------------------"
+    echo -e "${BOLD_YELLOW}Current stage: ${stage}${RESET}"
+
+    for bootstrap in "$@"; do
+        bootstrap="$BOOTSTRAP_D/$bootstrap"
+        echo ""
+        echo "======================"
+        echo -e "Executing ${BOLD_YELLOW}'$bootstrap'${RESET}"
+        source "$bootstrap"
+    done
+}
+
+# check if all files are present and executable
+check_files "${BS_PRE[@]}" "${BS_SHELL[@]}" "${BS_POST[@]}"
 
 # Ask for the administrator password upfront
 echo "Presaving sudo credentials..."
@@ -88,19 +77,9 @@ _error_trap() {
 }
 trap _error_trap ERR
 
-# bootstrap
-for stage in "${STAGES[@]}"; do
-    echo "----------------------"
-    echo -e "${BOLD_YELLOW}Current stage: ${stage##BS_}${RESET}"
-    declare -n arr="$stage"
-    for bootstrap in "${arr[@]}"; do
-        bootstrap="$BOOTSTRAP_D/$bootstrap"
-        echo ""
-        echo "======================"
-        echo -e "Executing ${BOLD_YELLOW}'$bootstrap'${RESET}"
-        source "$bootstrap"
-    done
-done
+run_stage "PRE" "${BS_PRE[@]}"
+run_stage "SHELL" "${BS_SHELL[@]}"
+run_stage "POST" "${BS_POST[@]}"
 
 echo "-------------------"
 echo -e "${BOLD_GREEN}Bootstrap finished!${RESET}"

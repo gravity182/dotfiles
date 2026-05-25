@@ -128,7 +128,8 @@ elif ! _has fzf; then
     log_install_pre 'fzf'
     rm -rf ~/.fzf
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install --all
+    ~/.fzf/install --bin
+    ln -sf "$HOME/.fzf/bin/fzf" "$HOME/.local/bin/fzf"
     require_cmd fzf
 fi
 

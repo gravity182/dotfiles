@@ -228,8 +228,7 @@ if has("gui_running")
     set guitablabel=%M\ %t
 
     if has("gui_macvim")
-        " set nerd font (required for vim-devicons)
-        " for terminal vim set it in the terminal's settings itself
+        " for terminal vim set the font in the terminal's settings itself
         set guifont=SauceCodeProNF:h15
         " configure window size
         set lines=28
@@ -416,32 +415,6 @@ endif
 " ====================
 
 " --------------------
-" https://github.com/easymotion/vim-easymotion
-" :help easymotion
-" --------------------
-
-" map <leader><leader> <Plug>(easymotion-prefix)
-
-" " Enable/Disable default mappings
-" let g:EasyMotion_do_mapping = 1
-
-" " Jump to anywhere you want with minimal keystrokes, with just one key binding.
-" " `s{char}{label}`
-" " nmap s <Plug>(easymotion-overwin-f)
-" " or
-" " `s{char}{char}{label}`
-" " Need one more keystroke, but on average, it may be more comfortable.
-" " nmap f <Plug>(easymotion-overwin-f2)
-
-" " Turn on case-insensitive feature
-" let g:EasyMotion_smartcase = 1
-
-" " JK motions: Line motions
-" map <leader>j <Plug>(easymotion-j)
-" map <leader>k <Plug>(easymotion-k)
-
-
-" --------------------
 " https://github.com/preservim/nerdtree
 " :help NERDTree
 " --------------------
@@ -460,28 +433,6 @@ nnoremap <silent> <expr> <leader>n g:NERDTree.IsOpen() ? "\:NERDTreeClose<CR>" :
 
 
 " --------------------
-" https://github.com/simnalamburt/vim-mundo
-" :help mundo
-" --------------------
-
-nnoremap <silent> <leader>u :MundoToggle<CR>
-let g:mundo_preview_bottom = 1
-
-
-" --------------------
-" https://github.com/preservim/vim-indent-guides
-" :help indent_guides
-" --------------------
-
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_auto_colors = 0
-let g:indent_guides_start_level = 2
-let g:indent_guides_guide_size = 1
-autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=gray     ctermbg=gray
-autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgrey ctermbg=darkgrey
-
-
-" --------------------
 " https://github.com/tpope/vim-commentary
 " :help commentary
 " --------------------
@@ -492,88 +443,34 @@ xmap <leader>c gc
 
 
 " --------------------
-" https://github.com/junegunn/vim-easy-align
-" :help vim-easy-align
-" --------------------
-
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
-
-" custom delimiters
-" see defaults - https://github.com/junegunn/vim-easy-align/blob/2.9.6/autoload/easy_align.vim#L32-L46
-if !exists('g:easy_align_delimiters')
-    let g:easy_align_delimiters = {}
-endif
-let g:easy_align_delimiters['#'] = { 'pattern': '#', 'ignore_groups': ['String'] }
-
-" If a delimiter is in a highlight group whose name matches any of the followings, it will be ignored
-" e.g. mapping keysheet section at the top of this config won't be aligned by default
-let g:easy_align_ignore_groups = ['Comment']
-
-
-" --------------------
 " https://github.com/itchyny/lightline.vim
 " :help lightline
 " --------------------
 
 let g:lightline = {
-            \ 'colorscheme': 'gruvbox8',
+    \ 'colorscheme': 'gruvbox8',
     \ 'active': {
     \   'left':  [
     \              [ 'mode', 'paste' ],
     \              [ 'readonly', 'filename', 'modified' ],
     \            ],
     \   'right': [
-    \              [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ],
     \              [ 'lineinfo' ],
     \              [ 'percent' ],
     \              [ 'fileformat', 'fileencoding', 'filetype' ],
-    \              [ 'fugitive' ],
     \            ],
-    \ },
-    \ 'component_expand': {
-    \   'linter_checking': 'lightline#ale#checking',
-    \   'linter_infos': 'lightline#ale#infos',
-    \   'linter_warnings': 'lightline#ale#warnings',
-    \   'linter_errors': 'lightline#ale#errors',
-    \   'linter_ok': 'lightline#ale#ok',
-    \ },
-    \ 'component_type': {
-    \   'linter_checking': 'right',
-    \   'linter_infos': 'right',
-    \   'linter_warnings': 'warning',
-    \   'linter_errors': 'error',
-    \   'linter_ok': 'right',
-    \ },
-    \ 'component_function': {
-    \   'filetype': 'AleFiletype',
     \ },
     \ 'component': {
     \   'readonly': '%{&filetype=="help"?"":&readonly?"\ue672":""}',
-    \   'modified': '%{&filetype=="help"?"":&modified?"+":&modifiable?"":"-"}',
-    \   'fugitive': '%{exists("*FugitiveHead")?FugitiveHead():""}'
+    \   'modified': '%{&filetype=="help"?"":&modified?"+":&modifiable?"":"-"}'
     \ },
     \ 'component_visible_condition': {
     \   'readonly': '(&filetype!="help"&& &readonly)',
-    \   'modified': '(&filetype!="help"&&(&modified||!&modifiable))',
-    \   'fugitive': '(exists("*FugitiveHead") && ""!=FugitiveHead())'
+    \   'modified': '(&filetype!="help"&&(&modified||!&modifiable))'
     \ },
     \ 'separator': { 'left': ' ', 'right': ' ' },
     \ 'subseparator': { 'left': ' ', 'right': '|' }
 \ }
-
-function! AleFiletype()
-    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : '?') : ''
-endfunction
-
-" let g:lightline#ale#indicator_checking = "\uf110"
-" let g:lightline#ale#indicator_infos = "\uf129"
-" let g:lightline#ale#indicator_warnings = "\uf071"
-" let g:lightline#ale#indicator_errors = "\uf05e"
-" let g:lightline#ale#indicator_ok = "\uf00c"
 
 " mode is already displayed by lightline
 set noshowmode
@@ -596,10 +493,6 @@ nnoremap ;           :Buffers<CR>
 nnoremap <leader>fb  :Buffers<CR>
 
 nnoremap <leader>fm  :Maps<CR>
-
-nnoremap <leader>fs  :Snippets<CR>
-
-nnoremap <leader>fg  :Commits<CR>
 
 nnoremap <leader>g   :Rg<Space>
 nnoremap <C-g>       :Rg<Space>
@@ -667,67 +560,10 @@ autocmd BufRead,BufNewFile *.journal set filetype=journal
 
 
 " --------------------
-" https://github.com/tmsvg/pear-tree
-" :help pear-tree
-" --------------------
-
-let g:pear_tree_repeatable_expand = 0
-
-let g:pear_tree_smart_openers = 1
-let g:pear_tree_smart_closers = 1
-let g:pear_tree_smart_backspace = 1
-
-let g:pear_tree_pairs = {
-    \ '(': {'closer': ')'},
-    \ '[': {'closer': ']'},
-    \ '{': {'closer': '}'},
-    \ "'": {'closer': "'"},
-    \ '"': {'closer': '"'},
-    \ '`': {'closer': '`'}
-\ }
-
-augroup pear_tree_pairs_html
-    autocmd!
-    autocmd FileType html let b:pear_tree_pairs = {
-            \ '<*>': {'closer': '</*>'}
-            \ }
-augroup END
-
-
-" --------------------
-" https://github.com/sirver/ultisnips
-" :h UltiSnips
-" --------------------
-
-" from the docs:
-" If you have g:UltiSnipsExpandTrigger and g:UltiSnipsJumpForwardTrigger set to the same value then the function you are actually going to use is UltiSnips#ExpandSnippetOrJump
-" this behaviour works perfectly for me
-let g:UltiSnipsExpandTrigger = "<c-j>"
-let g:UltiSnipsJumpForwardTrigger = "<c-j>"
-let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
-let g:UltiSnipsListSnippets = "<c-tab>"
-
-
-" --------------------
 " https://github.com/machakann/vim-highlightedyank
 " --------------------
 
 let g:highlightedyank_highlight_in_visual = 0
-
-
-" --------------------
-" https://github.com/junegunn/limelight.vim
-" --------------------
-
-" " Color name (:help cterm-colors) or ANSI code
-" let g:limelight_conceal_ctermfg = 240
-
-" " Color name (:help gui-colors) or RGB color
-" let g:limelight_conceal_guifg = '#777777'
-
-
-" autocmd! User GoyoEnter Limelight
-" autocmd! User GoyoLeave Limelight!
 
 
 " --------------------
@@ -756,16 +592,6 @@ let g:NERDTreeMapJumpNextSibling = ""
 " nnoremap <silent> <C-Down>       :<C-U>TmuxNavigateDown<cr>
 " nnoremap <silent> <C-Up>         :<C-U>TmuxNavigateUp<cr>
 " nnoremap <silent> <C-Right>      :<C-U>TmuxNavigateRight<cr>
-
-" --------------------
-" https://github.com/terryma/vim-smooth-scroll
-" --------------------
-
-noremap <silent> <c-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-
 
 " ====================
 " Miscellaneous

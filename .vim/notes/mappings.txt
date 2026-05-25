@@ -1031,27 +1031,13 @@ Plugins
 --------------
 
 - `<leader>ff`                                      ==>  open the file search (in the current CWD)
-- `<leader>;/<leader>f`                             ==>  open the MRU files search
+- `<leader>;`                                       ==>  open the file history search
 - `;/<leader>fb`                                    ==>  open the buffer search
 - `<leader>fc`                                      ==>  open the command search
 - `<leader>fch`                                     ==>  open the command history search
 - `<leader>fm`                                      ==>  open the maps search
-- `<leader>fs`                                      ==>  open the snippets search (UltiSnips)
-- `<leader>fg`                                      ==>  open the commits log search (fugitive)
 - `<leader>g/<CTRL-g>`                              ==>  open the ripgrep word search
-- `<leader>fw`                                      ==>  open the word search with a word at cursor or selected word (visual mode)
-- `<leader>fe`                                      ==>  instantly search for a word at cursor or selected word (visual mode)
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Plug] easymotion
------------------
-
-See `:h easymotion`.
-
-Mappings
----
-- `f{char}{char}{label}` - press `f`, followed by two chars you want to search for. You'll be presented with a view containing highlighted symbols that you can jump to just by typing those symbols
+- `{Visual}<leader>g/{Visual}<CTRL-g>`              ==>  search selected text with ripgrep
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1116,14 +1102,6 @@ Also, not related to the plugin, but these are my custom pure-vim-script mapping
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[Plug] yankstack.vim
---------------------
-
-- `nmap <CTRL-p>`                                   ==>  <Plug>yankstack_substitute_older_paste
-- `nmap <CTRL-n>`                                   ==>  <Plug>yankstack_substitute_newer_paste
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 [Plug] NERD Tree
 ----------------
 
@@ -1152,130 +1130,27 @@ Also, not related to the plugin, but these are my custom pure-vim-script mapping
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[Plug] Mundo
-----------------
+[Plug] vim-tmux-navigator
+-------------------------
 
-- `<leader>u`                                       ==>  open/close the m[u]ndo tree
-- `p`                                               ==>  diff selected undo and current state
-- `d`                                               ==>  vert diff of undo with current state
-- `q`                                               ==>  quit
-- `?`                                               ==>  see help
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Plug] Goyo
------------
-
-- `<leader>z`                                       ==>  enter the Goyo mode ([z]en mode)
+- `<CTRL-h>`                                        ==>  move to the pane on the left
+- `<CTRL-j>`                                        ==>  move to the pane below
+- `<CTRL-k>`                                        ==>  move to the pane above
+- `<CTRL-l>`                                        ==>  move to the pane on the right
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[Plug] Fugitive
----------------
+[Plug] vim-journal
+------------------
 
-- `<leader>gl`                                      ==>  copy the [l]ink to the [l]ine of a [G]it repository to the clipboard
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Plug] easy-align
------------------
-
-Help - *:h easy-align*.
-
-Interactive mode
-  *:h easy-align-interactive-mode*
----
-
-- {Visual}`ga`                                      ==>  easy-[a]lign on a selection; [g] is a namespace like in plenty of other system commands
-- `ga`{motion}                                      ==>  easy-align on a {motion}
-
-How to use:
-- 1. (Optional) <cr> to cycle between alignment mode (left, right, or center)
-- 2. (Optional) change options in the way you want. See all the possible alignment options - _:h easy-align-alignment-options-in-interactive-mode_
-- 3. (Optional) N-th delimiter (default: 1)
--   1 Around the 1st occurrences of delimiters
--   2 Around the 2nd occurrences of delimiters
--   ...
--   * Around all occurrences of delimiters
--   ** Left-right alternating alignment around all delimiters
--   - Around the last occurrences of delimiters (-1)
--   -2 Around the second to last occurrences of delimiters
-- 4. Delimiter key (a single keystroke; <Space>, =, :, ., |, &, #, ,) or an arbitrary regular expression preceded by <CTRL-X>
-
-Live interactive mode
-  *:h easy-align-live-interactive-mode*
----
-
-In the "live interactive mode" you can preview the result of the alignment on-the-fly as you type in.
-
-Live interactive mode can be started with `:LiveEasyAlign` command. Or you can switch to live interactive mode while in ordinary interactive mode by pressing CTRL-P (P for Preview).
-
-In live interactive mode, you have to type in the same delimiter (or CTRL-X on regular expression) again to finalize the alignment. This allows you to preview the result of the alignment and freely change the delimiter using backspace key without leaving the interactive mode.
-
-Non-interactive mode (cmd)
-  *:h easy-align-non-interactive-mode*
----
-
-Using predefined delimiters:
-`:[range]EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]`
-
-Using regular expression:
-`:[range]EasyAlign[!] [N-th] /REGEXP/ [OPTIONS]`
-
-
-For example, to align this document:
----
-Interactive:
-- visually select all file
-- ga
-- press '1' to align only around the first occurences of the "==>" delimiter (some explanations contain it too)
-- press <CTRL-g> once to not ignore comments and strings
-- press <CTRL-x> to use a regular expression, and type "\s==>\s"
-- press <CTRL-f> to filter for lines that contain commands, and type "^[-\*] "
-Cmd:
-- `:%EasyAlign 1/\s==>\s/ig[]g/^[-\*] /`
+- `*.journal`                                       ==>  use the journal filetype
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[Plug] UltiSnips
-----------------
+[Plug] vim-highlightedyank
+--------------------------
 
-Help - *:h UltiSnips*.
-
-- `{Insert}<c-j>`                                   ==>  expand the selected snippet
-- `{while expanded}<c-j>`                           ==>  jump to the next trigger
-- `{while expanded}<c-k>`                           ==>  jump to the previous trigger
-- `{Insert}<c-tab>`                                 ==>  built-in snippet autocompletion
-- `:Snippets`/`<leader>fs`                          ==>  check all available snippets with respect to the current filetype (powered by fzf.vim)
-
-Put your own snippets by path .vim/UltiSnips/<filetype>.snippets (for the specific filetype) or .vim/UltiSnips/all.snippets (global). See _:h UltiSnips-how-snippets-are-loaded_ for more info.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Plug] vim-indent-object
-----------------
-
-Help - *:h indent-object.txt*.
-
-- [count]`ai`                                       ==>  [a]n [i]ndentation level and line above
-- [count]`ii`                                       ==>  [i]nner [i]ndentation level (no line above)
-- [count]`aI`                                       ==>  an indentation level and lines above/below
-- [count]`iI`                                       ==>  inner indentation level (no lines above/below)
-
-Note: the `iI` mapping is included for completeness, but effectively it's a synonym for `ii`.
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[Plug] exchange
-----------------
-
-Help - *:h exchange.txt*.
-
-- `cx{motion}`                                      ==>  Used in pairs. FIRST USE: define the first region of text to be exchanged. Any valid {motion} can be used. SECOND USE: define the second region of text and perform the exchange. Note: If a region was defined accidentally, it can be cleared with |cxc|
-- `cxx`                                             ==>  Like |cx|, but for the current line. |linewise|
-- `cxc`                                             ==>  Clear any defined region of text (previously defined by a |cx| command)
-- `{Visual}X`                                       ==>  Can be used in |visual-mode|.
+- highlights yanked text briefly
 
 
 ******************************************************************************
@@ -1344,7 +1219,6 @@ More on it - https://vi.stackexchange.com/questions/18744/what-is-the-meaning-of
 Document notes
 -----------
 
-To align this file around ==>, execute `:%EasyAlign 1/\s==>\s/ig[]g/^[-\*] /`.
 When you copy fragments of :help, they end up with two spaces between words. To normalize spaces, execute `%s/\(\.\)\s\{2\}\(\a\)/\1 \2/cg`.
 
 <EOF>

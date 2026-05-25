@@ -41,6 +41,12 @@ brew install gnu-sed
 # Install GNU `awk`
 brew install gawk
 
+# ===============
+# Fonts
+# ===============
+
+brew install --cask font-jetbrains-mono-nerd-font
+
 # Restore sudo cache,
 # since brew resets cache on each invokation
 echo -e "${BOLD_YELLOW}Checking sudo credentials...${RESET}"

@@ -8,7 +8,7 @@ images:
 
 mounts:
   - location: "~/IdeaProjects"
-    mountPoint: "{{.Home}}/IdeaProjects"
+    mountPoint: "/Users/{{.User}}/IdeaProjects"
     writable: true
 
 portForwards:

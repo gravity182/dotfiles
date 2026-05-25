@@ -55,6 +55,15 @@ mkdir -p "$HOME/Library/Application Support/iTerm2/DynamicProfiles"
 ln -sf "$HOME/.config/iterm2/DynamicProfiles/Main.json" \
     "$HOME/Library/Application Support/iTerm2/DynamicProfiles/Main.json"
 
+# ===============
+# Firefox
+# ===============
+
+firefox_profile="$HOME/Library/Application Support/Firefox/Profiles/master"
+mkdir -p "$firefox_profile/chrome"
+ln -sf "$HOME/.config/firefox/master/user.js" "$firefox_profile/user.js"
+ln -sf "$HOME/.config/firefox/master/chrome/userChrome.css" "$firefox_profile/chrome/userChrome.css"
+
 # Restore sudo cache,
 # since brew resets cache on each invokation
 echo -e "${BOLD_YELLOW}Checking sudo credentials...${RESET}"

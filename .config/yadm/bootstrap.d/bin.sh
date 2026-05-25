@@ -14,6 +14,37 @@ MISE_TOOLS=(
     "uv@0.11.16"
 )
 
+function _ensure_docker_cli_plugin_dir() {
+    local plugin_dir="$1"
+    local docker_config_dir="${DOCKER_CONFIG:-$HOME/.docker}"
+    local docker_config="$docker_config_dir/config.json"
+    local tmp_config
+
+    require_cmd jq
+    mkdir -p "$docker_config_dir"
+
+    if [[ ! -s "$docker_config" ]]; then
+        printf '{}\n' > "$docker_config"
+    fi
+
+    tmp_config="$(mktemp)"
+    if ! jq --arg plugin_dir "$plugin_dir" '
+        if (.cliPluginsExtraDirs? != null and (.cliPluginsExtraDirs | type) != "array") then
+            error("cliPluginsExtraDirs must be an array")
+        else
+            .cliPluginsExtraDirs = (
+                (.cliPluginsExtraDirs // [])
+                | if index($plugin_dir) then . else . + [$plugin_dir] end
+            )
+        end
+    ' "$docker_config" > "$tmp_config"; then
+        rm -f "$tmp_config"
+        return 1
+    fi
+
+    mv "$tmp_config" "$docker_config"
+}
+
 
 # ===============
 # Basic utilities (Linux-only, macOS has these by default)
@@ -364,6 +395,7 @@ if ! docker compose version &>/dev/null; then
     log_install_pre 'Docker Compose'
     if _is_macos; then
         brew install docker-compose
+        _ensure_docker_cli_plugin_dir "$(brew --prefix)/lib/docker/cli-plugins"
     else
         _pkg_install docker-compose-plugin
     fi

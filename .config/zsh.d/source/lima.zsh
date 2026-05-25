@@ -67,6 +67,11 @@ vm-sync-configs() {
 # Create and provision a new VM (one-time setup)
 vm-create() {
     local name="${1:-$VM_DEFAULT_NAME}"
+    local root
+
+    for root in "${VM_SHARED_ROOTS[@]}"; do
+        mkdir -p "$root"
+    done
 
     echo "Creating VM '$name'..."
     if ! limactl start --name "$name" --tty=false "$VM_TEMPLATE"; then

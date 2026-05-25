@@ -7,8 +7,8 @@ images:
     digest: sha256:ec93c8acae3e7630daf723e31716703639417d86b87eb6962f3a0003d1045c15
 
 mounts:
-  - location: /Users/dmitryalexandrov/IdeaProjects
-    mountPoint: /Users/dmitryalexandrov/IdeaProjects
+  - location: "~/IdeaProjects"
+    mountPoint: "{{.Home}}/IdeaProjects"
     writable: true
 
 portForwards:

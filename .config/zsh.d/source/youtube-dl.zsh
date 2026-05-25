@@ -11,7 +11,8 @@ if ! _has yt-dlp; then
 fi
 
 # download path prefix
-readonly path_prefix='/mnt/d/Other'
+readonly path_prefix="${YTDLP_OUTPUT_DIR:-$HOME/Downloads/yt-dlp}"
+readonly music_video_path="${YTDLP_MUSIC_VIDEO_DIR:-$path_prefix/Music Videos}"
 # default opts when downloading a video
 # download 1440p resolution at most
 # remux video to mp4 container; remuxing only changes the container - the codecs are copied as is, so if remuxing is not possible the command will fail
@@ -39,7 +40,7 @@ function yt_dl_select() {
 # download a video
 # $1 - video link
 alias yt_dl="yt-dlp "$video_default_opts" -o '$path_prefix/%(title)s.%(ext)s'"
-alias yt_dl_music_video="yt-dlp "$video_default_opts" -o '/mnt/d/YandexDisk/Music Videos/%(title)s.%(ext)s'"
+alias yt_dl_music_video="yt-dlp "$video_default_opts" -o '$music_video_path/%(title)s.%(ext)s'"
 
 # Download YouTube playlist videos in separate directory indexed by video order in a playlist
 # $1 - playlist link
@@ -59,4 +60,3 @@ alias yt_dl_audio_uncompressed="yt-dlp -x --audio-quality 0 --audio-format wav -
 alias yt_dl_audio="yt-dlp -x --audio-quality 0 --audio-format 'm4a' -o '$path_prefix/%(title)s.%(ext)s'"
 
 alias yt_dl_update="yt-dlp -U"
-

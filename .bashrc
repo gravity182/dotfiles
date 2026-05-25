@@ -116,11 +116,12 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-. "$HOME/.cargo/env"
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)"
+fi
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+if command -v fzf >/dev/null 2>&1; then
+    source <(fzf --bash)
+fi
 
 set -o vi
-

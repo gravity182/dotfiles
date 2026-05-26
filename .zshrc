@@ -824,44 +824,6 @@ alias af='alf'
 alias exf='export | fzf'
 alias envf='env | fzf'
 
-# file/dir explorer powered by fzf + fd
-#  CTRL-D to display directories | CTRL-F to display files
-#  TAB to multi-select
-#  CTRL-A to select all | CTRL-X to deselect all
-#  CTRL-/ to toggle preview
-#  ENTER to edit | CTRL-R to interactively delete
-function ff() {
-    local selection=$(fd -t f -d 1 --hidden --follow --color never 2>/dev/null | fzf --multi \
-    --height=80% \
-    --color header:italic \
-    --header 'Press CTRL-F to display files | CTRL-D to display dirs
-Press <CR> to edit file or cd into dir
-Press CTRL-/ to toggle the preview window' \
-    --preview='bat --style numbers,changes --color=always --line-range=:500 {}' \
-    --preview-window='45%,border-sharp' \
-    --prompt='Files ∷ ' \
-    --bind='ctrl-r:execute(rm -ri {+})' \
-    --bind='ctrl-/:toggle-preview' \
-    --bind='ctrl-d:change-prompt(Dirs ∷ )' \
-    --bind='ctrl-d:+reload(fd -t d -d 1 --hidden --follow --color never 2>/dev/null)' \
-    --bind='ctrl-d:+change-preview(eza -T -L 1 --color=always {})' \
-    --bind='ctrl-d:+refresh-preview' \
-    --bind='ctrl-f:change-prompt(Files ∷ )' \
-    --bind='ctrl-f:+reload(fd -t f -d 1 --hidden --follow --color never 2>/dev/null)' \
-    --bind='ctrl-f:+change-preview(bat --style numbers --color=always --line-range=:500 {})' \
-    --bind='ctrl-f:+refresh-preview' \
-    --bind='ctrl-a:select-all' \
-    --bind='ctrl-x:deselect-all')
-
-    if [ -z "$selection" ]; then
-        return 0
-    elif [ -d "$selection" ]; then
-        builtin cd "$selection"
-    else
-        eval "$EDITOR $selection"
-    fi
-}
-
 # search for a process using fzf
 function procf() {
     local pid=$(ps | fzf --query="$1" --print0 | awk '{print $2}')

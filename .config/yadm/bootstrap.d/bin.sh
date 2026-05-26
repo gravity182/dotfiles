@@ -6,14 +6,6 @@ echo -e "${BOLD_GREEN}Detected system arch: ${BOLD_YELLOW}$(_arch)${RESET}"
 # change path temporarily
 export PATH=$PATH:$HOME/.local/bin
 
-MISE_TOOLS=(
-    "node@26.2.0"
-    "go@1.26.3"
-    "rust@1.95.0"
-    "java@corretto-25.0.3.9.1"
-    "uv@0.11.16"
-)
-
 function _ensure_docker_cli_plugin_dir() {
     local plugin_dir="$1"
     local docker_config_dir="${DOCKER_CONFIG:-$HOME/.docker}"
@@ -201,7 +193,7 @@ export PATH="$HOME/.local/bin:$PATH"
 require_cmd mise
 
 log_install_pre 'mise runtimes'
-mise install -y --locked "${MISE_TOOLS[@]}"
+mise install -y --locked -C "$HOME"
 eval "$(mise activate bash)"
 require_cmd node
 require_cmd go

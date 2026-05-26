@@ -18,3 +18,30 @@ portForwards:
 provision:
   - mode: user
     file: vm-provision.sh
+
+probes:
+  - mode: readiness
+    description: dev VM toolchain is ready
+    script: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      timeout 300s bash -lc '
+        until
+          command -v docker >/dev/null &&
+          test -S /var/run/docker.sock &&
+          docker version >/dev/null 2>&1 &&
+          command -v mise >/dev/null &&
+          mise x -- node --version >/dev/null 2>&1 &&
+          mise x -- go version >/dev/null 2>&1 &&
+          mise x -- rustc --version >/dev/null 2>&1 &&
+          mise x -- java -version >/dev/null 2>&1 &&
+          mise x -- uv --version >/dev/null 2>&1 &&
+          command -v gh >/dev/null
+        do
+          sleep 5
+        done
+      '
+    hint: |
+      The dev VM did not finish provisioning mandatory tools.
+      Check /var/log/cloud-init-output.log inside the VM.

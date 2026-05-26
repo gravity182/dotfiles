@@ -585,11 +585,12 @@ function .dotsync() {
 alias hs='history'
 
 if _has fd; then
-    alias fd='fd --hidden --follow'
+    alias fd='fd --hidden'
+    alias fdfollow='fd --hidden --follow'
 
-    alias fdf='fd -t f --strip-cwd-prefix --hidden --follow 2>/dev/null'
-    alias fdd='fd -t d --strip-cwd-prefix --hidden --follow 2>/dev/null'
-    alias fdd1='fd -t d -d 1 --strip-cwd-prefix --hidden --follow 2>/dev/null'
+    alias fdf='fd -t f --strip-cwd-prefix --hidden 2>/dev/null'
+    alias fdd='fd -t d --strip-cwd-prefix --hidden 2>/dev/null'
+    alias fdd1='fd -t d -d 1 --strip-cwd-prefix --hidden 2>/dev/null'
 else
     alias fdf='find . -type f -iname'
     alias fdd='find . -type d -iname'
@@ -659,7 +660,8 @@ alias tree1='tree --level 1'
 alias tree2='tree --level 2'
 
 if _has rg; then
-    alias rg='rg --smart-case --hidden --follow'
+    alias rg='rg --smart-case --hidden'
+    alias rgfollow='rg --smart-case --hidden --follow'
 fi
 
 alias tarc='tar -czvf'
@@ -1015,12 +1017,12 @@ bindkey '^[[1;5D' vi-backward-word
 # ---
 
 # specify the default command that fzf shall execute on empty stdin
-export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden --follow 2>/dev/null'
+export FZF_DEFAULT_COMMAND='fd -t f --strip-cwd-prefix --hidden 2>/dev/null'
 
 # see https://github.com/junegunn/fzf#key-bindings-for-command-line
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # also mapped as CTRL-E
-export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden --follow 2>/dev/null'
+export FZF_ALT_C_COMMAND='fd -t d -d 1 --strip-cwd-prefix --hidden 2>/dev/null'
 
 # these default options will be used everytime you call fzf
 FZF_MIN_HEIGHT="50%"
@@ -1122,12 +1124,12 @@ bindkey -M viins '\C-e' fzf-cd-widget
 # - The first argument to the function ($1) is the base path to start traversal
 # - See the source code (completion.{bash,zsh}) for the details.
 function _fzf_compgen_path() {
-    fd --hidden --follow . "$1" 2>/dev/null
+    fd --hidden . "$1" 2>/dev/null
 }
 
 # Use fd to generate an input for dir completion
 function _fzf_compgen_dir() {
-    fd -t d --hidden --follow . "$1" 2>/dev/null
+    fd -t d --hidden . "$1" 2>/dev/null
 }
 
 # Advanced customization of fzf options via _fzf_comprun function

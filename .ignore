@@ -13,10 +13,13 @@
 .git/
 node_modules/
 target/
+/go/pkg/mod/
 
 # HOME
 # ----
 
+/.cargo/git/
+/.cargo/registry/
 /.sdkman/
 /.android/
 /.ansible/
@@ -33,6 +36,7 @@ target/
 /.terraform.d/
 /.threaddeath/
 /.Trash/
+/VM-Shared/
 /.yarn/
 /.zsh_sessions/
 /.META-INF/
@@ -44,5 +48,5 @@ target/
 # MacOS
 # -----
 
-/Library/Caches
-
+/.CFUserTextEncoding
+/Library/

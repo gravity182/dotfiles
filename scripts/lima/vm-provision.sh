@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Source per-VM secrets and env vars before provisioning.
+# Host path: ~/VM-Shared/lima-<name>/.env
+env_file="$HOME/Shared/$(hostname)/.env"
+if [[ -f "$env_file" ]]; then
+  set -a
+  source "$env_file"
+  set +a
+fi
+
 # --- System packages ---
 apt_cache="/var/cache/apt/pkgcache.bin"
 cache_age=$(( $(date +%s) - $(stat -c %Y "$apt_cache" 2>/dev/null || echo 0) ))

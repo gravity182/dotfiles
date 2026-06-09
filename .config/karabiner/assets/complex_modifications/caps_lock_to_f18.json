@@ -1,0 +1,18 @@
+{
+    "title": "Caps Lock to F18 (input source switch without debounce)",
+    "rules": [
+        {
+            "description": "Caps Lock to F18 (use F18 as input source switch in System Settings to bypass Caps Lock debounce)",
+            "manipulators": [
+                {
+                    "from": {
+                        "key_code": "caps_lock",
+                        "modifiers": { "optional": ["any"] }
+                    },
+                    "to": [{ "key_code": "f18" }],
+                    "type": "basic"
+                }
+            ]
+        }
+    ]
+}

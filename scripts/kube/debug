@@ -3,6 +3,9 @@
 # Kubernetes Pod Debugger
 # Launches a netshoot debug container in a selected pod
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+source "$SCRIPT_DIR/_helpers.sh"
+
 show_help() {
     echo "Usage: $0 [--copy-to]"
     echo ""
@@ -35,23 +38,9 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     show_help
 fi
 
-# Check dependencies
-if ! command -v kubectl &> /dev/null; then
-    echo "Error: kubectl is not installed or not in PATH" >&2
-    exit 1
-fi
-
-if ! command -v fzf &> /dev/null; then
-    echo "Error: fzf is not installed or not in PATH" >&2
-    echo "Install with: brew install fzf" >&2
-    exit 1
-fi
-
-# Check if we have a valid kubectl context
-if ! kubectl config current-context &> /dev/null; then
-    echo "Error: No valid kubectl context found" >&2
-    exit 1
-fi
+kube_require_cmd kubectl
+kube_require_cmd fzf
+kube_require_context
 
 # Parse command line arguments
 COPY_TO_ENABLED="false"
@@ -80,11 +69,8 @@ done
 
 # Select namespace
 echo "Fetching namespaces..."
-SELECTED_NAMESPACE=$(kubectl get namespaces --no-headers -o custom-columns=":metadata.name" | fzf --prompt="Select a namespace: " --height=10)
-
-if [ -z "$SELECTED_NAMESPACE" ]; then
-    echo "No namespace selected. Exiting."
-    exit 1
+if ! SELECTED_NAMESPACE=$(kube_select_namespace); then
+    exit 0
 fi
 
 TARGET_NAMESPACE="$SELECTED_NAMESPACE"
@@ -103,7 +89,7 @@ SELECTED_POD_LINE=$(echo "$POD_INFO" | fzf --prompt="Select a pod: " --header-li
 
 if [ -z "$SELECTED_POD_LINE" ]; then
     echo "No pod selected. Exiting."
-    exit 1
+    exit 0
 fi
 
 POD_NAME=$(echo "$SELECTED_POD_LINE" | awk '{print $1}')
@@ -133,7 +119,7 @@ else
     SELECTED_CONTAINER=$(printf "%s\n" "${container_array[@]}" | fzf --prompt="Select a target container: " --height=10)
     if [ -z "$SELECTED_CONTAINER" ]; then
         echo "No container selected. Exiting."
-        exit 1
+        exit 0
     fi
     TARGET_CONTAINER="$SELECTED_CONTAINER"
     echo "Selected container: $TARGET_CONTAINER"
@@ -143,14 +129,7 @@ echo "Starting debug session..."
 
 DEBUG_CMD=(kubectl debug -it -n "$TARGET_NAMESPACE" "pod/$POD_NAME" --image=nicolaka/netshoot)
 if [ "$COPY_TO_ENABLED" = "true" ]; then
-    COPY_TO_SUFFIX="debug-$(date +%s)-$RANDOM"
-    COPY_TO_MAX_LEN=253
-    COPY_TO_POD_MAX=$((COPY_TO_MAX_LEN - 1 - ${#COPY_TO_SUFFIX}))
-    if [ "$COPY_TO_POD_MAX" -lt 1 ]; then
-        COPY_TO_POD_MAX=1
-    fi
-    COPY_TO_PREFIX="${POD_NAME:0:$COPY_TO_POD_MAX}"
-    COPY_TO_NAME="${COPY_TO_PREFIX}-${COPY_TO_SUFFIX}"
+    COPY_TO_NAME=$(kube_unique_name "$POD_NAME-debug")
     DEBUG_CMD+=(--copy-to "$COPY_TO_NAME")
 else
     DEBUG_CMD+=(--target "$TARGET_CONTAINER")

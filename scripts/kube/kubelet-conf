@@ -3,6 +3,9 @@
 # Kubernetes Kubelet Configuration Viewer
 # Displays kubelet configuration from selected node via kube proxy
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+source "$SCRIPT_DIR/_helpers.sh"
+
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     echo "Usage: $0"
     echo ""
@@ -16,6 +19,7 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     echo "  - kubectl must be installed and configured"
     echo "  - fzf must be installed for interactive node selection"
     echo "  - jq must be installed for JSON formatting"
+    echo "  - curl must be installed for proxy checks and requests"
     echo "  - kubectl proxy must be running on port 8001"
     echo ""
     echo "Examples:"
@@ -32,23 +36,10 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     exit 0
 fi
 
-# Check dependencies
-if ! command -v kubectl &> /dev/null; then
-    echo "Error: kubectl is not installed or not in PATH" >&2
-    exit 1
-fi
-
-if ! command -v fzf &> /dev/null; then
-    echo "Error: fzf is not installed or not in PATH" >&2
-    echo "Install with: brew install fzf" >&2
-    exit 1
-fi
-
-if ! command -v jq &> /dev/null; then
-    echo "Error: jq is not installed or not in PATH" >&2
-    echo "Install with: brew install jq" >&2
-    exit 1
-fi
+kube_require_cmd kubectl
+kube_require_cmd fzf
+kube_require_cmd jq
+kube_require_cmd curl
 
 # Check if kubectl proxy is running
 if ! curl -f http://127.0.0.1:8001/ &> /dev/null; then
@@ -57,18 +48,14 @@ if ! curl -f http://127.0.0.1:8001/ &> /dev/null; then
     exit 1
 fi
 
-# Check if we have a valid kubectl context
-if ! kubectl config current-context &> /dev/null; then
-    echo "Error: No valid kubectl context found" >&2
-    exit 1
-fi
+kube_require_context
 
 # Get nodes and let user select one
 node=$(kubectl get nodes | fzf --header-lines=1 --header="Select a node to display its kubelet conf" --print0 | awk '{print $1}')
 
 if [[ -z "$node" ]]; then
     echo "No node selected"
-    exit 1
+    exit 0
 fi
 
 echo "Fetching kubelet configuration for node: $node"

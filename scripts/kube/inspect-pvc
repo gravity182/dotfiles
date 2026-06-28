@@ -3,6 +3,9 @@
 # PVC Inspector - Creates a utility pod to inspect Persistent Volume Claims
 # Usage: pvc-inspector.sh [-n namespace] [-u uid] [-g gid] [-h|--help]
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+source "$SCRIPT_DIR/_helpers.sh"
+
 # Help message
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     echo "Usage: $0 [-n namespace] [-u uid] [-g gid] [-h|--help]"
@@ -53,32 +56,9 @@ GID_FLAG="0"
 
 # --- Script Logic ---
 
-sanitize_dns_label() {
-    local input="$1"
-    local max_len="${2:-63}"
-    local sanitized
-
-    sanitized=$(echo "$input" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g; s/^-+//; s/-+$//')
-    sanitized="${sanitized:0:$max_len}"
-
-    while [[ "$sanitized" == *- ]]; do
-        sanitized="${sanitized%-}"
-    done
-
-    printf '%s' "$sanitized"
-}
-
-# Check dependencies
-if ! command -v kubectl &> /dev/null; then
-    echo "Error: kubectl is not installed or not in PATH" >&2
-    exit 1
-fi
-
-if ! command -v fzf &> /dev/null; then
-    echo "Error: fzf is not installed or not in PATH" >&2
-    echo "Install with: brew install fzf" >&2
-    exit 1
-fi
+kube_require_cmd kubectl
+kube_require_cmd fzf
+kube_require_context
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -126,12 +106,8 @@ if [ -n "$NAMESPACE_FLAG" ]; then
   echo "Using namespace specified by flag: $TARGET_NAMESPACE"
 else
   echo "Fetching namespaces..."
-  # List namespaces and pipe to fzf for interactive selection
-  SELECTED_NAMESPACE=$(kubectl get namespaces --no-headers -o custom-columns=":metadata.name" | fzf --prompt="Select a namespace: " --height=10)
-
-  if [ -z "$SELECTED_NAMESPACE" ]; then
-    echo "No namespace selected. Exiting."
-    exit 1
+  if ! SELECTED_NAMESPACE=$(kube_select_namespace); then
+    exit 0
   fi
   TARGET_NAMESPACE="$SELECTED_NAMESPACE"
   echo "Selected namespace: $TARGET_NAMESPACE"
@@ -156,7 +132,7 @@ SELECTED_PVC_LINE=$(echo "$PVC_INFO" | fzf --prompt="Select a PVC: " --header-li
 
 if [ -z "$SELECTED_PVC_LINE" ]; then
   echo "No PVC selected. Exiting."
-  exit 1
+  exit 0
 fi
 
 # Extract the PVC name from the selected line (assuming name is the first column)
@@ -178,12 +154,7 @@ fi
 
 MOUNT_PATH="$MOUNT_BASE/$SANITIZED_PVC_NAME"
 
-TIMESTAMP_SUFFIX="$(date +%Y%m%d-%H%M%S)"
-UTILITY_POD_NAME=$(sanitize_dns_label "pvc-inspector-$SELECTED_PVC-$TIMESTAMP_SUFFIX" 63)
-if [ -z "$UTILITY_POD_NAME" ]; then
-    echo "Failed to create a valid pod name from PVC name: $SELECTED_PVC" >&2
-    exit 1
-fi
+UTILITY_POD_NAME=$(kube_unique_name "pvc-inspector-$SELECTED_PVC")
 echo "Running as UID: $UID_FLAG, GID: $GID_FLAG"
 
 # --- Create and Run Utility Pod ---

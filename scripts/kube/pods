@@ -3,6 +3,9 @@
 # Interactive Kubernetes Pod Browser
 # Browse, execute into, and view logs of pods using fzf
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+source "$SCRIPT_DIR/_helpers.sh"
+
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     echo "Usage: $0"
     echo ""
@@ -39,23 +42,9 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     exit 0
 fi
 
-# Check dependencies
-if ! command -v kubectl &> /dev/null; then
-    echo "Error: kubectl is not installed or not in PATH" >&2
-    exit 1
-fi
-
-if ! command -v fzf &> /dev/null; then
-    echo "Error: fzf is not installed or not in PATH" >&2
-    echo "Install with: brew install fzf" >&2
-    exit 1
-fi
-
-# Check if we have a valid kubectl context
-if ! kubectl config current-context &> /dev/null; then
-    echo "Error: No valid kubectl context found" >&2
-    exit 1
-fi
+kube_require_cmd kubectl
+kube_require_cmd fzf
+kube_require_context
 
 command='kubectl get pods'
 fzf \

@@ -17,6 +17,7 @@ Compact reference for the current Zed + IntelliJ/IdeaVim setup.
 | `Cmd-W` | Expand selection |  |
 | `Cmd-Shift-W` | Shrink selection |  |
 | `Cmd-Enter` | Code actions |  |
+| `Cmd-Shift-F` | Modal text search |  |
 
 ### `g` Namespace
 
@@ -64,6 +65,7 @@ Compact reference for the current Zed + IntelliJ/IdeaVim setup.
 | `Space C C` | Comment line |  |
 | Visual `Space C` | Comment selection |  |
 | `Space D` | Problems / diagnostics |  |
+| `Space /` | Modal text search | Zed only |
 | `Space E` | Toggle left dock | Zed only |
 | `Space T` | New center terminal | Zed only |
 

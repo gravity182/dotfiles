@@ -9,7 +9,13 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 
-Plug '~/.fzf'
+if isdirectory(expand('~/.fzf'))
+  Plug '~/.fzf'
+elseif isdirectory('/opt/homebrew/opt/fzf')
+  Plug '/opt/homebrew/opt/fzf'
+elseif isdirectory('/usr/local/opt/fzf')
+  Plug '/usr/local/opt/fzf'
+endif
 Plug 'junegunn/fzf.vim'
 
 Plug 'preservim/nerdtree'

@@ -16,7 +16,7 @@ IMPORTANT: These are my common development preferences and guidelines. You **MUS
 
 ## Codestyle
 
-- **NEVER** use non-ASCII typographic punctuation or presentation symbols. Instead use plain ASCII equivalents like `->`.
+- **NEVER** use non-ASCII typographic/presentation symbols (no smart quotes, em-dashes, arrows like -> rendered as →, etc.). Use plain ASCII equivalents.
 
 ## Development Tools
 

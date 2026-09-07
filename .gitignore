@@ -238,7 +238,9 @@ replay_pid*
 # Coding Agents
 # ======================
 
-CLAUDE_*.md
+CLAUDE.md
+AGENTS.md
+codex_*.md
 claude_*.md
 *_plan.md
 **/.claude/settings.local.json

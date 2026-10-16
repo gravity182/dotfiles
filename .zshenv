@@ -105,5 +105,8 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.claude/local:$PATH"
 export PATH="$HOME/.arkade/bin:$PATH"
 
+# Make mise tools available in non-interactive shells
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
 # Deduplicate PATH (keeps first occurrence)
 typeset -U path
